@@ -1,0 +1,14 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor temp
+*.swp
+*~
+
+# Project backups / experiments (not needed on GitHub Pages)
+backups/
+test3.mjs
+preview.html
+complete_preview.html
+핀터레스트 영상.png
