@@ -5078,66 +5078,55 @@ function getCtx() {
   return audioCtx;
 }
 
-// Satisfying mechanical keyboard click — crisp actuation + woody thock + reward chirp
+// 적축(Red Switch / Linear) — 클릭 없이 부드럽고 낮은 떠크. 조용하고 묵직한 느낌.
 function clickSound() {
   try {
     const ctx = getCtx();
     const now = ctx.currentTime;
 
-    // Random pitch variation per keystroke (feels human, not looped)
+    // 키 하나하나 미세한 피치 변화 (루프처럼 느껴지지 않게)
     const pv = 0.94 + Math.random() * 0.12;
 
-    // 1. ACTUATION CLICK — ultra-short bright noise for the switch click moment
-    const clickSize = Math.floor(ctx.sampleRate * 0.006);
-    const clickBuf = ctx.createBuffer(1, clickSize, ctx.sampleRate);
-    const cd = clickBuf.getChannelData(0);
-    for (let i = 0; i < clickSize; i++) cd[i] = (Math.random()*2-1) * Math.pow(1 - i/clickSize, 3);
-    const click = ctx.createBufferSource();
-    click.buffer = clickBuf;
-    const clickHp = ctx.createBiquadFilter();
-    clickHp.type = 'highpass';
-    clickHp.frequency.value = 5200;
-    const clickG = ctx.createGain();
-    clickG.gain.setValueAtTime(0.55, now);
-    clickG.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
-    click.connect(clickHp).connect(clickG).connect(ctx.destination);
-    click.start(now); click.stop(now + 0.012);
+    // 1. 키캡 컨택 — 아주 짧고 부드러운 접촉 소리 (클릭 아님, 플라스틱이 닿는 정도)
+    const tickSize = Math.floor(ctx.sampleRate * 0.005);
+    const tickBuf = ctx.createBuffer(1, tickSize, ctx.sampleRate);
+    const td = tickBuf.getChannelData(0);
+    for (let i = 0; i < tickSize; i++) td[i] = (Math.random()*2-1) * Math.pow(1 - i/tickSize, 4);
+    const tick = ctx.createBufferSource();
+    tick.buffer = tickBuf;
+    // 밝은 고역은 잘라내서 '틱' 대신 '톡' 느낌
+    const tickLp = ctx.createBiquadFilter();
+    tickLp.type = 'lowpass';
+    tickLp.frequency.value = 2600;
+    const tickG = ctx.createGain();
+    tickG.gain.setValueAtTime(0.16, now);
+    tickG.gain.exponentialRampToValueAtTime(0.001, now + 0.009);
+    tick.connect(tickLp).connect(tickG).connect(ctx.destination);
+    tick.start(now); tick.stop(now + 0.012);
 
-    // 2. THOCK — clean woody bottom-out (the "satisfying" core of mech keyboards)
+    // 2. 메인 떠크 — 적축 특유의 낮고 포근한 바닥 울림
     const thock = ctx.createOscillator();
     const thockG = ctx.createGain();
     thock.type = 'sine';
-    thock.frequency.setValueAtTime(420 * pv, now);
-    thock.frequency.exponentialRampToValueAtTime(160 * pv, now + 0.06);
+    thock.frequency.setValueAtTime(300 * pv, now);
+    thock.frequency.exponentialRampToValueAtTime(115 * pv, now + 0.07);
     thockG.gain.setValueAtTime(0.0, now);
-    thockG.gain.linearRampToValueAtTime(0.42, now + 0.003);
-    thockG.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    thockG.gain.linearRampToValueAtTime(0.34, now + 0.004);
+    thockG.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
     thock.connect(thockG).connect(ctx.destination);
-    thock.start(now); thock.stop(now + 0.1);
+    thock.start(now); thock.stop(now + 0.12);
 
-    // 3. REWARD CHIRP — subtle upward pitch bend gives that "yes!" feel on every key
-    const chirp = ctx.createOscillator();
-    const chirpG = ctx.createGain();
-    chirp.type = 'triangle';
-    chirp.frequency.setValueAtTime(900 * pv, now + 0.002);
-    chirp.frequency.exponentialRampToValueAtTime(1400 * pv, now + 0.05);
-    chirpG.gain.setValueAtTime(0.0, now + 0.002);
-    chirpG.gain.linearRampToValueAtTime(0.14, now + 0.008);
-    chirpG.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-    chirp.connect(chirpG).connect(ctx.destination);
-    chirp.start(now + 0.002); chirp.stop(now + 0.09);
-
-    // 4. SUB THUMP — tiny low-end body so it feels "solid" in the chest
+    // 3. 서브 덤프 — 아주 낮은 저역으로 "묵직함" 살짝만 보강
     const sub = ctx.createOscillator();
     const subG = ctx.createGain();
     sub.type = 'sine';
-    sub.frequency.setValueAtTime(90 * pv, now);
-    sub.frequency.exponentialRampToValueAtTime(55, now + 0.06);
+    sub.frequency.setValueAtTime(72 * pv, now);
+    sub.frequency.exponentialRampToValueAtTime(48, now + 0.07);
     subG.gain.setValueAtTime(0.0, now);
-    subG.gain.linearRampToValueAtTime(0.18, now + 0.003);
-    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    subG.gain.linearRampToValueAtTime(0.13, now + 0.004);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
     sub.connect(subG).connect(ctx.destination);
-    sub.start(now); sub.stop(now + 0.11);
+    sub.start(now); sub.stop(now + 0.13);
   } catch(e) {}
 }
 
