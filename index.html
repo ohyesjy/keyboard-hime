@@ -2805,6 +2805,278 @@
     .page-btn { min-width: 90px; padding: 10px 14px; font-size: 14px; }
     .page-indicator { font-size: 12px; padding: 5px 10px; }
   }
+
+  /* ========= 클라우드 동기화 ========= */
+  .cloud-status-badge {
+    background: #e9ecef; color: #555;
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 800;
+    cursor: pointer; border: 2px solid #adb5bd;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .cloud-status-badge:hover { background: #dee2e6; }
+  .cloud-status-badge.active {
+    background: linear-gradient(135deg,#74c0fc,#4dabf7);
+    color: #fff; border-color: #1971c2;
+    box-shadow: 0 2px 8px rgba(77,171,247,0.4);
+  }
+  .cloud-nick-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .cloud-nick-box {
+    background: #fff; border-radius: 20px;
+    padding: 26px 28px;
+    max-width: 380px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 3px solid #111;
+    text-align: center;
+  }
+  .cloud-nick-box h2 { font-size: 22px; font-weight: 900; color: #111; margin-bottom: 10px; }
+  .cloud-nick-sub { font-size: 13px; color: #555; margin-bottom: 18px; line-height: 1.6; }
+  .cloud-nick-sub b { color: #1971c2; }
+  #cloudNickInput {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 18px; font-weight: 700;
+    border: 3px solid #111; border-radius: 12px;
+    box-shadow: 3px 3px 0 #111;
+    text-align: center;
+    outline: none;
+  }
+  #cloudNickInput:focus { border-color: #4dabf7; box-shadow: 3px 3px 0 #4dabf7; }
+  .cloud-nick-actions {
+    display: flex; justify-content: center; gap: 10px;
+    margin-top: 18px;
+  }
+
+  /* ========= 낱말 떨어뜨리기 게임 ========= */
+  .wd-select { padding: 10px 0 24px 0; }
+  .wd-title {
+    text-align: center; font-size: 18px; font-weight: 900; color: #111;
+    margin-bottom: 14px;
+  }
+  .wd-stages {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+  }
+  .wd-stage-card {
+    background: linear-gradient(135deg,#fff9db,#ffe8a1);
+    border: 3px solid #111;
+    border-radius: 18px;
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #111;
+    transition: transform 0.15s, box-shadow 0.15s;
+    user-select: none;
+  }
+  .wd-stage-card:hover {
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 #111;
+    background: linear-gradient(135deg,#fff3bf,#ffd43b);
+  }
+  .wd-stage-card:active {
+    transform: translate(2px,2px);
+    box-shadow: 2px 2px 0 #111;
+  }
+  .wd-stage-ico { font-size: 36px; margin-bottom: 4px; }
+  .wd-stage-name { font-size: 16px; font-weight: 900; color: #111; margin-bottom: 4px; }
+  .wd-stage-desc { font-size: 12px; color: #555; line-height: 1.4; }
+
+  .wd-game { padding-top: 8px; }
+  .wd-hud {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .wd-hud-box {
+    background: #fff; border: 2.5px solid #111; border-radius: 12px;
+    padding: 6px 12px; font-size: 12px; font-weight: 800; color: #111;
+    box-shadow: 2px 2px 0 #111;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .wd-hud-box span { font-size: 11px; color: #777; font-weight: 700; }
+  .wd-hud-box b { font-size: 18px; color: #111; }
+  .wd-hud-score { background: #ffec99; }
+  .wd-hud-combo { background: #d0ebff; }
+  .wd-hud-lives { background: #ffe3e3; }
+  .wd-hud-speed { background: #d3f9d8; }
+
+  .wd-stage {
+    position: relative;
+    background: linear-gradient(180deg,#1a1d3a 0%, #2d1b4e 50%, #3d1b3d 100%);
+    border: 3px solid #111;
+    border-radius: 16px;
+    height: 440px;
+    overflow: hidden;
+    box-shadow: 5px 5px 0 #111, inset 0 0 40px rgba(0,0,0,0.6);
+  }
+  .wd-ground {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 18px;
+    background: repeating-linear-gradient(90deg,#ff6b6b 0 10px,#d6336c 10px 20px);
+    border-top: 4px solid #ffd43b;
+    box-shadow: 0 -10px 20px rgba(255,107,107,0.5);
+    z-index: 1;
+  }
+  .wd-ready {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; background: rgba(0,0,0,0.8); z-index: 5; text-align: center;
+  }
+  .wd-ready.hidden { display: none; }
+  .wd-ready-big {
+    font-size: 64px; font-weight: 900; color: #ffd43b;
+    text-shadow: 4px 4px 0 #d6336c, 8px 8px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    letter-spacing: 4px;
+    animation: readyBounce 1s infinite;
+  }
+  .wd-ready-sub { color: #fff; font-weight: 700; font-size: 15px; line-height: 1.7; }
+  .wd-ready-sub b { color: #ffd43b; }
+
+  /* Falling word block */
+  .wd-word {
+    position: absolute;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 18px;
+    background: linear-gradient(135deg,#fff,#ffe8a1);
+    border: 3px solid #111;
+    border-radius: 14px;
+    font-size: 22px; font-weight: 900; color: #111;
+    box-shadow: 3px 3px 0 #111, inset 0 -3px 0 rgba(0,0,0,0.1);
+    white-space: nowrap;
+    user-select: none;
+    z-index: 2;
+    transition: box-shadow 0.1s;
+  }
+  .wd-word .wd-typed { color: #2b8a3e; }
+  .wd-word .wd-rest { color: #111; }
+  .wd-word.wd-active {
+    background: linear-gradient(135deg,#fff,#b2f2bb);
+    box-shadow: 4px 4px 0 #2b8a3e, 0 0 16px rgba(64,192,87,0.7);
+    transform: scale(1.08);
+  }
+  .wd-word.wd-break {
+    animation: wdBreakAnim 0.45s forwards;
+    pointer-events: none;
+  }
+  @keyframes wdBreakAnim {
+    0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    30% { transform: scale(1.35) rotate(6deg); filter: brightness(1.8); }
+    100% { transform: scale(0.2) rotate(-20deg); opacity: 0; }
+  }
+  .wd-word.wd-miss {
+    animation: wdMissAnim 0.4s forwards;
+  }
+  @keyframes wdMissAnim {
+    0% { transform: scale(1); filter: brightness(1); }
+    40% { transform: scale(1.1); filter: brightness(0.5) hue-rotate(320deg); background: #ff6b6b; }
+    100% { transform: translateY(40px) scale(0.3); opacity: 0; }
+  }
+
+  .wd-shard {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: radial-gradient(circle,#ffd43b,#f76707);
+    border: 1.5px solid #111;
+    border-radius: 4px;
+    pointer-events: none;
+    animation: wdShardFly 0.6s ease-out forwards;
+    z-index: 3;
+  }
+  @keyframes wdShardFly {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr,360deg)); opacity: 0; }
+  }
+
+  .wd-speedup {
+    position: absolute; top: 40%; left: 0; right: 0;
+    text-align: center;
+    font-size: 48px; font-weight: 900; color: #ffd43b;
+    text-shadow: 4px 4px 0 #d6336c, 6px 6px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    pointer-events: none; opacity: 0; z-index: 4;
+    letter-spacing: 3px;
+  }
+  .wd-speedup.show { animation: wdSpeedPop 1.1s ease-out; }
+  @keyframes wdSpeedPop {
+    0% { opacity: 0; transform: scale(0.6); }
+    25% { opacity: 1; transform: scale(1.2); }
+    70% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  .wd-combo-popup {
+    position: absolute;
+    font-size: 32px; font-weight: 900; color: #ffd43b;
+    text-shadow: 3px 3px 0 #d6336c, 5px 5px 0 #111;
+    -webkit-text-stroke: 1.5px #111;
+    pointer-events: none;
+    animation: wdComboPop 0.9s ease-out forwards;
+    z-index: 4;
+  }
+  @keyframes wdComboPop {
+    0% { opacity: 0; transform: translateY(0) scale(0.6); }
+    30% { opacity: 1; transform: translateY(-20px) scale(1.15); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+  }
+
+  .wd-flash {
+    position: absolute; inset: 0;
+    background: #fff;
+    opacity: 0; pointer-events: none;
+    animation: wdFlashAnim 0.2s ease-out;
+    z-index: 4;
+  }
+  @keyframes wdFlashAnim {
+    0% { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
+  .wd-flash.red { background: #ff6b6b; }
+
+  .wd-gameover {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px;
+    background: rgba(0,0,0,0.88); z-index: 6;
+    text-align: center;
+  }
+  .wd-gameover-big {
+    font-size: 54px; font-weight: 900; color: #ff6b6b;
+    text-shadow: 4px 4px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    letter-spacing: 3px;
+    animation: readyBounce 1.2s infinite;
+  }
+  .wd-gameover-stats {
+    display: flex; gap: 16px; color: #fff; font-weight: 800;
+  }
+  .wd-gameover-stats > div { background: rgba(255,255,255,0.12); padding: 10px 14px; border-radius: 12px; border: 2px solid #ffd43b; }
+  .wd-gameover-stats b { display: block; font-size: 22px; color: #ffd43b; }
+
+  .wd-input {
+    margin-top: 10px; font-size: 22px; text-align: center;
+    border: 3px solid #111; border-radius: 14px;
+    background: #fff; padding: 12px;
+    box-shadow: 3px 3px 0 #111;
+  }
+  .wd-input:focus { outline: none; box-shadow: 3px 3px 0 #2b8a3e; border-color: #2b8a3e; }
+  .wd-footer {
+    display: flex; justify-content: center; gap: 10px; margin-top: 12px;
+  }
+  @media (max-width: 520px) {
+    .wd-stage { height: 380px; }
+    .wd-word { font-size: 18px; padding: 8px 14px; }
+    .wd-ready-big { font-size: 48px; }
+    .wd-hud-box { padding: 5px 9px; font-size: 11px; }
+    .wd-hud-box b { font-size: 15px; }
+  }
 </style>
 </head>
 <body>
@@ -2820,6 +3092,7 @@
       <div class="stat streak">🔥 <span id="streak">0</span>일 연속</div>
       <div class="stat xp">⭐ <span id="xp">0</span> XP</div>
       <div class="stat badge">🏅 <span id="badgeCount">0</span>/8</div>
+      <div class="cloud-status-badge" id="cloudStatusBadge" onclick="cloudSync.showNickModal(false)" title="클라우드 동기화">☁️ 동기화 안됨</div>
     </div>
   </div>
 
@@ -2830,6 +3103,7 @@
     <button data-tab="short">✏️ 단문</button>
     <button data-tab="long">📖 장문</button>
     <button data-tab="chat">💬 채팅</button>
+    <button data-tab="game">🎮 게임</button>
     <button data-tab="badges">🏆 뱃지</button>
   </div>
 
@@ -2842,7 +3116,7 @@
     </div>
     <div id="worldGateGrid" class="world-gate-grid"></div>
     <div style="text-align:center;margin-top:20px;">
-      <button onclick="if(confirm('모든 학습 기록을 초기화할까요?')){localStorage.clear();location.reload();}" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;">학습 기록 초기화</button>
+      <button onclick="parentResetConfirm()" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;">학습 기록 초기화</button>
     </div>
     <!-- 비밀번호 입력 모달 -->
     <div class="world-pw-modal" id="worldPwModal">
@@ -3251,6 +3525,65 @@
     <button class="btn ghost" onclick="startChat()" style="margin-top:10px">🔄 새 대화 시작</button>
   </div>
 
+  <!-- GAME: 낱말 떨어뜨리기 -->
+  <div class="panel" id="tab-game" style="display:none">
+    <h2>🎮 낱말 떨어뜨리기</h2>
+    <p class="hint">낱말이 땅에 닿기 전에 타이핑해서 막아요! 15초마다 점점 빨라져요 🔥</p>
+
+    <!-- Stage select -->
+    <div id="wdSelect" class="wd-select">
+      <div class="wd-title">단계를 선택하세요</div>
+      <div class="wd-stages">
+        <div class="wd-stage-card" onclick="wdStart('home')">
+          <div class="wd-stage-ico">🏠</div>
+          <div class="wd-stage-name">1단계 · 기본자리</div>
+          <div class="wd-stage-desc">ㅁㄴㅇㄹㅎ·ㅏㅓㅗㅣ로 만든 쉬운 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('top')">
+          <div class="wd-stage-ico">⬆️</div>
+          <div class="wd-stage-name">2단계 · 윗줄</div>
+          <div class="wd-stage-desc">ㅂㅈㄷㄱㅅ이 섞인 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('bottom')">
+          <div class="wd-stage-ico">⬇️</div>
+          <div class="wd-stage-name">3단계 · 아랫줄</div>
+          <div class="wd-stage-desc">ㅋㅌㅊㅍ이 섞인 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('mix')">
+          <div class="wd-stage-ico">🌈</div>
+          <div class="wd-stage-name">4단계 · 섞인 낱말</div>
+          <div class="wd-stage-desc">모든 글자가 섞여서 떨어져요!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game play area -->
+    <div id="wdGame" class="wd-game" style="display:none">
+      <div class="wd-hud">
+        <div class="wd-hud-box"><span>단계</span><b id="wdStageLbl">기본자리</b></div>
+        <div class="wd-hud-box wd-hud-score"><span>점수</span><b id="wdScore">0</b></div>
+        <div class="wd-hud-box wd-hud-combo"><span>콤보</span><b id="wdCombo">0</b></div>
+        <div class="wd-hud-box wd-hud-lives"><span>생명</span><b id="wdLives">3</b></div>
+        <div class="wd-hud-box wd-hud-speed"><span>속도</span><b id="wdSpeedLvl">1</b></div>
+        <div class="wd-hud-box"><span>시간</span><b id="wdTime">0s</b></div>
+      </div>
+      <div class="wd-stage" id="wdStage">
+        <div class="wd-ready" id="wdReady">
+          <div class="wd-ready-big">READY?</div>
+          <div class="wd-ready-sub"><b id="wdReadyStage">기본자리</b>의 낱말이 떨어져요!<br>땅에 닿기 전에 정확히 입력하세요 ⚡</div>
+          <button class="btn" onclick="wdBegin()">▶ 시작!</button>
+        </div>
+        <div class="wd-speedup" id="wdSpeedUp">SPEED UP!</div>
+        <div class="wd-ground"></div>
+      </div>
+      <input type="text" class="input-area wd-input" id="wdInput" placeholder="여기에 낱말을 입력!" autocomplete="off" style="display:none">
+      <div class="wd-footer">
+        <button class="btn ghost" onclick="wdShowSelect()">← 단계 선택</button>
+        <button class="btn" id="wdRestartBtn" onclick="wdRestart()" style="display:none">다시 도전!</button>
+      </div>
+    </div>
+  </div>
+
   <!-- BADGES -->
   <div class="panel" id="tab-badges" style="display:none">
     <h2>🏆 내 뱃지</h2>
@@ -3400,7 +3733,199 @@
   </div>
 </div>
 
+<!-- Firebase SDK (compat — works with global `firebase` object) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
+/* ================================================================
+   ☁️  Cloud Sync (Firebase Realtime Database)
+   - 닉네임 기반: 데이터는 users/<nickname>/ 에 저장
+   - 로드시: 클라우드가 로컬보다 새 데이터면 클라우드로 복원
+   - 저장시: allState + worldState 를 debounced push
+   ================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA0AZAmvQ9j6qY8" + "LRcvtynimGgaM5k6-YM",
+  authDomain: "keyboard-hime.firebaseapp.com",
+  databaseURL: "https://keyboard-hime-default-rtdb.firebaseio.com",
+  projectId: "keyboard-hime",
+  storageBucket: "keyboard-hime.firebasestorage.app",
+  messagingSenderId: "689509113310",
+  appId: "1:689509113310:web:e" + "fc38dc4b4f9b8def0514f",
+  measurementId: "G-GTLX5H57QV"
+};
+
+const cloudSync = {
+  enabled: false,
+  nickname: null,
+  db: null,
+  ref: null,
+  pushTimer: null,
+  lastPushed: 0,
+  cloudLoaded: false,
+
+  init() {
+    if (typeof firebase === 'undefined') { console.warn('[cloud] firebase SDK not loaded'); return; }
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      this.db = firebase.database();
+      this.enabled = true;
+    } catch(e) { console.error('[cloud] init failed:', e); }
+  },
+
+  sanitizeNick(n) {
+    // Firebase paths forbid: . $ # [ ] / and control chars
+    return (n || '').trim().replace(/[.$#\[\]\/\s]+/g, '_').slice(0, 30);
+  },
+
+  getNick() {
+    return localStorage.getItem('khime_nick') || null;
+  },
+
+  async setNick(n) {
+    const clean = this.sanitizeNick(n);
+    if (!clean || clean.length < 2) { alert('닉네임은 2글자 이상이에요'); return false; }
+    localStorage.setItem('khime_nick', clean);
+    this.nickname = clean;
+    if (this.enabled) this.ref = this.db.ref('users/' + clean);
+    await this.pull();
+    return true;
+  },
+
+  // Open nickname prompt modal
+  showNickModal(force) {
+    const existing = document.getElementById('cloudNickModal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'cloudNickModal';
+    modal.innerHTML = `
+      <div class="cloud-nick-backdrop">
+        <div class="cloud-nick-box">
+          <h2>☁️ 클라우드 동기화</h2>
+          <p class="cloud-nick-sub">닉네임을 입력하면 어느 기기에서든 같은 기록을 쓸 수 있어요!<br>
+          <b>iPad, 노트북에서 같은 닉네임</b>으로 로그인하면 자동으로 기록이 따라와요.</p>
+          <input type="text" id="cloudNickInput" placeholder="예: 예은" autocomplete="off" />
+          <div class="cloud-nick-actions">
+            ${force ? '' : '<button class="btn ghost" onclick="cloudSync.skipNick()">나중에</button>'}
+            <button class="btn" onclick="cloudSync.submitNick()">시작!</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    setTimeout(() => document.getElementById('cloudNickInput').focus(), 100);
+    document.getElementById('cloudNickInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') cloudSync.submitNick();
+    });
+  },
+
+  async submitNick() {
+    const inp = document.getElementById('cloudNickInput');
+    if (!inp) return;
+    const ok = await this.setNick(inp.value);
+    if (ok) {
+      const m = document.getElementById('cloudNickModal');
+      if (m) m.remove();
+      this.updateStatusBadge();
+      try { pop('☁️ 클라우드 동기화 켜짐!'); } catch(e) {}
+    }
+  },
+
+  skipNick() {
+    const m = document.getElementById('cloudNickModal');
+    if (m) m.remove();
+    localStorage.setItem('khime_nick_skipped', '1');
+  },
+
+  updateStatusBadge() {
+    let b = document.getElementById('cloudStatusBadge');
+    if (!b) return;
+    if (this.nickname) {
+      b.textContent = '☁️ ' + this.nickname;
+      b.classList.add('active');
+      b.title = '클라우드 동기화됨 — ' + this.nickname + ' (클릭해 변경)';
+    } else {
+      b.textContent = '☁️ 동기화 안됨';
+      b.classList.remove('active');
+      b.title = '클릭해서 클라우드 동기화 켜기';
+    }
+  },
+
+  // Fetch cloud data & apply if newer
+  async pull() {
+    if (!this.enabled || !this.ref) return;
+    try {
+      const snap = await this.ref.once('value');
+      const cloud = snap.val();
+      this.cloudLoaded = true;
+      if (!cloud) {
+        // Cloud empty — push local as initial
+        console.log('[cloud] no cloud data, pushing initial');
+        this.pushNow();
+        return;
+      }
+      const cloudTs = cloud.updatedAt || 0;
+      const localTs = parseInt(localStorage.getItem('khime_updated_at') || '0', 10);
+      if (cloudTs > localTs + 500) {
+        // Cloud is newer — adopt
+        console.log('[cloud] applying cloud data (cloud:' + cloudTs + ' > local:' + localTs + ')');
+        if (cloud.allState) {
+          localStorage.setItem('khime_v2', JSON.stringify(cloud.allState));
+        }
+        if (cloud.worldState) {
+          localStorage.setItem('khime_worlds', JSON.stringify(cloud.worldState));
+        }
+        localStorage.setItem('khime_updated_at', String(cloudTs));
+        try { pop('☁️ 클라우드에서 기록을 불러왔어요!'); } catch(e) {}
+        // Reload to reinitialize all state from storage
+        setTimeout(() => location.reload(), 800);
+      } else {
+        console.log('[cloud] local is newer or equal, pushing');
+        this.pushNow();
+      }
+    } catch(e) { console.error('[cloud] pull failed:', e); }
+  },
+
+  // Debounced push
+  push() {
+    if (!this.enabled || !this.ref) return;
+    if (this.pushTimer) clearTimeout(this.pushTimer);
+    this.pushTimer = setTimeout(() => this.pushNow(), 1200);
+  },
+
+  async pushNow() {
+    if (!this.enabled || !this.ref) return;
+    try {
+      const all = JSON.parse(localStorage.getItem('khime_v2') || '{}');
+      const wst = JSON.parse(localStorage.getItem('khime_worlds') || '{}');
+      const ts = Date.now();
+      localStorage.setItem('khime_updated_at', String(ts));
+      await this.ref.set({
+        allState: all,
+        worldState: wst,
+        updatedAt: ts,
+        nickname: this.nickname,
+      });
+      this.lastPushed = ts;
+      console.log('[cloud] pushed @' + ts);
+    } catch(e) { console.error('[cloud] push failed:', e); }
+  },
+
+  // Called after DOMContentLoaded
+  async start() {
+    this.init();
+    if (!this.enabled) return;
+    const saved = this.getNick();
+    if (saved) {
+      this.nickname = saved;
+      this.ref = this.db.ref('users/' + saved);
+      await this.pull();
+    } else if (!localStorage.getItem('khime_nick_skipped')) {
+      // First visit — prompt for nickname
+      setTimeout(() => this.showNickModal(false), 500);
+    }
+    this.updateStatusBadge();
+  }
+};
+
 /* ========= Data ========= */
 // 기본자리: ㅁㄴㅇㄹㅎ + ㅏㅓㅗㅣ 만 사용하는 낱말
 const WORDS_HOME = ['나','너','말','알','안','인','날','님','한','힘','남','몸','놈','얼','혼','놀','나라','머리','하나','아이','나이','오리','하마','놀이','얼마','만남','놀란','머리말','어머니','어린이','놀라운','이마','하늘이','아름','한마리','몰라','나만','하나님','어린','놀림'];
@@ -3971,6 +4496,8 @@ function save() {
   // Persist the entire multi-character container (v2). Also keep legacy 'khime'
   // key in sync for backward-compat if any external code reads it.
   localStorage.setItem('khime_v2', JSON.stringify(allState));
+  localStorage.setItem('khime_updated_at', String(Date.now()));
+  try { cloudSync.push(); } catch(e) {}
 }
 
 /* ========= World Gate System ========= */
@@ -3987,6 +4514,8 @@ if (!worldState.unlockedWorlds.includes('saiki')) {
 }
 function saveWorldState() {
   localStorage.setItem('khime_worlds', JSON.stringify(worldState));
+  localStorage.setItem('khime_updated_at', String(Date.now()));
+  try { cloudSync.push(); } catch(e) {}
 }
 
 function switchWorld(worldId) {
@@ -5078,55 +5607,72 @@ function getCtx() {
   return audioCtx;
 }
 
-// 적축(Red Switch / Linear) — 클릭 없이 부드럽고 낮은 떠크. 조용하고 묵직한 느낌.
+// 적축(Red Switch / Linear) — 노이즈 기반. 날카로운 "택" + 나무통 같은 "톡".
 function clickSound() {
   try {
     const ctx = getCtx();
     const now = ctx.currentTime;
-
-    // 키 하나하나 미세한 피치 변화 (루프처럼 느껴지지 않게)
     const pv = 0.94 + Math.random() * 0.12;
 
-    // 1. 키캡 컨택 — 아주 짧고 부드러운 접촉 소리 (클릭 아님, 플라스틱이 닿는 정도)
-    const tickSize = Math.floor(ctx.sampleRate * 0.005);
-    const tickBuf = ctx.createBuffer(1, tickSize, ctx.sampleRate);
-    const td = tickBuf.getChannelData(0);
-    for (let i = 0; i < tickSize; i++) td[i] = (Math.random()*2-1) * Math.pow(1 - i/tickSize, 4);
-    const tick = ctx.createBufferSource();
-    tick.buffer = tickBuf;
-    // 밝은 고역은 잘라내서 '틱' 대신 '톡' 느낌
-    const tickLp = ctx.createBiquadFilter();
-    tickLp.type = 'lowpass';
-    tickLp.frequency.value = 2600;
-    const tickG = ctx.createGain();
-    tickG.gain.setValueAtTime(0.16, now);
-    tickG.gain.exponentialRampToValueAtTime(0.001, now + 0.009);
-    tick.connect(tickLp).connect(tickG).connect(ctx.destination);
-    tick.start(now); tick.stop(now + 0.012);
+    // 1. 상단 "택" — 3500Hz bandpass + 1600Hz highpass, 8ms (날카로운 키캡 접촉)
+    const tackSize = Math.floor(ctx.sampleRate * 0.008);
+    const tackBuf = ctx.createBuffer(1, tackSize, ctx.sampleRate);
+    const td = tackBuf.getChannelData(0);
+    for (let i = 0; i < tackSize; i++) td[i] = (Math.random()*2-1) * Math.pow(1 - i/tackSize, 1.4);
+    const tack = ctx.createBufferSource();
+    tack.buffer = tackBuf;
+    const tackHp = ctx.createBiquadFilter(); tackHp.type = 'highpass'; tackHp.frequency.value = 1600;
+    const tackBp = ctx.createBiquadFilter(); tackBp.type = 'bandpass'; tackBp.frequency.value = 3500 * pv; tackBp.Q.value = 2.2;
+    const tackG = ctx.createGain();
+    tackG.gain.setValueAtTime(0.34, now);
+    tackG.gain.exponentialRampToValueAtTime(0.001, now + 0.008);
+    tack.connect(tackHp).connect(tackBp).connect(tackG).connect(ctx.destination);
+    tack.start(now); tack.stop(now + 0.01);
 
-    // 2. 메인 떠크 — 적축 특유의 낮고 포근한 바닥 울림
-    const thock = ctx.createOscillator();
-    const thockG = ctx.createGain();
-    thock.type = 'sine';
-    thock.frequency.setValueAtTime(300 * pv, now);
-    thock.frequency.exponentialRampToValueAtTime(115 * pv, now + 0.07);
-    thockG.gain.setValueAtTime(0.0, now);
-    thockG.gain.linearRampToValueAtTime(0.34, now + 0.004);
-    thockG.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
-    thock.connect(thockG).connect(ctx.destination);
-    thock.start(now); thock.stop(now + 0.12);
+    // 2. 본체 "톡" — 780Hz bandpass Q=5, 45ms (나무통 울림)
+    const bodySize = Math.floor(ctx.sampleRate * 0.045);
+    const bodyBuf = ctx.createBuffer(1, bodySize, ctx.sampleRate);
+    const bd = bodyBuf.getChannelData(0);
+    for (let i = 0; i < bodySize; i++) bd[i] = (Math.random()*2-1);
+    const body = ctx.createBufferSource();
+    body.buffer = bodyBuf;
+    const bodyBp = ctx.createBiquadFilter(); bodyBp.type = 'bandpass'; bodyBp.frequency.value = 780 * pv; bodyBp.Q.value = 5;
+    const bodyG = ctx.createGain();
+    bodyG.gain.setValueAtTime(0.0, now);
+    bodyG.gain.linearRampToValueAtTime(0.32, now + 0.002);
+    bodyG.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+    body.connect(bodyBp).connect(bodyG).connect(ctx.destination);
+    body.start(now); body.stop(now + 0.06);
 
-    // 3. 서브 덤프 — 아주 낮은 저역으로 "묵직함" 살짝만 보강
-    const sub = ctx.createOscillator();
+    // 3. 클릭감 — 1650Hz bandpass Q=6, 20ms (스위치 금속음)
+    const hiSize = Math.floor(ctx.sampleRate * 0.02);
+    const hiBuf = ctx.createBuffer(1, hiSize, ctx.sampleRate);
+    const hd = hiBuf.getChannelData(0);
+    for (let i = 0; i < hiSize; i++) hd[i] = (Math.random()*2-1);
+    const hi = ctx.createBufferSource();
+    hi.buffer = hiBuf;
+    const hiBp = ctx.createBiquadFilter(); hiBp.type = 'bandpass'; hiBp.frequency.value = 1650 * pv; hiBp.Q.value = 6;
+    const hiG = ctx.createGain();
+    hiG.gain.setValueAtTime(0.0, now);
+    hiG.gain.linearRampToValueAtTime(0.18, now + 0.001);
+    hiG.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+    hi.connect(hiBp).connect(hiG).connect(ctx.destination);
+    hi.start(now); hi.stop(now + 0.03);
+
+    // 4. Sub — 155Hz bandpass Q=4, 25ms (살짝 묵직함)
+    const subSize = Math.floor(ctx.sampleRate * 0.025);
+    const subBuf = ctx.createBuffer(1, subSize, ctx.sampleRate);
+    const sd = subBuf.getChannelData(0);
+    for (let i = 0; i < subSize; i++) sd[i] = (Math.random()*2-1);
+    const sub = ctx.createBufferSource();
+    sub.buffer = subBuf;
+    const subBp = ctx.createBiquadFilter(); subBp.type = 'bandpass'; subBp.frequency.value = 155; subBp.Q.value = 4;
     const subG = ctx.createGain();
-    sub.type = 'sine';
-    sub.frequency.setValueAtTime(72 * pv, now);
-    sub.frequency.exponentialRampToValueAtTime(48, now + 0.07);
     subG.gain.setValueAtTime(0.0, now);
-    subG.gain.linearRampToValueAtTime(0.13, now + 0.004);
-    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-    sub.connect(subG).connect(ctx.destination);
-    sub.start(now); sub.stop(now + 0.13);
+    subG.gain.linearRampToValueAtTime(0.09, now + 0.003);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    sub.connect(subBp).connect(subG).connect(ctx.destination);
+    sub.start(now); sub.stop(now + 0.05);
   } catch(e) {}
 }
 
@@ -5457,7 +6003,7 @@ function renderDashboard() {
 
 /* ========= Tabs ========= */
 // Ordered page flow for the prev/next buttons
-const PAGE_ORDER = ['home','finger','word','short','long','chat','badges'];
+const PAGE_ORDER = ['home','finger','word','short','long','chat','game','badges'];
 const PAGE_LABELS = {
   home: '🏠 홈',
   finger: '✋ 손가락자리',
@@ -5465,6 +6011,7 @@ const PAGE_LABELS = {
   short: '✏️ 단문',
   long: '📖 장문',
   chat: '💬 채팅',
+  game: '🎮 게임',
   badges: '🏆 뱃지'
 };
 let currentTab = 'home';
@@ -5524,6 +6071,14 @@ function showTab(tab) {
   } else if (tab === 'chat' && chatState.active && !chatState.ended && !chatState.timerId) {
     // Resume timer when returning to chat without restarting
     chatState.timerId = setInterval(updateChatTimer, 500);
+  }
+  // Leaving word-drop game: stop loops & show stage select next time
+  if (tab !== 'game' && typeof wordDropGame !== 'undefined' && wordDropGame.running) {
+    try { wdStop(); } catch(e) {}
+  }
+  if (tab === 'game' && typeof wordDropGame !== 'undefined' && !wordDropGame.running && !wordDropGame.ended) {
+    // If freshly entering and no game in progress, show the stage selection
+    try { wdShowSelect(); } catch(e) {}
   }
   currentTab = tab;
   updatePageNav();
@@ -8933,6 +9488,377 @@ try { renderStats(); } catch(e) { console.error('renderStats:', e); }
 try { renderBadges(); } catch(e) { console.error('renderBadges:', e); }
 try { renderKeyboard(); } catch(e) { console.error('renderKeyboard:', e); }
 try { updateAllPracticeGameUI(); } catch(e) { console.error('updateAllPracticeGameUI:', e); }
+// Start cloud sync (will prompt for nickname on first visit)
+try { cloudSync.start(); } catch(e) { console.error('cloudSync.start:', e); }
+
+// Parent-password-protected reset (so kids can't accidentally nuke records)
+function parentResetConfirm() {
+  const ans = prompt('🔒 부모님 확인\n\n모든 학습 기록을 삭제하려면 아래 암산 문제를 푸세요:\n\n7 × 8 = ?');
+  if (ans === null) return;
+  if (String(ans).trim() !== '56') {
+    alert('❌ 정답이 아니에요. 부모님께 도움을 요청하세요.');
+    return;
+  }
+  if (!confirm('정말 모든 기록을 삭제하시겠어요? (클라우드에 저장된 것은 유지됩니다)')) return;
+  // Clear local only — cloud snapshot preserved as safety net
+  const nick = localStorage.getItem('khime_nick');
+  localStorage.clear();
+  if (nick) localStorage.setItem('khime_nick', nick);
+  location.reload();
+}
+
+/* ================================================================
+   🎮 낱말 떨어뜨리기 게임 (Word Drop Game)
+   - 4단계: home / top / bottom / mix
+   - 낱말이 위에서 떨어지면 정확히 타이핑해서 파괴
+   - 15초마다 스피드 레벨 +1 (스폰 간격 짧아지고 낙하 속도 증가)
+   - 생명 3개, 땅에 닿으면 -1
+   ================================================================ */
+const WD_STAGE_LABELS = { home: '기본자리', top: '윗줄', bottom: '아랫줄', mix: '복합' };
+const wordDropGame = {
+  running: false, ended: false,
+  stage: 'home',
+  score: 0, combo: 0, lives: 3,
+  elapsed: 0, speedLvl: 1,
+  words: [],
+  spawnId: null, tickId: null, timerId: null,
+  startedAt: 0,
+  activeWord: null, // the falling-word element currently being typed (lowest y that matches input)
+};
+
+function wdShowSelect() {
+  wdStop();
+  document.getElementById('wdSelect').style.display = '';
+  document.getElementById('wdGame').style.display = 'none';
+}
+
+function wdStart(stage) {
+  wordDropGame.stage = stage;
+  document.getElementById('wdSelect').style.display = 'none';
+  document.getElementById('wdGame').style.display = '';
+  document.getElementById('wdStageLbl').textContent = WD_STAGE_LABELS[stage] || stage;
+  document.getElementById('wdReadyStage').textContent = WD_STAGE_LABELS[stage] || stage;
+  document.getElementById('wdReady').classList.remove('hidden');
+  document.getElementById('wdRestartBtn').style.display = 'none';
+  // Remove any stale gameover overlay
+  document.querySelectorAll('.wd-gameover').forEach(n => n.remove());
+  // Reset HUD
+  document.getElementById('wdScore').textContent = '0';
+  document.getElementById('wdCombo').textContent = '0';
+  document.getElementById('wdLives').textContent = '3';
+  document.getElementById('wdSpeedLvl').textContent = '1';
+  document.getElementById('wdTime').textContent = '0s';
+  // Clear stage
+  const st = document.getElementById('wdStage');
+  st.querySelectorAll('.wd-word, .wd-shard, .wd-combo-popup, .wd-flash, .wd-gameover').forEach(n => n.remove());
+}
+
+function wdBegin() {
+  wordDropGame.running = true;
+  wordDropGame.ended = false;
+  wordDropGame.score = 0; wordDropGame.combo = 0; wordDropGame.lives = 3;
+  wordDropGame.elapsed = 0; wordDropGame.speedLvl = 1;
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  wordDropGame.startedAt = performance.now();
+  document.getElementById('wdReady').classList.add('hidden');
+  document.getElementById('wdRestartBtn').style.display = 'none';
+  const inp = document.getElementById('wdInput');
+  inp.style.display = '';
+  inp.value = ''; inp.disabled = false;
+  setTimeout(() => inp.focus(), 50);
+  try { gameStartSound(); } catch(e) {}
+  // Cleanup previous loops
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  wdScheduleSpawn();
+  wdTick();
+  wordDropGame.timerId = setInterval(() => {
+    if (!wordDropGame.running) return;
+    wordDropGame.elapsed++;
+    document.getElementById('wdTime').textContent = wordDropGame.elapsed + 's';
+    // Every 15 seconds, speed up
+    if (wordDropGame.elapsed > 0 && wordDropGame.elapsed % 15 === 0) {
+      wordDropGame.speedLvl++;
+      document.getElementById('wdSpeedLvl').textContent = wordDropGame.speedLvl;
+      wdShowSpeedUp();
+      try { comboSound(10); } catch(e) {}
+    }
+  }, 1000);
+}
+
+function wdStop() {
+  wordDropGame.running = false;
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  wordDropGame.spawnId = wordDropGame.timerId = wordDropGame.tickId = null;
+  wordDropGame.words.forEach(w => { if (w && w.el) w.el.remove(); });
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  const inp = document.getElementById('wdInput');
+  if (inp) inp.style.display = 'none';
+}
+
+function wdRestart() { wdStart(wordDropGame.stage); }
+
+function wdScheduleSpawn() {
+  const loop = () => {
+    if (!wordDropGame.running) return;
+    wdSpawnWord();
+    // Spawn interval: starts at 1800ms, shrinks with speedLvl and score.
+    const base = 1800;
+    const lvlBonus = (wordDropGame.speedLvl - 1) * 180;
+    const scoreBonus = wordDropGame.score * 4;
+    const interval = Math.max(550, base - lvlBonus - scoreBonus);
+    wordDropGame.spawnId = setTimeout(loop, interval);
+  };
+  wordDropGame.spawnId = setTimeout(loop, 900);
+}
+
+function wdSpawnWord() {
+  const stage = document.getElementById('wdStage');
+  if (!stage) return;
+  const pool = (typeof WORD_MODES !== 'undefined' && WORD_MODES[wordDropGame.stage]) || WORDS_HOME;
+  const text = pool[Math.floor(Math.random() * pool.length)];
+  // Avoid two words starting with the exact same first character on screen (so active word is unambiguous)
+  const existingStarts = new Set(wordDropGame.words.map(w => w.text.charAt(0)));
+  let word = text;
+  let tries = 0;
+  while (existingStarts.has(word.charAt(0)) && tries < 6) {
+    word = pool[Math.floor(Math.random() * pool.length)];
+    tries++;
+  }
+  const el = document.createElement('div');
+  el.className = 'wd-word';
+  el.innerHTML = `<span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
+  stage.appendChild(el);
+  // Position: random x within stage, accounting for word width
+  const stageW = stage.clientWidth;
+  const wordW = el.offsetWidth || 90;
+  const maxX = Math.max(10, stageW - wordW - 10);
+  const x = 10 + Math.random() * maxX;
+  el.style.left = x + 'px';
+  el.style.top = '-60px';
+  // Falling speed: scales with speedLvl. Level 1 ≈ 42 px/s, +18 per level, +small jitter.
+  const baseSpeed = 42 + (wordDropGame.speedLvl - 1) * 18;
+  const speed = baseSpeed + Math.random() * 14;
+  wordDropGame.words.push({ el, text: word, y: -60, speed, id: Math.random().toString(36).slice(2) });
+}
+
+function wdTick() {
+  const stage = document.getElementById('wdStage');
+  if (!stage) { wordDropGame.tickId = null; return; }
+  let last = performance.now();
+  const loop = (now) => {
+    if (!wordDropGame.running) { wordDropGame.tickId = null; return; }
+    const dt = Math.min(48, now - last) / 1000;
+    last = now;
+    const groundLine = stage.clientHeight - 38;
+    for (let i = wordDropGame.words.length - 1; i >= 0; i--) {
+      const w = wordDropGame.words[i];
+      w.y += w.speed * dt;
+      w.el.style.top = w.y + 'px';
+      if (w.y >= groundLine) {
+        wdMissWord(w);
+        wordDropGame.words.splice(i, 1);
+      }
+    }
+    wordDropGame.tickId = requestAnimationFrame(loop);
+  };
+  wordDropGame.tickId = requestAnimationFrame(loop);
+}
+
+function wdMissWord(w) {
+  const stage = document.getElementById('wdStage');
+  if (!w.el) return;
+  w.el.classList.add('wd-miss');
+  try { groundHitSound(); } catch(e) {}
+  setTimeout(() => { if (w.el) w.el.remove(); }, 420);
+  wordDropGame.combo = 0;
+  wordDropGame.lives--;
+  document.getElementById('wdCombo').textContent = '0';
+  document.getElementById('wdLives').textContent = wordDropGame.lives;
+  if (stage) {
+    const flash = document.createElement('div');
+    flash.className = 'wd-flash red';
+    stage.appendChild(flash);
+    setTimeout(() => flash.remove(), 220);
+  }
+  if (wordDropGame.activeWord === w) wordDropGame.activeWord = null;
+  // Reset input when we miss — current input may have matched this word
+  const inp = document.getElementById('wdInput');
+  if (inp) inp.value = '';
+  wdUpdateHighlight('');
+  if (wordDropGame.lives <= 0) wdGameOver('💀 생명 없음!');
+}
+
+function wdBreakWord(w) {
+  const stage = document.getElementById('wdStage');
+  if (!stage || !w.el) return;
+  const rect = w.el.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+  const cx = rect.left - stageRect.left + rect.width/2;
+  const cy = rect.top - stageRect.top + rect.height/2;
+  w.el.classList.add('wd-break');
+  // Shards
+  for (let i = 0; i < 10; i++) {
+    const s = document.createElement('div');
+    s.className = 'wd-shard';
+    s.style.left = (cx - 5) + 'px';
+    s.style.top = (cy - 5) + 'px';
+    const ang = (i / 10) * Math.PI * 2;
+    const dist = 50 + Math.random() * 50;
+    s.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
+    s.style.setProperty('--sy', Math.sin(ang) * dist + 'px');
+    s.style.setProperty('--sr', (Math.random() * 720 - 360) + 'deg');
+    stage.appendChild(s);
+    setTimeout(() => s.remove(), 650);
+  }
+  // White flash
+  const flash = document.createElement('div');
+  flash.className = 'wd-flash';
+  stage.appendChild(flash);
+  setTimeout(() => flash.remove(), 220);
+  try { rockBreakSound(); } catch(e) {}
+  setTimeout(() => { if (w.el) w.el.remove(); }, 460);
+  // Score
+  wordDropGame.combo++;
+  const base = 10 + w.text.length * 2;
+  const comboBonus = Math.floor(wordDropGame.combo / 3) * 5;
+  const pts = base + comboBonus;
+  wordDropGame.score += pts;
+  document.getElementById('wdScore').textContent = wordDropGame.score;
+  document.getElementById('wdCombo').textContent = wordDropGame.combo;
+  if (wordDropGame.combo >= 3) {
+    const p = document.createElement('div');
+    p.className = 'wd-combo-popup';
+    p.style.left = cx + 'px';
+    p.style.top = (cy - 20) + 'px';
+    p.textContent = `${wordDropGame.combo} COMBO!`;
+    stage.appendChild(p);
+    setTimeout(() => p.remove(), 920);
+    if (wordDropGame.combo % 5 === 0) {
+      try { comboSound(wordDropGame.combo); } catch(e) {}
+    }
+  }
+}
+
+function wdUpdateHighlight(typed) {
+  // Determine the active word: the lowest-on-screen word whose text starts with `typed`
+  // (case-sensitive — Korean is case-agnostic anyway). Empty input => no active word.
+  wordDropGame.words.forEach(w => { if (w.el) w.el.classList.remove('wd-active'); });
+  wordDropGame.activeWord = null;
+  if (!typed) {
+    // Render all words without typed prefix
+    wordDropGame.words.forEach(w => wdRenderWord(w, ''));
+    return;
+  }
+  // Find the candidate closest to the ground (largest y) that starts with typed
+  let best = null;
+  for (const w of wordDropGame.words) {
+    if (w.text.startsWith(typed) && (!best || w.y > best.y)) best = w;
+  }
+  wordDropGame.activeWord = best;
+  wordDropGame.words.forEach(w => {
+    wdRenderWord(w, (w === best) ? typed : '');
+    if (w === best && w.el) w.el.classList.add('wd-active');
+  });
+}
+
+function wdRenderWord(w, typedPrefix) {
+  if (!w.el) return;
+  const rest = w.text.slice(typedPrefix.length);
+  const typedSpan = w.el.querySelector('.wd-typed');
+  const restSpan = w.el.querySelector('.wd-rest');
+  if (typedSpan) typedSpan.textContent = typedPrefix;
+  if (restSpan) restSpan.textContent = rest;
+}
+
+function wdGameOver(msg) {
+  wordDropGame.running = false;
+  wordDropGame.ended = true;
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  wordDropGame.spawnId = wordDropGame.timerId = wordDropGame.tickId = null;
+  // Remove remaining words after a short delay (so last frame renders)
+  wordDropGame.words.forEach(w => { if (w.el) w.el.remove(); });
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  try { errorSound(); } catch(e) {}
+  // XP reward
+  const xpEarned = Math.floor(wordDropGame.score / 4);
+  if (xpEarned > 0 && typeof state !== 'undefined') {
+    try {
+      state.xp = (state.xp || 0) + xpEarned;
+      if (typeof save === 'function') save();
+      if (typeof renderStats === 'function') renderStats();
+    } catch(e) {}
+  }
+  try { if (typeof gameOverSound === 'function') gameOverSound(); } catch(e) {}
+  const stage = document.getElementById('wdStage');
+  if (stage) {
+    const over = document.createElement('div');
+    over.className = 'wd-gameover';
+    over.innerHTML = `
+      <div class="wd-gameover-big">${msg}</div>
+      <div class="wd-gameover-stats">
+        <div>점수<b>${wordDropGame.score}</b></div>
+        <div>최고 콤보<b>${wordDropGame.combo}</b></div>
+        <div>속도Lv<b>${wordDropGame.speedLvl}</b></div>
+        <div>+XP<b>${xpEarned}</b></div>
+      </div>
+    `;
+    stage.appendChild(over);
+  }
+  document.getElementById('wdRestartBtn').style.display = '';
+  const inp = document.getElementById('wdInput');
+  if (inp) { inp.value = ''; inp.disabled = true; }
+}
+
+function wdShowSpeedUp() {
+  const el = document.getElementById('wdSpeedUp');
+  if (!el) return;
+  el.classList.remove('show');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('show');
+}
+
+// Input handler: check full-word match on every change
+(function bindWdInput() {
+  // Defer binding until DOM has the element (script runs at end of body so it exists now)
+  const inp = document.getElementById('wdInput');
+  if (!inp) return;
+  inp.addEventListener('input', () => {
+    if (!wordDropGame.running) return;
+    const typed = inp.value;
+    // First: check for complete match on any visible word → destroy
+    let matched = null;
+    // Prefer the lowest-y word that fully matches (that's what highlighting shows)
+    for (const w of wordDropGame.words) {
+      if (w.text === typed && (!matched || w.y > matched.y)) matched = w;
+    }
+    if (matched) {
+      wordDropGame.words = wordDropGame.words.filter(x => x !== matched);
+      wdBreakWord(matched);
+      inp.value = '';
+      wdUpdateHighlight('');
+      return;
+    }
+    // Otherwise: update highlighting based on prefix
+    // If no word starts with this prefix, clear the input (soft reset)
+    const hasMatch = wordDropGame.words.some(w => w.text.startsWith(typed));
+    if (!hasMatch && typed.length > 0) {
+      inp.value = '';
+      wdUpdateHighlight('');
+      try { errorSound(); } catch(e) {}
+      return;
+    }
+    wdUpdateHighlight(typed);
+  });
+})();
 </script>
 </body>
 </html>
