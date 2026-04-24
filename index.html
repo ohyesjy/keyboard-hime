@@ -6657,20 +6657,20 @@ const rockGame = {
 
 // 단계별 난이도 설정 — 쉬운 기본자리부터 점점 상승
 // 기본자리: 영석님 지정값 (간격 5초 고정, 속도 22~80, 점수당 +1)
-// 그 외 단계는 elapsed 기반 램프 유지
+// 2단계(윗줄)부터도 양 대폭 감소 — 간격 크게, 화면 동시 돌 2개로 제한
 const ROCK_DIFFICULTY = {
   basic:  { lives: 5, time: 45, spawnStart: 5000, spawnMin: 5000,
             speedBase: 22, speedMax: 80, speedPerScore: 1, speedRandom: 0,
-            rampMode: 'score' },
-  top:    { lives: 5, time: 40, spawnStart: 4000, spawnMin: 2200,
-            speedBase: 26, speedRampPerSec: 0.9, speedMaxAdd: 35, speedRandom: 10,
-            rampMode: 'elapsed' },
-  bottom: { lives: 4, time: 40, spawnStart: 3600, spawnMin: 1900,
-            speedBase: 30, speedRampPerSec: 1.1, speedMaxAdd: 42, speedRandom: 11,
-            rampMode: 'elapsed' },
-  mix:    { lives: 4, time: 35, spawnStart: 3200, spawnMin: 1500,
-            speedBase: 34, speedRampPerSec: 1.3, speedMaxAdd: 50, speedRandom: 13,
-            rampMode: 'elapsed' },
+            rampMode: 'score', maxOnScreen: 2 },
+  top:    { lives: 5, time: 50, spawnStart: 5500, spawnMin: 5500,
+            speedBase: 26, speedMax: 85, speedPerScore: 1, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 2 },
+  bottom: { lives: 4, time: 45, spawnStart: 4800, spawnMin: 4800,
+            speedBase: 30, speedMax: 90, speedPerScore: 1.2, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 2 },
+  mix:    { lives: 4, time: 40, spawnStart: 4200, spawnMin: 4200,
+            speedBase: 34, speedMax: 95, speedPerScore: 1.5, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 3 },
 };
 function getRockDiff() { return ROCK_DIFFICULTY[rockGame.mode] || ROCK_DIFFICULTY.basic; }
 
@@ -6730,16 +6730,16 @@ function fingerGameStart() {
 
 function scheduleSpawns() {
   // Spawn rocks periodically — 단계별로 간격이 달라짐
-  // 기본자리(rampMode='score')는 간격 고정, 다른 단계는 점수따라 줄어듦
-  // 화면에 돌이 3개 이상 있으면 스폰 건너뛰어서 쌓임 방지
+  // 화면에 돌이 maxOnScreen 이상 있으면 스폰 건너뛰어서 쌓임 방지 (단계별 설정)
   const diff = getRockDiff();
+  const capRocks = diff.maxOnScreen || 3;
   const spawn = () => {
     if (!rockGame.running) return;
     const currentRocks = rockGame.rocks.length;
-    if (currentRocks < 3) {
+    if (currentRocks < capRocks) {
       spawnRock();
     }
-    // 기본자리는 간격 고정(spawnStart=spawnMin=5000), 그 외는 점수따라 감소
+    // rampMode='score'는 간격 고정, 그 외는 점수따라 감소
     const interval = diff.rampMode === 'score'
       ? diff.spawnStart
       : Math.max(diff.spawnMin, diff.spawnStart - rockGame.score * 8);
