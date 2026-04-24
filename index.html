@@ -6449,7 +6449,13 @@ function makeGame(opts) {
       }
       if (val.length === 0) { this.pos = 0; this.render(); return; }
       const expected = this.text[val.length-1];
-      if (last === expected) {
+      // 처음부터 val.length까지 전부 정확히 일치해야 진짜 정답으로 인정
+      // (중간에 오타가 있는데 마지막 글자만 맞아서 통과되는 버그 방지)
+      let allMatch = true;
+      for (let i = 0; i < val.length; i++) {
+        if (val[i] !== this.text[i]) { allMatch = false; break; }
+      }
+      if (last === expected && allMatch) {
         this.pos = val.length;
         clickSound();
         state.totalChars++;
@@ -6457,6 +6463,13 @@ function makeGame(opts) {
         this.updateLive();
         if (this.pos === this.text.length) this.complete();
       } else {
+        // 오타: pos는 정확하게 친 데까지만 표시 (앞쪽부터 틀린 위치 찾기)
+        let correctLen = 0;
+        for (let i = 0; i < val.length; i++) {
+          if (val[i] === this.text[i]) correctLen = i + 1;
+          else break;
+        }
+        this.pos = correctLen;
         this.errors++;
         errorSound();
         this.updateLive();
@@ -6544,6 +6557,23 @@ function closeModal() {
     window._nextAfterModal = null;
     setTimeout(fn, 200);
   }
+  // 모달 닫힌 뒤 현재 탭의 입력창으로 자동 포커스 (사용자가 마우스 클릭 안 하게)
+  setTimeout(() => {
+    const inputId = ({
+      finger: 'fingerInput',
+      word: 'wordInput',
+      short: 'shortInput',
+      long: 'longInput',
+      chat: 'chatInput',
+      game: 'wdInput',
+    })[currentTab];
+    if (inputId) {
+      const inp = document.getElementById(inputId);
+      if (inp && inp.offsetParent !== null && !inp.disabled) {
+        inp.focus();
+      }
+    }
+  }, 250);
 }
 // Space key closes the result modal (capture phase to beat input handlers).
 // If Space isn't pressed, the modal auto-closes after 2.5s.
