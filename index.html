@@ -6655,6 +6655,15 @@ const rockGame = {
   mode: 'basic',
 };
 
+// 단계별 난이도 설정 — 쉬운 기본자리부터 점점 상승
+const ROCK_DIFFICULTY = {
+  basic:  { lives: 5, time: 45, spawnStart: 2800, spawnMin: 1500, speedBase: 22, speedRampPerSec: 0.7, speedMaxAdd: 30, speedRandom: 8 },
+  top:    { lives: 5, time: 40, spawnStart: 2500, spawnMin: 1200, speedBase: 26, speedRampPerSec: 0.9, speedMaxAdd: 35, speedRandom: 10 },
+  bottom: { lives: 4, time: 40, spawnStart: 2300, spawnMin: 1100, speedBase: 30, speedRampPerSec: 1.1, speedMaxAdd: 42, speedRandom: 11 },
+  mix:    { lives: 4, time: 35, spawnStart: 2000, spawnMin: 900,  speedBase: 34, speedRampPerSec: 1.3, speedMaxAdd: 50, speedRandom: 13 },
+};
+function getRockDiff() { return ROCK_DIFFICULTY[rockGame.mode] || ROCK_DIFFICULTY.basic; }
+
 function openFingerGame() {
   const count = state.fingerCompletes[currentFingerMode] || 0;
   if (count < 5) {
@@ -6672,17 +6681,19 @@ function closeFingerGame() {
 }
 
 function fingerGameStart() {
-  // Reset state
+  // Reset state — 단계별 난이도 적용 (기본자리 가장 쉬움)
+  const diff = getRockDiff();
   rockGame.running = true;
   rockGame.ended = false;
-  rockGame.score = 0; rockGame.combo = 0; rockGame.lives = 3;
-  rockGame.timeLeft = 30;
+  rockGame.score = 0; rockGame.combo = 0;
+  rockGame.lives = diff.lives;
+  rockGame.timeLeft = diff.time;
   rockGame.rocks = [];
   rockGame.startedAt = performance.now();
   document.getElementById('gScore').textContent = '0';
   document.getElementById('gCombo').textContent = '0';
-  document.getElementById('gLives').textContent = '3';
-  document.getElementById('gTime').textContent = '30';
+  document.getElementById('gLives').textContent = String(diff.lives);
+  document.getElementById('gTime').textContent = String(diff.time);
   document.getElementById('gReady').classList.add('hidden');
   document.getElementById('gRestartBtn').style.display = 'none';
   // Remove any stale rocks/overlays
@@ -6708,15 +6719,17 @@ function fingerGameStart() {
 }
 
 function scheduleSpawns() {
-  // Spawn rocks periodically; rate increases as score goes up
+  // Spawn rocks periodically — 단계별로 간격이 달라짐 (쉬운 단계는 더 여유있게)
+  const diff = getRockDiff();
   const spawn = () => {
     if (!rockGame.running) return;
     spawnRock();
-    // Dynamic interval: 2000ms → 700ms as score grows (더 천천히 빨라짐)
-    const interval = Math.max(700, 2000 - rockGame.score * 15);
+    // Score에 따라 점진적으로 간격 줄어듦 (더 완만하게: 12/score 감소)
+    const interval = Math.max(diff.spawnMin, diff.spawnStart - rockGame.score * 12);
     rockGame.spawnId = setTimeout(spawn, interval);
   };
-  rockGame.spawnId = setTimeout(spawn, 1200);
+  // 첫 돌은 1.5초 뒤 (준비 시간)
+  rockGame.spawnId = setTimeout(spawn, 1500);
 }
 
 function spawnRock() {
@@ -6732,9 +6745,10 @@ function spawnRock() {
   const x = 20 + Math.random() * Math.max(20, w - 110);
   rock.style.left = x + 'px';
   rock.style.top = '-80px';
-  // Speed scales with elapsed time (35~90 px/s, 더 천천히)
+  // 단계별 낙하 속도 (기본자리 가장 느림, 섞기 가장 빠름)
+  const diff = getRockDiff();
   const elapsed = (performance.now() - rockGame.startedAt) / 1000;
-  const speed = 35 + Math.min(55, elapsed * 1.5) + Math.random() * 15;
+  const speed = diff.speedBase + Math.min(diff.speedMaxAdd, elapsed * diff.speedRampPerSec) + Math.random() * diff.speedRandom;
   rock._y = -80;
   rock._speed = speed;
   rock._id = Math.random().toString(36).slice(2);
