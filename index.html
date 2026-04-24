@@ -6656,11 +6656,12 @@ const rockGame = {
 };
 
 // 단계별 난이도 설정 — 쉬운 기본자리부터 점점 상승
+// 속도는 유지하고 스폰 간격을 늘려서 화면에 한꺼번에 많이 안 쌓이게
 const ROCK_DIFFICULTY = {
-  basic:  { lives: 5, time: 45, spawnStart: 2800, spawnMin: 1500, speedBase: 22, speedRampPerSec: 0.7, speedMaxAdd: 30, speedRandom: 8 },
-  top:    { lives: 5, time: 40, spawnStart: 2500, spawnMin: 1200, speedBase: 26, speedRampPerSec: 0.9, speedMaxAdd: 35, speedRandom: 10 },
-  bottom: { lives: 4, time: 40, spawnStart: 2300, spawnMin: 1100, speedBase: 30, speedRampPerSec: 1.1, speedMaxAdd: 42, speedRandom: 11 },
-  mix:    { lives: 4, time: 35, spawnStart: 2000, spawnMin: 900,  speedBase: 34, speedRampPerSec: 1.3, speedMaxAdd: 50, speedRandom: 13 },
+  basic:  { lives: 5, time: 45, spawnStart: 4500, spawnMin: 2500, speedBase: 22, speedRampPerSec: 0.7, speedMaxAdd: 30, speedRandom: 8 },
+  top:    { lives: 5, time: 40, spawnStart: 4000, spawnMin: 2200, speedBase: 26, speedRampPerSec: 0.9, speedMaxAdd: 35, speedRandom: 10 },
+  bottom: { lives: 4, time: 40, spawnStart: 3600, spawnMin: 1900, speedBase: 30, speedRampPerSec: 1.1, speedMaxAdd: 42, speedRandom: 11 },
+  mix:    { lives: 4, time: 35, spawnStart: 3200, spawnMin: 1500, speedBase: 34, speedRampPerSec: 1.3, speedMaxAdd: 50, speedRandom: 13 },
 };
 function getRockDiff() { return ROCK_DIFFICULTY[rockGame.mode] || ROCK_DIFFICULTY.basic; }
 
@@ -6720,12 +6721,18 @@ function fingerGameStart() {
 
 function scheduleSpawns() {
   // Spawn rocks periodically — 단계별로 간격이 달라짐 (쉬운 단계는 더 여유있게)
+  // 화면에 돌이 3개 이상 있으면 스폰 건너뛰어서 쌓임 방지
   const diff = getRockDiff();
   const spawn = () => {
     if (!rockGame.running) return;
-    spawnRock();
-    // Score에 따라 점진적으로 간격 줄어듦 (더 완만하게: 12/score 감소)
-    const interval = Math.max(diff.spawnMin, diff.spawnStart - rockGame.score * 12);
+    // 현재 화면의 돌 개수에 따라 다음 스폰 결정
+    const currentRocks = rockGame.rocks.length;
+    // 3개 이상 쌓여있으면 잠시 기다림 (한 화면에 너무 많이 안 모이게)
+    if (currentRocks < 3) {
+      spawnRock();
+    }
+    // Score에 따라 점진적으로 간격 줄어듦 (더 완만하게: 8/score 감소)
+    const interval = Math.max(diff.spawnMin, diff.spawnStart - rockGame.score * 8);
     rockGame.spawnId = setTimeout(spawn, interval);
   };
   // 첫 돌은 1.5초 뒤 (준비 시간)
