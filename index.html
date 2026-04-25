@@ -5609,9 +5609,27 @@ function showGroupPhoto() {
 let audioCtx;
 function getCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
+
+// AudioContext는 사용자 제스처에서만 활성화 가능 (iOS Safari 등)
+// 모든 종류의 사용자 인터랙션에서 오디오 잠금 해제 + silent 버퍼 재생으로 확실히 resume
+function unlockAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    // 짧은 무음 버퍼 재생 — iOS에서 컨텍스트를 확실히 깨우는 트릭
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+  } catch(e) {}
+}
+['pointerdown','touchstart','mousedown','keydown','click'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { passive: true, capture: true });
+});
 
 // 적축(Red Switch / Linear) — 노이즈 기반. 날카로운 "택" + 나무통 같은 "톡".
 function clickSound() {
