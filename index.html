@@ -4555,6 +4555,21 @@ function switchWorld(worldId) {
   try { if (typeof ensureMissions === 'function') { ensureMissions(); if (typeof renderMissions === 'function') renderMissions(); } } catch(e) { console.error('switchWorld→ensureMissions:', e); }
 }
 
+// 미공개 월드의 캐릭터를 클릭했을 때 — 확인 후 해금 + 입장
+function pickLockedChar(worldId, charId, event) {
+  const w = WORLDS.find(x => x.id === worldId);
+  const c = (w && (w.chars || [w.char])).find(ch => ch.id === charId);
+  if (!c) return;
+  const ok = confirm(`🔓 ${c.name} 캐릭터로 놀고 싶어?\n\n"${w.name}" 월드를 열고 ${c.name}와 함께 연습할게요!`);
+  if (!ok) return;
+  // 월드 자동 해금
+  if (!worldState.unlockedWorlds.includes(worldId)) {
+    worldState.unlockedWorlds.push(worldId);
+    saveWorldState();
+  }
+  enterWorldAsChar(worldId, charId, event);
+}
+
 function renderWorldGate() {
   const grid = document.getElementById('worldGateGrid');
   if (!grid) return;
@@ -4566,9 +4581,10 @@ function renderWorldGate() {
     const chars = w.chars || [w.char];
     chars.forEach(c => {
       const cls = isCompleted ? 'completed' : (isUnlocked ? '' : 'locked');
+      // 미공개 캐릭터도 직접 클릭해서 들어갈 수 있게 (확인 후 자동 해금)
       const clickAction = isUnlocked
         ? `enterWorldAsChar('${w.id}','${c.id}',event)`
-        : (w.password ? `openWorldPw('${w.id}')` : '');
+        : `pickLockedChar('${w.id}','${c.id}',event)`;
       cards += `
         <div class="world-gate-card ${cls}" onclick="${clickAction}">
           <div class="world-gate-emoji">
@@ -4580,7 +4596,7 @@ function renderWorldGate() {
           ${c.role ? `<div style="font-size:11px;color:#888;font-weight:700;margin-top:2px">${c.role}</div>` : ''}
           ${isUnlocked
             ? `<div class="world-gate-enter">${isCompleted ? '다시 입장 →' : '입장하기 →'}</div>`
-            : `<div class="world-gate-lock">🔒</div>`
+            : `<div class="world-gate-lock">🔒 골라서 놀기</div>`
           }
         </div>
       `;
