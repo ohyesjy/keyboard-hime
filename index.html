@@ -2806,6 +2806,137 @@
     .page-indicator { font-size: 12px; padding: 5px 10px; }
   }
 
+  /* ========= ⚡ 일주일 뱃지 특별 모달 ========= */
+  .streak7-modal { position: fixed; inset: 0; z-index: 9999; }
+  .streak7-backdrop {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,212,59,0.4), rgba(0,0,0,0.85));
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .streak7-box {
+    background: linear-gradient(135deg, #fff9db, #fff0f6);
+    border: 4px solid #111;
+    border-radius: 24px;
+    padding: 28px 24px;
+    max-width: 460px; width: 92%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 8px 8px 0 #111;
+    animation: streak7Pop 0.5s cubic-bezier(.2,.8,.3,1.05);
+    max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes streak7Pop {
+    0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+    60% { transform: scale(1.05) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .streak7-confetti { font-size: 32px; letter-spacing: 6px; animation: bounce 1s infinite; }
+  .streak7-pw-confetti { font-size: 36px; letter-spacing: 8px; animation: bounce 0.8s infinite; }
+  .streak7-title {
+    font-size: 24px; font-weight: 900; color: #d6336c;
+    margin: 8px 0 12px; letter-spacing: -0.5px;
+  }
+  .streak7-msg {
+    font-size: 15px; line-height: 1.7; color: #2d2d4d;
+    font-weight: 700; margin-bottom: 18px;
+  }
+  .streak7-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin: 14px 0 10px;
+  }
+  .streak7-pick {
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 16px;
+    padding: 12px 8px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #111;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .streak7-pick:hover:not(:disabled) {
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 #d6336c;
+    background: #fff9db;
+  }
+  .streak7-pick:active:not(:disabled) {
+    transform: translate(2px,2px);
+    box-shadow: 2px 2px 0 #111;
+  }
+  .streak7-pick.locked {
+    background: #adb5bd !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: grayscale(1);
+    box-shadow: 2px 2px 0 #555 !important;
+  }
+  .streak7-pick.chosen {
+    background: linear-gradient(135deg,#ffd43b,#fab005) !important;
+    box-shadow: 4px 4px 0 #d6336c !important;
+    border-color: #d6336c !important;
+    animation: streak7Glow 1s infinite alternate;
+  }
+  @keyframes streak7Glow {
+    from { box-shadow: 4px 4px 0 #d6336c, 0 0 0 rgba(214,51,108,0); }
+    to { box-shadow: 4px 4px 0 #d6336c, 0 0 30px rgba(214,51,108,0.6); }
+  }
+  .streak7-pick-img {
+    width: 70px; height: 70px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffd89b, #ff8fa3);
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #111;
+  }
+  .streak7-pick-img img { width: 100%; height: 100%; object-fit: cover; }
+  .streak7-fallback { font-size: 36px; }
+  .streak7-pick-name {
+    font-size: 14px; font-weight: 900; color: #111; margin-top: 4px;
+  }
+  .streak7-pick-series { font-size: 11px; color: #666; font-weight: 700; }
+  .streak7-warn {
+    font-size: 12px; color: #c92a2a; font-weight: 800;
+    margin-top: 12px; padding: 8px;
+    background: rgba(255,107,107,0.15); border-radius: 10px;
+  }
+  .streak7-pw-display {
+    font-size: 56px; font-weight: 900;
+    color: #d6336c;
+    background: #fff;
+    border: 4px solid #111;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 14px 0;
+    letter-spacing: 16px;
+    box-shadow: 4px 4px 0 #111;
+    font-family: 'D2Coding', monospace;
+    animation: streak7PwReveal 1s ease-out;
+  }
+  @keyframes streak7PwReveal {
+    0% { opacity: 0; transform: scale(0.5); filter: blur(8px); }
+    50% { opacity: 1; transform: scale(1.1); filter: blur(0); }
+    100% { transform: scale(1); }
+  }
+  .streak7-pw-box { max-width: 400px; }
+
+  /* ========= 뱃지 D-day 표시 ========= */
+  .badge-item { position: relative; }
+  .badge-dday {
+    position: absolute; top: 6px; right: 6px;
+    background: linear-gradient(135deg,#ff6b6b,#d6336c);
+    color: #fff; font-weight: 900; font-size: 11px;
+    padding: 3px 7px; border-radius: 999px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+    animation: ddayPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes ddayPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
   /* ========= 클라우드 동기화 ========= */
   .cloud-status-badge {
     background: #e9ecef; color: #555;
@@ -4557,6 +4688,11 @@ function switchWorld(worldId) {
 
 // 미공개 월드의 캐릭터를 클릭했을 때 — 확인 후 해금 + 입장
 function pickLockedChar(worldId, charId, event) {
+  // 일주일 보상에서 선택 안 한 월드는 잠금 (다음 보상까지 못 봄)
+  if (state.streak7Locked && state.streak7Locked.includes(worldId)) {
+    alert('🔒 이 친구는 다음 보상에서 만날 수 있어!\n\n다른 친구를 골라봐~ ⚡');
+    return;
+  }
   const w = WORLDS.find(x => x.id === worldId);
   const c = (w && (w.chars || [w.char])).find(ch => ch.id === charId);
   if (!c) return;
@@ -5213,19 +5349,146 @@ function checkBadges() {
       state.badges.push(b.id);
       pop(`🏅 뱃지 획득! ${b.icon} ${b.name}`);
       save();
+      // ⚡ 일주일 뱃지 특별 이벤트 — 잠긴 월드 중 1개를 직접 선택 + 비밀번호 공개
+      if (b.id === 'streak7' && !state.streak7CelebrationDone) {
+        setTimeout(() => showStreak7Celebration(), 1200);
+      }
     }
   });
   // 뱃지 획득 후 월드 완성 체크
   checkWorldCompletion();
 }
 
+/* ========= ⚡ 일주일 뱃지 특별 보상: 캐릭터 1명 골라서 비밀번호 받기 ========= */
+function showStreak7Celebration() {
+  // 잠긴 월드(비밀번호 있는 것) 중 미선택 항목만 후보
+  const candidates = WORLDS.filter(w => w.password && !worldState.unlockedWorlds.includes(w.id));
+  if (!candidates.length) {
+    state.streak7CelebrationDone = true;
+    save();
+    return;
+  }
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // 모달 생성
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎉🎊⚡🎉🎊</div>
+        <h2 class="streak7-title">${nick}짱 축하해!! ⚡</h2>
+        <p class="streak7-msg">
+          여기까지 오다니 정말 꾸준히 노력했구나 ^^<br>
+          ${nick}짱이 <b>먼저 캐릭터를 고를 수 있어</b> ^^ !!<br>
+          원하는 캐릭터를 <b>한 개</b> 선택하면<br>
+          <span style="color:#d6336c;font-weight:900">${nick}짱에게만 비밀번호를 알려줄게!!!</span>
+        </p>
+        <div class="streak7-grid">
+          ${candidates.map(w => {
+            const c = (w.chars && w.chars[0]) || w.char;
+            return `
+              <button class="streak7-pick" data-world="${w.id}" onclick="pickStreak7Reward('${w.id}')">
+                <div class="streak7-pick-img">
+                  ${c.img ? `<img src="${encodeURI(c.img)}" alt="${c.name}" onerror="this.outerHTML='<span class=streak7-fallback>${c.fallback||w.gateEmoji}</span>'">` : `<span class="streak7-fallback">${c.fallback||w.gateEmoji}</span>`}
+                </div>
+                <div class="streak7-pick-name">${c.name}</div>
+                <div class="streak7-pick-series">${w.name}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="streak7-warn">⚠️ 한 번 선택하면 나머지 캐릭터는 잠겨. 신중히 골라!</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function pickStreak7Reward(worldId) {
+  const w = WORLDS.find(x => x.id === worldId);
+  if (!w) return;
+  // 다른 후보들의 버튼 잠그기 — 비밀번호 못 보게
+  const modal = document.querySelector('.streak7-modal');
+  if (modal) {
+    modal.querySelectorAll('.streak7-pick').forEach(btn => {
+      if (btn.dataset.world !== worldId) {
+        btn.classList.add('locked');
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="streak7-pick-img"><span class="streak7-fallback">🔒</span></div>
+          <div class="streak7-pick-name">잠김</div>
+          <div class="streak7-pick-series">선택 못 함</div>
+        `;
+      } else {
+        btn.classList.add('chosen');
+      }
+    });
+  }
+  // 상태 저장: 선택한 월드 + 차단된 월드들
+  if (!state.streak7Locked) state.streak7Locked = [];
+  WORLDS.forEach(other => {
+    if (other.password && other.id !== worldId && !worldState.unlockedWorlds.includes(other.id)) {
+      if (!state.streak7Locked.includes(other.id)) state.streak7Locked.push(other.id);
+    }
+  });
+  state.streak7Choice = worldId;
+  state.streak7CelebrationDone = true;
+  // 선택한 월드 자동 해금
+  if (!worldState.unlockedWorlds.includes(worldId)) {
+    worldState.unlockedWorlds.push(worldId);
+    saveWorldState();
+  }
+  save();
+  // 1.5초 후 비밀번호 공개 팝업
+  setTimeout(() => {
+    if (modal) modal.remove();
+    showStreak7Password(w);
+  }, 1500);
+}
+
+function showStreak7Password(w) {
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  const c = (w.chars && w.chars[0]) || w.char;
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box streak7-pw-box">
+        <div class="streak7-pw-confetti">🎁✨🎁</div>
+        <h2 class="streak7-title">너만 알고 있어~~ 🤫</h2>
+        <p class="streak7-msg">
+          ${nick}짱이 고른 친구는<br>
+          <b style="font-size:22px;color:#d6336c">${c.name}</b> (${w.name})<br><br>
+          ${c.name}와 친해지려면 비밀번호가 필요해!
+        </p>
+        <div class="streak7-pw-display">${w.password}</div>
+        <p class="streak7-msg" style="font-size:13px;color:#666">
+          이 비밀번호를 외워둬!<br>
+          월드 입장할 때 입력하면 ${c.name}와 같이 놀 수 있어 💖
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove()" style="margin-top:14px">알겠어! (${nick}만의 비밀)</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  try { successSound(); } catch(e) {}
+  try { emojiBurst && emojiBurst(); } catch(e) {}
+}
+
 function renderBadges() {
   const el = document.getElementById('badgesGrid');
   el.innerHTML = BADGES.map(b => {
     const earned = state.badges.includes(b.id);
+    // ⚡ 일주일 뱃지에 D-day 카운터 표시 (며칠 남았는지)
+    let dday = '';
+    if (b.id === 'streak7' && !earned) {
+      const remain = Math.max(0, 7 - (state.streak || 0));
+      dday = `<div class="badge-dday">D-${remain}</div>`;
+    }
     return `<div class="badge-item ${earned?'earned':''}">
       <div class="icon">${b.icon}</div>
       <div class="name">${b.name}</div>
+      ${dday}
     </div>`;
   }).join('');
   renderCollection();
