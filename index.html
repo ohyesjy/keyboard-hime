@@ -4686,19 +4686,24 @@ function switchWorld(worldId) {
   try { if (typeof ensureMissions === 'function') { ensureMissions(); if (typeof renderMissions === 'function') renderMissions(); } } catch(e) { console.error('switchWorld→ensureMissions:', e); }
 }
 
-// 미공개 월드의 캐릭터를 클릭했을 때 — 확인 후 해금 + 입장
+// 미공개 월드의 캐릭터를 클릭했을 때
 function pickLockedChar(worldId, charId, event) {
-  // 일주일 보상에서 선택 안 한 월드는 잠금 (다음 보상까지 못 봄)
+  // 보상 이벤트에서 선택 안 한 월드는 잠금 (다음 보상까지 못 봄)
   if (state.streak7Locked && state.streak7Locked.includes(worldId)) {
     alert('🔒 이 친구는 다음 보상에서 만날 수 있어!\n\n다른 친구를 골라봐~ ⚡');
     return;
   }
   const w = WORLDS.find(x => x.id === worldId);
   const c = (w && (w.chars || [w.char])).find(ch => ch.id === charId);
-  if (!c) return;
+  if (!w || !c) return;
+  // 비밀번호가 있는 월드는 비번 입력 팝업 (가챠로 받은 비번을 직접 입력하는 재미)
+  if (w.password) {
+    openWorldPw(worldId);
+    return;
+  }
+  // 비번 없는 월드는 직접 해금
   const ok = confirm(`🔓 ${c.name} 캐릭터로 놀고 싶어?\n\n"${w.name}" 월드를 열고 ${c.name}와 함께 연습할게요!`);
   if (!ok) return;
-  // 월드 자동 해금
   if (!worldState.unlockedWorlds.includes(worldId)) {
     worldState.unlockedWorlds.push(worldId);
     saveWorldState();
@@ -5453,11 +5458,7 @@ function pickStreak7Reward(worldId) {
   });
   state.streak7Choice = worldId;
   state.streak7CelebrationDone = true;
-  // 선택한 월드 자동 해금
-  if (!worldState.unlockedWorlds.includes(worldId)) {
-    worldState.unlockedWorlds.push(worldId);
-    saveWorldState();
-  }
+  // ⚠️ 자동 해금 안 함 — 비밀번호 직접 입력하는 재미를 위해
   save();
   // 1.5초 후 비밀번호 공개 팝업
   setTimeout(() => {
@@ -5598,10 +5599,7 @@ function pickEventGachaReward(worldId) {
       if (!state.streak7Locked.includes(other.id)) state.streak7Locked.push(other.id);
     }
   });
-  if (!worldState.unlockedWorlds.includes(worldId)) {
-    worldState.unlockedWorlds.push(worldId);
-    saveWorldState();
-  }
+  // ⚠️ 자동 해금 안 함 — 사용자가 비밀번호 직접 입력하는 재미 살리기
   save();
   setTimeout(() => {
     if (modal) modal.remove();
