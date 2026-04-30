@@ -6779,14 +6779,14 @@ function changeCharacter() {
 }
 
 function changeWorld() {
-  // 월드 게이트로 돌아가기
+  // 월드 게이트로 돌아가기 — 테마도 함께 리셋
   activateCharState(null);
   currentWorldId = null;
   worldState.currentWorld = null;
   saveWorldState();
   save();
+  try { applyWorldThemeClass(null); } catch(e) {}
   showTab('home');
-  // 헤더도 비워진 throwaway state 로 동기화
   try { renderStats(); } catch(e) {}
 }
 
@@ -6891,14 +6891,15 @@ const PAGE_LABELS = {
 let currentTab = 'home';
 
 function showTab(tab) {
-  // 월드 테마 적용은 캐릭터를 골라서 입장한 후에만 (월드게이트/캐릭터선택 화면은 기본 테마)
-  // tab이 'home'이고 캐릭터가 아직 안 골라졌으면 → 테마 클래스 제거 (기본 첫화면)
+  // 월드 테마는 대시보드/연습 페이지에서만 — 월드게이트(첫화면)는 항상 기본 테마
   try {
-    const onGate = (tab === 'home') && (!state || !state.currentChar || !getCurrentChar());
-    if (onGate) {
+    if (tab === 'home' && !currentWorldId) {
+      // 월드게이트(첫화면) → 테마 제거
       applyWorldThemeClass(null);
     } else if (currentWorldId) {
       applyWorldThemeClass(currentWorldId);
+    } else {
+      applyWorldThemeClass(null);
     }
   } catch(e) {}
   document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
