@@ -683,11 +683,20 @@
   /* ========= 체인소맨 월드 전체 테마 ========= */
   body.world-chainsaw {
     background:
-      radial-gradient(ellipse at top right, rgba(233,69,96,0.18), transparent 50%),
-      radial-gradient(ellipse at bottom left, rgba(255,140,0,0.12), transparent 60%),
+      linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(20,10,20,0.65) 60%, rgba(40,10,20,0.8) 100%),
+      url("체인소맨/덴지로제 배경.jpeg") center top / cover no-repeat fixed,
       linear-gradient(180deg, #0a0a0a 0%, #1a0a14 50%, #2a0a14 100%) !important;
+    background-attachment: fixed, fixed, fixed !important;
     color: #f0f0f0 !important;
   }
+  body.world-chainsaw::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at top right, rgba(233,69,96,0.22), transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(255,140,0,0.18), transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  body.world-chainsaw .app { position: relative; z-index: 1; }
   /* 체인 패턴 데코 — 페이지 모서리에 톱니 라인 */
   body.world-chainsaw .app::before {
     content: ''; position: fixed; top: 0; left: 0; right: 0; height: 6px;
