@@ -5466,6 +5466,149 @@ function pickStreak7Reward(worldId) {
   }, 1500);
 }
 
+/* ========= 🎰 시윤 깜짝 이벤트: 단문 3회 연습 시 캐릭터 가챠 =========
+   테스트 모드: 모든 닉네임에 대해 즉시 발동 (가챠 완료 전까지)
+   본 이벤트로 전환 시 아래 주석 처리된 게이트(date/time/nick)를 활성화하세요. */
+function checkSpecialEvent() {
+  try {
+    // ── 본 이벤트 배포 시 아래 주석 해제 ──
+    // const now = new Date();
+    // const isEventDay = now.getFullYear() === 2026 && now.getMonth() === 3 && now.getDate() === 30;
+    // const isAfter7pm = now.getHours() >= 19;
+    // const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
+    // if (!isEventDay || !isAfter7pm) return;
+    // if (nick !== '시윤') return;
+    state.eventGacha = state.eventGacha || { announced: false, shortDone: 0, gachaDone: false };
+    if (state.eventGacha.gachaDone) return;
+    if (state.eventGacha.announced) return;
+    state.eventGacha.announced = true;
+    save();
+    setTimeout(showEventGachaAnnounce, 1500);
+  } catch(e) { console.error('checkSpecialEvent:', e); }
+}
+
+function showEventGachaAnnounce() {
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // ✨ 장송의 프리렌 마법진 효과 — 화면 중앙에서 마법진 전개
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎰✨🎁✨🎰</div>
+        <h2 class="streak7-title">오늘 캐릭터 가챠!! 🎰</h2>
+        <p class="streak7-msg">
+          ${nick}짱! 오늘 저녁 특별 이벤트야 ✨<br><br>
+          <b style="color:#d6336c;font-size:18px">✏️ 단문 3회 연습</b>을 끝내면<br>
+          <b>새 캐릭터를 뽑을 수 있어!</b> 🎁
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove();showTab('short')" style="font-size:16px">단문 연습 시작하기 →</button>
+      </div>
+    </div>`;
+  // 마법진 전개 후 모달 등장 (1.2초 뒤)
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
+}
+
+// 단문 완료 시 호출 (이벤트 카운터)
+function onShortCompleteForEvent() {
+  if (!state.eventGacha || !state.eventGacha.announced || state.eventGacha.gachaDone) return;
+  state.eventGacha.shortDone = (state.eventGacha.shortDone || 0) + 1;
+  save();
+  const remain = 3 - state.eventGacha.shortDone;
+  if (remain > 0) {
+    pop(`🎰 가챠까지 ${remain}회 남음! (${state.eventGacha.shortDone}/3)`);
+  } else {
+    state.eventGacha.gachaDone = true;
+    save();
+    setTimeout(showEventGacha, 1500);
+  }
+}
+
+function showEventGacha() {
+  const candidates = WORLDS.filter(w => w.password && !worldState.unlockedWorlds.includes(w.id));
+  if (!candidates.length) {
+    pop('🎁 이미 모든 친구를 만났어! 축하해 ✨');
+    return;
+  }
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // ✨ 프리렌 마법진 — 캐릭터 가챠 등장 시
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎰🎉🎁🎉🎰</div>
+        <h2 class="streak7-title">${nick}짱 단문 3회 완료!! 🎉</h2>
+        <p class="streak7-msg">
+          짠! 오늘의 가챠 시간이야!<br>
+          <b>한 캐릭터를 골라봐</b> ✨
+        </p>
+        <div class="streak7-grid">
+          ${candidates.map(w => {
+            const c = (w.chars && w.chars[0]) || w.char;
+            return `
+              <button class="streak7-pick" data-world="${w.id}" onclick="pickEventGachaReward('${w.id}')">
+                <div class="streak7-pick-img">
+                  ${c.img ? `<img src="${encodeURI(c.img)}" alt="${c.name}" onerror="this.outerHTML='<span class=streak7-fallback>${c.fallback||w.gateEmoji}</span>'">` : `<span class="streak7-fallback">${c.fallback||w.gateEmoji}</span>`}
+                </div>
+                <div class="streak7-pick-name">${c.name}</div>
+                <div class="streak7-pick-series">${w.name}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="streak7-warn">⚠️ 한 번 선택하면 나머지는 잠겨! 신중히 골라!</div>
+      </div>
+    </div>`;
+  // 마법진 효과 후 등장
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
+}
+
+function pickEventGachaReward(worldId) {
+  const w = WORLDS.find(x => x.id === worldId);
+  if (!w) return;
+  const modal = document.querySelector('.streak7-modal');
+  if (modal) {
+    modal.querySelectorAll('.streak7-pick').forEach(btn => {
+      if (btn.dataset.world !== worldId) {
+        btn.classList.add('locked');
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="streak7-pick-img"><span class="streak7-fallback">🔒</span></div>
+          <div class="streak7-pick-name">잠김</div>
+          <div class="streak7-pick-series">선택 못 함</div>
+        `;
+      } else {
+        btn.classList.add('chosen');
+      }
+    });
+  }
+  // 선택 안 한 후보들은 영구 잠금
+  if (!state.streak7Locked) state.streak7Locked = [];
+  WORLDS.forEach(other => {
+    if (other.password && other.id !== worldId && !worldState.unlockedWorlds.includes(other.id)) {
+      if (!state.streak7Locked.includes(other.id)) state.streak7Locked.push(other.id);
+    }
+  });
+  if (!worldState.unlockedWorlds.includes(worldId)) {
+    worldState.unlockedWorlds.push(worldId);
+    saveWorldState();
+  }
+  save();
+  setTimeout(() => {
+    if (modal) modal.remove();
+    showStreak7Password(w); // 비밀번호 공개 — 기존 함수 재활용
+  }, 1500);
+}
+
 function showStreak7Password(w) {
   const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
   const c = (w.chars && w.chars[0]) || w.char;
@@ -8228,6 +8371,8 @@ const shortGame = makeGame({
     if (count === 5) {
       setTimeout(() => pop('🎮 게임 가능! 단문 게임이 열렸어요!'), 500);
     }
+    // 🎰 가챠 이벤트 단문 카운터
+    try { onShortCompleteForEvent(); } catch(e) {}
     setTimeout(() => nextShort(), 800);
   }
 });
@@ -9994,6 +10139,8 @@ try { renderKeyboard(); } catch(e) { console.error('renderKeyboard:', e); }
 try { updateAllPracticeGameUI(); } catch(e) { console.error('updateAllPracticeGameUI:', e); }
 // Start cloud sync (will prompt for nickname on first visit)
 try { cloudSync.start(); } catch(e) { console.error('cloudSync.start:', e); }
+// 🎰 깜짝 이벤트 체크 (cloud sync 끝난 후 실행되도록 지연)
+setTimeout(() => { try { checkSpecialEvent(); } catch(e) { console.error('checkSpecialEvent:', e); } }, 2500);
 
 // Parent-password-protected reset (so kids can't accidentally nuke records)
 function parentResetConfirm() {
