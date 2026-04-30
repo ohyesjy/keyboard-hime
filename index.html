@@ -680,6 +680,11 @@
     100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
   }
 
+  /* 풀 테마 월드는 어플 배경 영상 숨김 (CSS 배경이 보이게) */
+  body.world-chainsaw #bgVideo,
+  body.world-kimetsu #bgVideo,
+  body.world-miku #bgVideo { display: none !important; }
+
   /* ========= 체인소맨 월드 전체 테마 ========= */
   body.world-chainsaw {
     background:
