@@ -6891,8 +6891,16 @@ const PAGE_LABELS = {
 let currentTab = 'home';
 
 function showTab(tab) {
-  // 매 페이지 전환마다 월드 테마 클래스 재적용 (캐시 등으로 누락 방지)
-  try { if (currentWorldId) applyWorldThemeClass(currentWorldId); } catch(e) {}
+  // 월드 테마 적용은 캐릭터를 골라서 입장한 후에만 (월드게이트/캐릭터선택 화면은 기본 테마)
+  // tab이 'home'이고 캐릭터가 아직 안 골라졌으면 → 테마 클래스 제거 (기본 첫화면)
+  try {
+    const onGate = (tab === 'home') && (!state || !state.currentChar || !getCurrentChar());
+    if (onGate) {
+      applyWorldThemeClass(null);
+    } else if (currentWorldId) {
+      applyWorldThemeClass(currentWorldId);
+    }
+  } catch(e) {}
   document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   // Home routes: world gate → character select → dashboard
@@ -10433,8 +10441,15 @@ try { renderStats(); } catch(e) { console.error('renderStats:', e); }
 try { renderBadges(); } catch(e) { console.error('renderBadges:', e); }
 try { renderKeyboard(); } catch(e) { console.error('renderKeyboard:', e); }
 try { updateAllPracticeGameUI(); } catch(e) { console.error('updateAllPracticeGameUI:', e); }
-// 월드 테마 클래스 즉시 적용 (페이지 로드 시 현재 월드)
-try { if (typeof currentWorldId !== 'undefined' && currentWorldId) applyWorldThemeClass(currentWorldId); } catch(e) {}
+// 월드 테마 클래스 즉시 적용 — 단, 캐릭터까지 골라진 상태에서만 (월드게이트/캐릭터선택 첫화면은 기본 테마 유지)
+try {
+  if (typeof currentWorldId !== 'undefined' && currentWorldId
+      && state && state.currentChar && typeof getCurrentChar === 'function' && getCurrentChar()) {
+    applyWorldThemeClass(currentWorldId);
+  } else {
+    applyWorldThemeClass(null);
+  }
+} catch(e) {}
 // Start cloud sync (will prompt for nickname on first visit)
 try { cloudSync.start(); } catch(e) { console.error('cloudSync.start:', e); }
 // 🎰 깜짝 이벤트 체크 (cloud sync 끝난 후 실행되도록 지연)
