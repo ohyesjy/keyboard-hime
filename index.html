@@ -4824,11 +4824,17 @@ function switchWorld(worldId) {
   buildCharacters();
   // 도감 재할당
   COLLECTION = WORLD_COLLECTIONS[worldId] || WORLD_COLLECTIONS.frieren;
-  // 테마 색상 적용
-  document.body.style.background = w.theme.bg;
+  // 테마 색상 적용 — 풀 CSS 테마가 있는 월드는 인라인 배경 안 입힘
+  const hasFullTheme = ['chainsaw','kimetsu','miku'].includes(worldId);
+  if (hasFullTheme) {
+    document.body.style.removeProperty('background');
+  } else {
+    document.body.style.background = w.theme.bg;
+  }
   // body에 월드 클래스 세팅 (CSS 분기용)
-  document.body.classList.remove('world-frieren','world-saiki','world-chainsaw','world-kimetsu','world-miku');
+  document.body.classList.remove('world-frieren','world-saiki','world-chainsaw','world-kimetsu','world-miku','no-finger-tutorial');
   document.body.classList.add('world-' + worldId);
+  if (w && w.noFinger) document.body.classList.add('no-finger-tutorial');
   // 월드 자막 업데이트
   const sub = document.getElementById('worldSubtitle');
   if (sub) sub.textContent = `🌍 ${w.name} 월드`;
@@ -5289,6 +5295,11 @@ function applyWorldThemeClass(worldId) {
     body.classList.add('world-' + worldId);
     const w = WORLDS.find(x => x.id === worldId);
     if (w && w.noFinger) body.classList.add('no-finger-tutorial');
+    // 인라인 배경 스타일 제거 — CSS가 우선되도록
+    // chainsaw/kimetsu/miku 같은 풀 테마 월드는 body.world-* 클래스 CSS만 사용
+    if (worldId === 'chainsaw' || worldId === 'kimetsu' || worldId === 'miku') {
+      body.style.removeProperty('background');
+    }
   }
 }
 
