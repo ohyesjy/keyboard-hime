@@ -5763,18 +5763,16 @@ function pickStreak7Reward(worldId) {
   }, 1500);
 }
 
-/* ========= 🎰 시윤 깜짝 이벤트: 단문 3회 연습 시 캐릭터 가챠 =========
-   테스트 모드: 모든 닉네임에 대해 즉시 발동 (가챠 완료 전까지)
-   본 이벤트로 전환 시 아래 주석 처리된 게이트(date/time/nick)를 활성화하세요. */
+/* ========= 🎰 시윤 깜짝 이벤트 (2026-05-01 시윤 입장 시 발동)
+   단문 3회 연습 → 축하 + 덴지(체인소맨) 월드 비번 직접 공개 (선택 단계 없음) */
 function checkSpecialEvent() {
   try {
-    // ── 본 이벤트 배포 시 아래 주석 해제 ──
-    // const now = new Date();
-    // const isEventDay = now.getFullYear() === 2026 && now.getMonth() === 3 && now.getDate() === 30;
-    // const isAfter7pm = now.getHours() >= 19;
-    // const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
-    // if (!isEventDay || !isAfter7pm) return;
-    // if (nick !== '시윤') return;
+    const now = new Date();
+    // 2026년 5월 1일 (금) — 시윤 전용
+    const isEventDay = now.getFullYear() === 2026 && now.getMonth() === 4 && now.getDate() === 1;
+    const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
+    if (!isEventDay) return;
+    if (nick !== '시윤') return;
     state.eventGacha = state.eventGacha || { announced: false, shortDone: 0, gachaDone: false };
     if (state.eventGacha.gachaDone) return;
     if (state.eventGacha.announced) return;
@@ -5786,24 +5784,23 @@ function checkSpecialEvent() {
 
 function showEventGachaAnnounce() {
   const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
-  // ✨ 장송의 프리렌 마법진 효과 — 화면 중앙에서 마법진 전개
+  // ✨ 프리렌 마법진 효과
   try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
   const modal = document.createElement('div');
   modal.className = 'streak7-modal';
   modal.innerHTML = `
     <div class="streak7-backdrop">
       <div class="streak7-box">
-        <div class="streak7-confetti">🎰✨🎁✨🎰</div>
-        <h2 class="streak7-title">오늘 캐릭터 가챠!! 🎰</h2>
+        <div class="streak7-confetti">🎁✨💖✨🎁</div>
+        <h2 class="streak7-title">${nick}짱 깜짝 선물!! 🎁</h2>
         <p class="streak7-msg">
-          ${nick}짱! 오늘 저녁 특별 이벤트야 ✨<br><br>
+          ${nick}짱! 오늘 특별 이벤트야 ✨<br><br>
           <b style="color:#d6336c;font-size:18px">✏️ 단문 3회 연습</b>을 끝내면<br>
-          <b>새 캐릭터를 뽑을 수 있어!</b> 🎁
+          <b>새 캐릭터의 비밀번호를 알려줄게!</b> 🔐
         </p>
         <button class="btn" onclick="this.closest('.streak7-modal').remove();showTab('short')" style="font-size:16px">단문 연습 시작하기 →</button>
       </div>
     </div>`;
-  // 마법진 전개 후 모달 등장 (1.2초 뒤)
   setTimeout(() => {
     document.body.appendChild(modal);
     try { successSound(); } catch(e) {}
@@ -5817,12 +5814,47 @@ function onShortCompleteForEvent() {
   save();
   const remain = 3 - state.eventGacha.shortDone;
   if (remain > 0) {
-    pop(`🎰 가챠까지 ${remain}회 남음! (${state.eventGacha.shortDone}/3)`);
+    pop(`🎁 보상까지 ${remain}회 남음! (${state.eventGacha.shortDone}/3)`);
   } else {
     state.eventGacha.gachaDone = true;
+    // 덴지(체인소맨) 월드 자동 차단 해제하지 말고, 비번만 직접 알려줌 (시윤이 직접 입력하는 재미 유지)
     save();
-    setTimeout(showEventGacha, 1500);
+    setTimeout(showEventGiftDenji, 1500);
   }
+}
+
+// 단문 3회 완료 → 덴지 월드 비번 직접 공개 (선택 단계 없음, 시윤 전용 기프트)
+function showEventGiftDenji() {
+  const w = WORLDS.find(x => x.id === 'chainsaw');
+  if (!w) return;
+  const c = (w.chars && w.chars[0]) || w.char;
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // 프리렌 마법진 효과
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box streak7-pw-box">
+        <div class="streak7-pw-confetti">🎁✨🎁</div>
+        <h2 class="streak7-title">${nick}짱 단문 3회 완료!! 🎉</h2>
+        <p class="streak7-msg">
+          정말 잘했어 ^^ 약속한 선물을 줄게 🎁<br>
+          오늘부터 <b style="color:#d6336c;font-size:18px">${c.name}</b>(${w.name})와 친해질 수 있어!<br><br>
+          ${c.name}와 만나려면 비밀번호가 필요해 🔐
+        </p>
+        <div class="streak7-pw-display">${w.password}</div>
+        <p class="streak7-msg" style="font-size:13px;color:#666">
+          이 비밀번호를 외워둬!<br>
+          월드 변경 → 덴지 카드 → 비밀번호 ${w.password} 입력하면 입장 💖
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove()" style="margin-top:14px">알겠어! (${nick}만의 비밀)</button>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
 }
 
 function showEventGacha() {
