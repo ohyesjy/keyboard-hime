@@ -6848,6 +6848,8 @@ const PAGE_LABELS = {
 let currentTab = 'home';
 
 function showTab(tab) {
+  // 매 페이지 전환마다 월드 테마 클래스 재적용 (캐시 등으로 누락 방지)
+  try { if (currentWorldId) applyWorldThemeClass(currentWorldId); } catch(e) {}
   document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   // Home routes: world gate → character select → dashboard
