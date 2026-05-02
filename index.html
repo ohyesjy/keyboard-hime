@@ -805,8 +805,11 @@
   body.world-chainsaw .mission h4 { color: #ffd400 !important; }
   body.world-chainsaw .keyboard { background: #0a0a0a !important; border: 2px solid #e94560; }
 
-  /* noFinger 월드: 손가락자리 페이지의 튜토리얼만 숨김 (탭/연습 자체는 유지) */
+  /* noFinger 월드 (체인소맨/귀멸/미쿠): 손가락자리 완전 제거 — 낱말/단문/장문/게임으로 연습 */
   body.no-finger-tutorial .finger-tutorial-section { display: none !important; }
+  body.no-finger-tutorial .nav button[data-tab="finger"] { display: none !important; }
+  body.no-finger-tutorial #tab-finger { display: none !important; }
+  body.no-finger-tutorial .home-card[data-section="finger"] { display: none !important; }
 
   /* Game unlock popup */
   .game-unlock-overlay {
@@ -6923,12 +6926,18 @@ function showTab(tab) {
   // 월드 테마는 대시보드/연습 페이지에서만 — 월드게이트(첫화면)는 항상 기본 테마
   try {
     if (tab === 'home' && !currentWorldId) {
-      // 월드게이트(첫화면) → 테마 제거
       applyWorldThemeClass(null);
     } else if (currentWorldId) {
       applyWorldThemeClass(currentWorldId);
     } else {
       applyWorldThemeClass(null);
+    }
+  } catch(e) {}
+  // noFinger 월드에서 손가락자리 접근 시도 → 낱말로 자동 우회
+  try {
+    const curW = WORLDS.find(w => w.id === currentWorldId);
+    if (curW && curW.noFinger && tab === 'finger') {
+      tab = 'word';
     }
   } catch(e) {}
   document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
