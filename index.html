@@ -707,11 +707,11 @@
   /* ========= 체인소맨 월드 전체 테마 ========= */
   body.world-chainsaw {
     background:
-      linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(20,10,20,0.65) 60%, rgba(40,10,20,0.8) 100%),
-      url("체인소맨/덴지로제 배경.jpeg") center top / cover no-repeat fixed,
-      linear-gradient(180deg, #0a0a0a 0%, #1a0a14 50%, #2a0a14 100%) !important;
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.15) 100%),
+      url("체인소맨/메인배경.png") center center / cover no-repeat fixed,
+      #1a1a1a !important;
     background-attachment: fixed, fixed, fixed !important;
-    color: #f0f0f0 !important;
+    color: #1a1a1a !important;
   }
   body.world-chainsaw::before {
     content: ''; position: fixed; inset: 0;
@@ -760,14 +760,15 @@
     box-shadow: 0 0 14px rgba(233,69,96,0.7), 0 0 28px rgba(255,140,0,0.4);
   }
   body.world-chainsaw .panel {
-    background: rgba(15,10,15,0.85) !important;
-    border: 2px solid rgba(233,69,96,0.4);
-    box-shadow: 0 14px 40px rgba(0,0,0,0.5), inset 0 0 60px rgba(233,69,96,0.05);
-    color: #f0f0f0;
+    background: rgba(255,255,255,0.96) !important;
+    border: 4px solid #e94560 !important;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.5), 0 0 40px rgba(233,69,96,0.3) !important;
+    color: #1a1a1a;
   }
-  body.world-chainsaw .panel h2,
-  body.world-chainsaw .panel h3 { color: #ff6b6b !important; }
-  body.world-chainsaw .panel .hint { color: #c0a0a0 !important; }
+  body.world-chainsaw .panel h2 { color: #e94560 !important; }
+  body.world-chainsaw .panel h3 { color: #e94560 !important; }
+  body.world-chainsaw .panel .hint { color: #555 !important; }
+  body.world-chainsaw .panel p { color: #2a2a2a; }
   body.world-chainsaw .btn {
     background: linear-gradient(135deg, #e94560, #ff6b6b) !important;
     box-shadow: 0 4px 14px rgba(233,69,96,0.5), 0 0 0 2px #1a0a0a !important;
