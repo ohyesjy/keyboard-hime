@@ -5763,16 +5763,12 @@ function pickStreak7Reward(worldId) {
   }, 1500);
 }
 
-/* ========= 🎰 시윤 깜짝 이벤트 (2026-05-01 시윤 입장 시 발동)
+/* ========= 🎰 시윤 깜짝 이벤트 (시윤 입장 시 1회 발동)
    단문 3회 연습 → 축하 + 덴지(체인소맨) 월드 비번 직접 공개 (선택 단계 없음) */
 function checkSpecialEvent() {
   try {
-    const now = new Date();
-    // 2026년 5월 1일 (금) — 시윤 전용
-    const isEventDay = now.getFullYear() === 2026 && now.getMonth() === 4 && now.getDate() === 1;
     const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
-    if (!isEventDay) return;
-    if (nick !== '시윤') return;
+    if (nick !== '시윤') return; // 시윤 전용
     state.eventGacha = state.eventGacha || { announced: false, shortDone: 0, gachaDone: false };
     if (state.eventGacha.gachaDone) return;
     if (state.eventGacha.announced) return;
