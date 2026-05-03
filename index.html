@@ -10500,6 +10500,16 @@ try {
     applyWorldThemeClass(null);
   }
 } catch(e) {}
+// 월드게이트 카드 강제 렌더링 (혹시 누락 방지)
+setTimeout(() => {
+  try {
+    const grid = document.getElementById('worldGateGrid');
+    if (grid && grid.children.length === 0) {
+      console.warn('[키보드히메] World gate empty — forcing re-render');
+      renderWorldGate();
+    }
+  } catch(e) { console.error('forced renderWorldGate:', e); }
+}, 1000);
 // Start cloud sync (will prompt for nickname on first visit)
 try { cloudSync.start(); } catch(e) { console.error('cloudSync.start:', e); }
 // 🎰 깜짝 이벤트 체크 (cloud sync 끝난 후 실행되도록 지연)
