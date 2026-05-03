@@ -4515,6 +4515,7 @@ const WORLDS = [
   {
     id: 'chainsaw',
     name: '체인소맨',
+    alwaysLocked: true,  // 항상 비밀번호 필요 (시윤이만 입장 가능)
     char: { id: 'pochita', name: '포치타', role: '데빌헌터', tagline: '체인소의 악마와 함께!',
             series: '체인소맨', img: '체인소맨/포치타도감.jpeg', fallback: '🐕' },
     chars: [
@@ -4910,7 +4911,8 @@ function renderWorldGate() {
   // 각 월드의 캐릭터를 개별 카드로 표시
   let cards = '';
   WORLDS.forEach(w => {
-    const isUnlocked = worldState.unlockedWorlds.includes(w.id);
+    // alwaysLocked 월드(체인소맨)는 항상 비번 입력 필요 — 영구 해금 안 됨
+    const isUnlocked = !w.alwaysLocked && worldState.unlockedWorlds.includes(w.id);
     const isCompleted = worldState.completedWorlds.includes(w.id);
     const chars = w.chars || [w.char];
     chars.forEach(c => {
@@ -5470,13 +5472,15 @@ function checkPw() {
   if (!w) return;
   if (pwInput === w.password) {
     // 정답!
-    worldState.unlockedWorlds.push(w.id);
-    saveWorldState();
+    // alwaysLocked 월드는 영구 해금하지 않음 (매번 비번 입력 필요 — 시윤이만 입장 가능)
+    if (!w.alwaysLocked) {
+      worldState.unlockedWorlds.push(w.id);
+      saveWorldState();
+    }
     closeWorldPw();
     pop(`🎉 ${w.name} 월드가 열렸어요!`);
     try { comboSound(10); } catch(e) {}
     renderWorldGate();
-    // 바로 입장
     setTimeout(() => enterWorld(w.id), 800);
   } else {
     // 틀림! 흔들기 효과
