@@ -1,0 +1,26 @@
+{
+  "name": "키보드히메",
+  "short_name": "키보드히메",
+  "description": "초등학생 한글 타자 연습 게임",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffd89b",
+  "theme_color": "#d6336c",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "장송의프리렌/fern.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "장송의프리렌/fern.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
