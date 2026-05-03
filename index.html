@@ -4910,6 +4910,12 @@ function renderWorldGate() {
   if (!grid) return;
   // 각 월드의 캐릭터를 개별 카드로 표시
   let cards = '';
+  // 안전 가드 — worldState 필드가 누락된 경우 기본값 보강
+  if (!worldState || typeof worldState !== 'object') {
+    worldState = { unlockedWorlds: ['frieren','saiki'], completedWorlds: [], currentWorld: null };
+  }
+  if (!Array.isArray(worldState.unlockedWorlds)) worldState.unlockedWorlds = ['frieren','saiki'];
+  if (!Array.isArray(worldState.completedWorlds)) worldState.completedWorlds = [];
   WORLDS.forEach(w => {
     // alwaysLocked 월드(체인소맨)는 항상 비번 입력 필요 — 영구 해금 안 됨
     const isUnlocked = !w.alwaysLocked && worldState.unlockedWorlds.includes(w.id);
