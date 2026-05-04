@@ -14,18 +14,32 @@
 <meta name="apple-mobile-web-app-title" content="키보드히메">
 <link rel="apple-touch-icon" href="장송의프리렌/fern.jpg">
 <script>
-// 페이지 로드 즉시: 잔여 서비스 워커 + 캐시 모두 정리 (PWA 캐시 자동 해제)
-(function autoCleanCache(){
+// PWA 서비스 워커 등록 — Network-First 전략으로 항상 최신 HTML/JS 가져옴
+// (PWA 캐시 문제 해결: 매번 새 코드 자동 로드, 오프라인 시에만 캐시 폴백)
+(function registerSW(){
   try {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        regs.forEach(r => r.unregister());
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+          .then(reg => {
+            // 매번 등록 시점에 즉시 업데이트 체크
+            try { reg.update(); } catch(e) {}
+            // 새 워커 활성화되면 페이지 자동 새로고침
+            reg.addEventListener('updatefound', () => {
+              const nw = reg.installing;
+              if (!nw) return;
+              nw.addEventListener('statechange', () => {
+                if (nw.state === 'activated' && navigator.serviceWorker.controller) {
+                  console.log('[키보드히메] 새 버전 감지 — 자동 새로고침');
+                  setTimeout(() => location.reload(), 500);
+                }
+              });
+            });
+          })
+          .catch(err => console.warn('[키보드히메] SW 등록 실패:', err));
       });
     }
-    if ('caches' in window) {
-      caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-    }
-  } catch(e) {}
+  } catch(e) { console.warn('SW init:', e); }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
