@@ -5794,7 +5794,13 @@ function openWorldPw(worldId) {
   pwInput = '';
   const w = WORLDS.find(ww => ww.id === worldId);
   if (!w) return;
-  document.getElementById('worldPwChar').textContent = w.gateEmoji;
+  // 체인소맨은 덴지 누끼 이미지, 그 외는 이모지
+  var pwCharEl = document.getElementById('worldPwChar');
+  if (worldId === 'chainsaw') {
+    pwCharEl.innerHTML = '<img src="' + encodeURI('체인소맨/denji_pw.png') + '" alt="덴지" style="width:140px;height:auto;display:block;margin:0 auto;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));">';
+  } else {
+    pwCharEl.textContent = w.gateEmoji;
+  }
   document.getElementById('worldPwTitle').textContent = `🔒 ${w.name} 비밀번호`;
   renderPwDots();
   renderPwKeypad();
