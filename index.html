@@ -11597,11 +11597,14 @@ function wdShowSpeedUp() {
     var typed = inputEl.value;
     var active = getActiveBuilding();
     if (!active) return;
-    // typed가 word의 prefix가 아니면 잘못된 입력 — 무시 (또는 시각 표시)
+    // 타이핑 사운드 (글자가 추가됐을 때)
+    if (typed.length > (active.typed || '').length) {
+      try { if (typeof clickSound === 'function') clickSound(); } catch(_) {}
+    }
+    // typed가 word의 prefix가 아니면 잘못된 입력 — 무시
     if (active.word.indexOf(typed) === 0) {
       active.typed = typed;
     } else {
-      // 잘못된 키 → 그냥 두면 prefix 안 맞음
       active.typed = '';
     }
   }
@@ -11613,7 +11616,7 @@ function wdShowSpeedUp() {
         // 식빵 먹기 효과 — 점프 대신
         eatActiveBread(active);
         inputEl.value = '';
-        try { if (typeof successSound === 'function') successSound(); } catch(_) {}
+        csCookieCrunchSound();
       } else {
         // 미완료 시 입력 클리어 (잘못된 단어 방지)
         inputEl.value = '';
@@ -11621,6 +11624,47 @@ function wdShowSpeedUp() {
       }
       e.preventDefault();
     }
+  }
+  function csCookieCrunchSound() {
+    try {
+      var ctx = (window._csAudioCtx = window._csAudioCtx || new (window.AudioContext || window.webkitAudioContext)());
+      var now = ctx.currentTime;
+      // 3~4번 연속 짧은 크런치 (쿠키 부서지는 느낌)
+      var crunches = 3 + Math.floor(Math.random() * 2);
+      for (var i = 0; i < crunches; i++) {
+        var t = now + i * (0.04 + Math.random() * 0.03);
+        var len = 0.025 + Math.random() * 0.02;
+        var size = Math.floor(ctx.sampleRate * len);
+        var buf = ctx.createBuffer(1, size, ctx.sampleRate);
+        var data = buf.getChannelData(0);
+        for (var k = 0; k < size; k++) data[k] = (Math.random()*2-1) * Math.pow(1 - k/size, 0.6);
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        var bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = 1500 + Math.random() * 1500;
+        bp.Q.value = 1.8;
+        var hp = ctx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.value = 600;
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.18, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + len);
+        src.connect(hp).connect(bp).connect(g).connect(ctx.destination);
+        src.start(t); src.stop(t + len + 0.01);
+      }
+      // 마지막에 부드러운 "냠" 사운드 (저음 살짝)
+      var endT = now + crunches * 0.05 + 0.04;
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(280, endT);
+      osc.frequency.exponentialRampToValueAtTime(160, endT + 0.15);
+      var og = ctx.createGain();
+      og.gain.setValueAtTime(0.08, endT);
+      og.gain.exponentialRampToValueAtTime(0.001, endT + 0.18);
+      osc.connect(og).connect(ctx.destination);
+      osc.start(endT); osc.stop(endT + 0.2);
+    } catch(e) {}
   }
   function getActiveBuilding() {
     for (var i = 0; i < state.buildings.length; i++) {
