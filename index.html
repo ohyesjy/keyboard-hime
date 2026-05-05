@@ -3525,7 +3525,10 @@
   .cs-jump-stage {
     position: relative;
     width: 100%; height: 320px;
-    background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #f0e68c 100%);
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 100%),
+      url("체인소맨/jump_bg.jpg") center bottom / cover no-repeat,
+      linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #f0e68c 100%);
     border: 3px solid #1a1a1a;
     border-radius: 16px;
     overflow: hidden;
@@ -3542,9 +3545,9 @@
     position: absolute; bottom: 0; left: 0; right: 0;
     height: 50px;
     background:
-      repeating-linear-gradient(90deg, #5a3825 0, #5a3825 16px, #4a2d1c 16px, #4a2d1c 32px),
-      linear-gradient(180deg, #6b4226 0%, #4a2d1c 100%);
-    border-top: 3px solid #2a1a10;
+      linear-gradient(180deg, rgba(60,55,50,0.5) 0%, rgba(30,28,26,0.85) 100%);
+    border-top: 2px solid rgba(20,18,16,0.7);
+    backdrop-filter: blur(1px);
   }
   .cs-jump-pochita {
     position: absolute;
