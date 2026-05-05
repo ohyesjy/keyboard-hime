@@ -5645,8 +5645,11 @@ function ensureMissions() {
         { id: 'm1', name: '🍎 낱말 5번 연습', target: 5, progress: 0, reward: 30, type: 'practice_word' },
         { id: 'm2', name: '✏️ 단문 5번 연습', target: 5, progress: 0, reward: 30, type: 'practice_short' },
         { id: 'm3', name: '📖 장문 3번 연습', target: 3, progress: 0, reward: 40, type: 'practice_long' },
-        { id: 'm4', name: '💬 채팅 1번 완료', target: 1, progress: 0, reward: 30, type: 'practice_chat' },
       ];
+      // 체인소맨 월드는 채팅 미션 제외, 그 외 noFinger 월드는 채팅 추가
+      if (currentWorldId !== 'chainsaw') {
+        state.missions.push({ id: 'm4', name: '💬 채팅 1번 완료', target: 1, progress: 0, reward: 30, type: 'practice_chat' });
+      }
     } else {
       state.missions = [
         { id: 'm1', name: '🖐️ 기본자리 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_basic' },
