@@ -3507,6 +3507,147 @@
     .wd-hud-box b { font-size: 15px; }
   }
 </style>
+<style id="csJumpStyles">
+  /* ===== 체인소맨 점프 게임 ===== */
+  body.world-chainsaw #wdGameLegacy { display: none !important; }
+  body:not(.world-chainsaw) #csJump { display: none !important; }
+  body.world-chainsaw #csJump { display: block !important; }
+  .cs-jump { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+  .cs-jump-header h2 { color: #e94560 !important; margin-bottom: 4px; }
+  .cs-jump-header .hint { color: #555 !important; font-size: 13px; margin-bottom: 12px; }
+  .cs-jump-stats { display: flex; gap: 12px; margin-bottom: 10px; }
+  .cs-jump-stat {
+    flex: 1; text-align: center;
+    background: linear-gradient(135deg, rgba(20,10,15,0.92), rgba(40,15,20,0.88));
+    color: #ffd400; padding: 8px 12px; border-radius: 12px;
+    border: 2px solid #e94560; font-weight: 800; font-size: 16px;
+  }
+  .cs-jump-stage {
+    position: relative;
+    width: 100%; height: 320px;
+    background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #f0e68c 100%);
+    border: 3px solid #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+  .cs-jump-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.5) 0, transparent 60%),
+      radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.4) 0, transparent 50%);
+    pointer-events: none;
+  }
+  .cs-jump-ground {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 50px;
+    background:
+      repeating-linear-gradient(90deg, #5a3825 0, #5a3825 16px, #4a2d1c 16px, #4a2d1c 32px),
+      linear-gradient(180deg, #6b4226 0%, #4a2d1c 100%);
+    border-top: 3px solid #2a1a10;
+  }
+  .cs-jump-pochita {
+    position: absolute;
+    bottom: 50px; left: 80px;
+    width: 60px; height: auto;
+    z-index: 5;
+    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4));
+  }
+  .cs-jump-pochita.run {
+    animation: csPochitaBob 0.4s ease-in-out infinite alternate;
+  }
+  @keyframes csPochitaBob {
+    from { transform: translateY(0) rotate(-2deg); }
+    to { transform: translateY(-4px) rotate(2deg); }
+  }
+  .cs-jump-buildings { position: absolute; inset: 0; pointer-events: none; }
+  .cs-jump-bld {
+    position: absolute; bottom: 50px;
+    width: 78px;
+    background: linear-gradient(180deg, #2a2a35 0%, #1a1a25 100%);
+    border: 2.5px solid #0a0a15;
+    border-radius: 4px 4px 0 0;
+    color: #ffd400;
+    text-align: center;
+    font-weight: 900;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.4) inset;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 6px 4px;
+  }
+  .cs-jump-bld::before {
+    content: '';
+    position: absolute; top: 8px; left: 4px; right: 4px; bottom: 30%;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,200,0.15) 0 4px, transparent 4px 8px),
+      repeating-linear-gradient(90deg, rgba(255,255,200,0.1) 0 6px, transparent 6px 12px);
+    pointer-events: none;
+  }
+  .cs-jump-bld-word {
+    position: relative; z-index: 2;
+    font-size: 16px; letter-spacing: 1px;
+    background: rgba(0,0,0,0.55);
+    padding: 4px 8px; border-radius: 6px;
+    border: 1.5px solid #ffd400;
+    color: #ffd400;
+    text-shadow: 0 0 4px rgba(255,212,0,0.6);
+  }
+  .cs-jump-bld.active {
+    box-shadow: 0 0 20px rgba(233,69,96,0.8), 0 0 40px rgba(233,69,96,0.4);
+    border-color: #e94560;
+  }
+  .cs-jump-bld-typed { color: #ff6b6b; }
+  .cs-jump-input-row {
+    margin-top: 12px;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .cs-jump-current {
+    flex: 1;
+    background: rgba(20,10,15,0.85);
+    color: #ffd400;
+    border: 2.5px solid #e94560;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 900; font-size: 18px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .cs-jump-input {
+    flex: 0 0 200px;
+    padding: 12px 14px;
+    border: 2.5px solid #e94560;
+    border-radius: 12px;
+    background: #1a0a0e;
+    color: #ffd400;
+    font-size: 16px; font-weight: 700;
+    outline: none;
+    caret-color: #ff8c00;
+  }
+  .cs-jump-input:focus {
+    border-color: #ff8c00;
+    box-shadow: 0 0 0 4px rgba(255,140,0,0.3);
+  }
+  .cs-jump-overlay {
+    position: absolute; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    color: #ffd400;
+    font-size: 28px; font-weight: 900;
+    text-align: center;
+    z-index: 20;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+  }
+  .cs-jump-overlay.show { display: flex; }
+  .cs-jump-overlay .big { font-size: 36px; color: #ff1744; text-shadow: 0 0 12px #ff1744; }
+  .cs-jump-overlay .sub { font-size: 16px; color: #fff; }
+  @media (max-width: 600px) {
+    .cs-jump-stage { height: 240px; }
+    .cs-jump-input-row { flex-direction: column; }
+    .cs-jump-input { width: 100%; flex: 1 1 100%; }
+  }
+</style>
 </head>
 <body>
 <!-- 🎬 어플 전체 배경 영상 (Pinterest MP4 루프) -->
