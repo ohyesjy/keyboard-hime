@@ -5469,7 +5469,7 @@ function enterWorldAsChar(worldId, charId, evt) {
     saiki: typeof telepathyEntrance === 'function' ? telepathyEntrance : null,
     frieren: typeof frierenMagicEntrance === 'function' ? frierenMagicEntrance : null,
     kimetsu: typeof kimetsuEntrance === 'function' ? kimetsuEntrance : null,
-    chainsaw: typeof chainsawEntrance === 'function' ? chainsawEntrance : null,
+    chainsaw: null,  // 체인소맨 입장 효과 비활성화 (사용자 요청)
     miku: typeof mikuEntrance === 'function' ? mikuEntrance : null,
   };
   try {
@@ -5509,7 +5509,7 @@ function enterWorld(worldId) {
     saiki: typeof telepathyEntrance === 'function' ? telepathyEntrance : null,
     frieren: typeof frierenMagicEntrance === 'function' ? frierenMagicEntrance : null,
     kimetsu: typeof kimetsuEntrance === 'function' ? kimetsuEntrance : null,
-    chainsaw: typeof chainsawEntrance === 'function' ? chainsawEntrance : null,
+    chainsaw: null,  // 체인소맨 입장 효과 비활성화 (사용자 요청)
     miku: typeof mikuEntrance === 'function' ? mikuEntrance : null,
   };
   try {
@@ -11069,5 +11069,71 @@ function wdShowSpeedUp() {
   });
 })();
 </script>
+
+<style>
+/* 포치타 마우스 트레일 (체인소맨 월드 전용) */
+.pochita-trail-particle {
+  position: fixed;
+  width: 60px;
+  height: auto;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.6s ease-out, transform 0.8s ease-out;
+  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+  user-select: none;
+}
+.pochita-trail-particle.spawn {
+  opacity: 0.9;
+  transform: translate(-50%, -50%) scale(1) rotate(0deg);
+}
+.pochita-trail-particle.fade {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6) rotate(15deg) translateY(20px);
+}
+@media (max-width: 600px) {
+  .pochita-trail-particle { width: 44px; }
+}
+</style>
+<script>
+(function() {
+  var TRAIL_IMG = '체인소맨/pochita_trail.png';
+  var lastSpawnAt = 0;
+  var SPAWN_INTERVAL = 90; // ms — 너무 자주 생성 방지
+  var lastX = 0, lastY = 0;
+  var lastMoveAt = 0;
+  function spawn(x, y) {
+    var now = Date.now();
+    if (now - lastSpawnAt < SPAWN_INTERVAL) return;
+    // 체인소맨 월드에서만 활성
+    if (!document.body.classList.contains('world-chainsaw')) return;
+    lastSpawnAt = now;
+    var img = document.createElement('img');
+    img.className = 'pochita-trail-particle';
+    img.src = encodeURI(TRAIL_IMG) + '?v=' + (Math.floor(now/300000));
+    img.alt = '';
+    img.style.left = x + 'px';
+    img.style.top = y + 'px';
+    document.body.appendChild(img);
+    requestAnimationFrame(function() { img.classList.add('spawn'); });
+    setTimeout(function() {
+      img.classList.remove('spawn');
+      img.classList.add('fade');
+    }, 250);
+    setTimeout(function() {
+      if (img.parentNode) img.parentNode.removeChild(img);
+    }, 1100);
+  }
+  document.addEventListener('mousemove', function(e) {
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    // 일정 거리 이상 움직였을 때만 (정지 시 생성 방지)
+    if (dist < 24) return;
+    lastX = e.clientX; lastY = e.clientY;
+    spawn(e.clientX, e.clientY);
+  }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
