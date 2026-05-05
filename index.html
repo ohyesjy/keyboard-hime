@@ -7729,7 +7729,9 @@ function makeGame(opts) {
         }
         this.pos = correctLen;
         this.errors++;
-        errorSound();
+        // 손가락자리 등 단일 자음/모음 모드만 errorSound 사용 (deferResult=false)
+        // 낱말/단문/장문은 한글 IME 조합 중간에 거짓 오타가 빈번해서 사운드 무음
+        if (!this.deferResult) errorSound();
         this.updateLive();
       }
       this.render();
