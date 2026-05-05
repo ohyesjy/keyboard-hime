@@ -1350,87 +1350,40 @@
   }
 
   /* Dashboard */
-  .dash-row {
-    display: flex; flex-direction: column; gap: 14px;
-    margin: 10px 0 22px 0;
-    width: 50%; margin-left: auto;
-    align-items: stretch;
-  }
-  .dash-row > .dash-header { flex: 0 0 auto; margin: 0; min-width: 0; width: 100%; }
-  .dash-row > .dash-game-shortcut {
-    flex: 0 0 auto; width: 100%;
+  /* 덴지 카드 안에 체인소맨 게임 버튼 통합 */
+  .dash-header.dash-header-wide { gap: 18px; }
+  .dash-header .dash-game-shortcut {
+    flex: 0 0 auto;
+    width: 130px;
     background: transparent;
-    border: none; border-radius: 0;
-    box-shadow: none;
+    border: none;
     overflow: visible;
     position: relative;
     cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px;
+    display: flex; align-items: center; justify-content: center;
     transition: transform 0.15s, filter 0.15s;
-    min-height: 110px;
-    padding: 0;
+    margin-left: auto;
   }
-  .dash-row > .dash-game-shortcut:hover {
-    transform: translate(-2px, -2px) scale(1.02);
-    filter: drop-shadow(0 0 12px rgba(233,69,96,0.45));
+  .dash-header .dash-game-shortcut:hover {
+    transform: translateY(-2px) scale(1.04);
+    filter: drop-shadow(0 0 14px rgba(233,69,96,0.55));
   }
-  .dash-row > .dash-game-shortcut img {
+  .dash-header .dash-game-shortcut img {
     width: 100%; height: auto;
-    max-height: 320px;
+    max-height: 160px;
     object-fit: contain; display: block;
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35));
   }
-  /* 네온 레드 'GAME START!' 레이블 — 가독성 강화 (검은 배경 + 굵은 외곽선) */
-  .dash-row > .dash-game-shortcut .dash-game-neon {
-    font-family: "Impact", "Arial Black", -apple-system, sans-serif;
-    font-weight: 900;
-    font-size: 38px;
-    letter-spacing: 3px;
-    color: #ff1744;
-    text-transform: uppercase;
-    background: rgba(10, 0, 0, 0.85);
-    border: 2.5px solid #ff1744;
-    border-radius: 12px;
-    padding: 8px 22px;
-    -webkit-text-stroke: 1.5px #fff;
-    text-shadow:
-      0 0 6px #ff1744,
-      0 0 14px #ff1744,
-      0 0 26px #ff1744,
-      0 0 50px #ff174488;
-    box-shadow:
-      0 0 12px rgba(255,23,68,0.7),
-      0 0 28px rgba(255,23,68,0.4),
-      inset 0 0 8px rgba(255,23,68,0.3);
-    animation: neonFlicker 2.5s ease-in-out infinite;
-    margin-top: 6px;
-    pointer-events: none;
-    user-select: none;
-    z-index: 5;
-    position: relative;
-  }
-  @keyframes neonFlicker {
-    0%, 18%, 22%, 25%, 53%, 57%, 100% {
-      text-shadow:
-        0 0 6px #ff1744,
-        0 0 14px #ff1744,
-        0 0 26px #ff1744,
-        0 0 50px #ff174488;
-      box-shadow:
-        0 0 12px rgba(255,23,68,0.7),
-        0 0 28px rgba(255,23,68,0.4),
-        inset 0 0 8px rgba(255,23,68,0.3);
-      opacity: 1;
-    }
-    20%, 24%, 55% {
-      text-shadow: 0 0 4px #ff1744;
-      box-shadow: 0 0 6px rgba(255,23,68,0.4), inset 0 0 4px rgba(255,23,68,0.2);
-      opacity: 0.92;
-    }
+  .dash-header .dash-game-shortcut .dash-game-fallback {
+    font-size: 14px; font-weight: 900;
+    background: linear-gradient(135deg, #ffd43b, #fab005);
+    color: #111; padding: 10px 14px;
+    border-radius: 12px; border: 2.5px solid #111;
+    box-shadow: 2px 2px 0 #111;
   }
   @media (max-width: 600px) {
-    .dash-row > .dash-game-shortcut .dash-game-neon { font-size: 26px; letter-spacing: 2px; padding: 6px 16px; }
+    .dash-header.dash-header-wide { flex-wrap: wrap; }
+    .dash-header .dash-game-shortcut { width: 100%; margin-left: 0; }
   }
   .dash-row > .dash-game-shortcut .dash-game-fallback {
     font-size: 22px; font-weight: 900;
@@ -3632,23 +3585,20 @@
     <div style="display:flex;gap:8px;margin-bottom:10px;">
       <button class="btn ghost" onclick="changeWorld()" style="font-size:12px;">🌍 월드 변경</button>
     </div>
-    <div class="dash-row">
+    <div class="dash-header dash-header-wide">
+      <div class="dash-portrait" id="dashPortrait">
+        <img id="dashImg" src="" alt="">
+        <div class="dash-fallback">🎮</div>
+      </div>
+      <div class="dash-info">
+        <h2 id="dashName">이름</h2>
+        <div class="dash-level"><b>Lv.<span id="dashLevel">1</span></b></div>
+        <div class="xp-bar"><div class="xp-fill" id="dashXpFill"></div></div>
+        <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
+      </div>
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
-        <span class="dash-game-neon" id="dashGameNeon">게임 START!</span>
-      </div>
-      <div class="dash-header">
-        <div class="dash-portrait" id="dashPortrait">
-          <img id="dashImg" src="" alt="">
-          <div class="dash-fallback">🎮</div>
-        </div>
-        <div class="dash-info">
-          <h2 id="dashName">이름</h2>
-          <div class="dash-level"><b>Lv.<span id="dashLevel">1</span></b></div>
-          <div class="xp-bar"><div class="xp-fill" id="dashXpFill"></div></div>
-          <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
-        </div>
       </div>
     </div>
 
