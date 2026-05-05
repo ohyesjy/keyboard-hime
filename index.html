@@ -3580,11 +3580,30 @@
     transition: left 0.05s linear;
   }
   .cs-jump-pochita.run {
-    animation: csPochitaBob 0.4s ease-in-out infinite alternate;
+    animation:
+      csPochitaRun 0.6s ease-in-out infinite,
+      csPochitaShadow 0.6s ease-in-out infinite;
+    transform-origin: 50% 100%;
   }
-  @keyframes csPochitaBob {
-    from { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)) brightness(1); }
-    to { filter: drop-shadow(2px 6px 4px rgba(0,0,0,0.5)) brightness(1.04); }
+  /* 포치타 달리는 모션 — 작게 폴짝폴짝 + 몸체 좌우 흔들 */
+  @keyframes csPochitaRun {
+    0%   { transform: translateY(0) rotate(-3deg) scaleY(1) scaleX(1); }
+    15%  { transform: translateY(-7px) rotate(0deg) scaleY(0.95) scaleX(1.05); }
+    30%  { transform: translateY(0) rotate(3deg) scaleY(1.05) scaleX(0.95); }
+    45%  { transform: translateY(-3px) rotate(1deg) scaleY(1) scaleX(1); }
+    60%  { transform: translateY(0) rotate(-2deg) scaleY(0.98) scaleX(1.02); }
+    75%  { transform: translateY(-9px) rotate(2deg) scaleY(0.92) scaleX(1.08); }
+    90%  { transform: translateY(0) rotate(-1deg) scaleY(1.04) scaleX(0.96); }
+    100% { transform: translateY(0) rotate(-3deg) scaleY(1) scaleX(1); }
+  }
+  /* 그림자 살짝 같이 변하기 */
+  @keyframes csPochitaShadow {
+    0%, 100% { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)) brightness(1); }
+    50%      { filter: drop-shadow(2px 8px 5px rgba(0,0,0,0.55)) brightness(1.06); }
+  }
+  @keyframes csPochitaBob { /* alias 유지 (호환) */
+    from { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)); }
+    to   { filter: drop-shadow(2px 6px 5px rgba(0,0,0,0.5)); }
   }
   /* 식빵 먹기 애니메이션 */
   @keyframes csBreadEat {
@@ -11555,10 +11574,9 @@ function wdShowSpeedUp() {
     setTimeout(function(){ if (burst.parentNode) burst.parentNode.removeChild(burst); }, 800);
   }
   function render() {
-    // pochita 위치 — 점프 제거됨, 항상 지면에
+    // pochita 위치 — 점프 제거됨, 항상 지면에. transform은 CSS run 애니메이션이 제어
     pochita.style.bottom = GROUND_Y + 'px';
     pochita.style.left = state.pochitaX + 'px';
-    pochita.style.transform = '';
     // 파랄랙스 제거 — 배경이 흘러가서 빈 공간(하늘색) 노출되던 문제 해결
     // buildings
     var html = '';
