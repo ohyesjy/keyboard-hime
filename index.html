@@ -1343,13 +1343,14 @@
 
   /* Dashboard */
   .dash-row {
-    display: flex; gap: 14px;
+    display: flex; flex-direction: column; gap: 14px;
     margin: 10px 0 22px 0;
+    width: 50%; margin-left: auto;
     align-items: stretch;
   }
-  .dash-row > .dash-header { flex: 1 1 50%; margin: 0; min-width: 0; }
+  .dash-row > .dash-header { flex: 0 0 auto; margin: 0; min-width: 0; width: 100%; }
   .dash-row > .dash-game-shortcut {
-    flex: 1 1 50%;
+    flex: 0 0 auto; width: 100%;
     background: #fff;
     border: 3px solid #111; border-radius: 20px;
     box-shadow: 5px 5px 0 #111;
@@ -1375,11 +1376,9 @@
     border-radius: 16px; border: 2.5px solid #111;
     box-shadow: 3px 3px 0 #111;
   }
-  /* 모바일: 세로 스택 */
+  /* 모바일: 전체 폭으로 확장 */
   @media (max-width: 600px) {
-    .dash-row { flex-direction: column; }
-    .dash-row > .dash-header,
-    .dash-row > .dash-game-shortcut { flex: 1 1 auto; }
+    .dash-row { width: 100%; margin-left: 0; }
   }
   .dash-header {
     display: flex; align-items: center; gap: 20px;
@@ -3571,6 +3570,10 @@
       <button class="btn ghost" onclick="changeWorld()" style="font-size:12px;">🌍 월드 변경</button>
     </div>
     <div class="dash-row">
+      <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
+        <img id="dashGameShortcutImg" alt="게임" style="display:none">
+        <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
+      </div>
       <div class="dash-header">
         <div class="dash-portrait" id="dashPortrait">
           <img id="dashImg" src="" alt="">
@@ -3582,10 +3585,6 @@
           <div class="xp-bar"><div class="xp-fill" id="dashXpFill"></div></div>
           <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
         </div>
-      </div>
-      <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
-        <img id="dashGameShortcutImg" alt="게임" style="display:none">
-        <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
       </div>
     </div>
 
