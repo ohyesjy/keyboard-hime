@@ -3949,6 +3949,7 @@
       <button class="btn game-unlock-btn" id="longGameBtn" onclick="openLongGame()" disabled>🎮 게임하기</button>
     </div>
   </div>
+  </div>
 
   <!-- CHAT -->
   <div class="panel" id="tab-chat" style="display:none">
@@ -3962,6 +3963,32 @@
 
   <!-- GAME: 낱말 떨어뜨리기 -->
   <div class="panel" id="tab-game" style="display:none">
+
+    <!-- ===== 체인소맨 월드 전용: 포치타 점프 게임 (너구리 스타일) ===== -->
+    <div id="csJump" class="cs-jump" style="display:none">
+      <div class="cs-jump-header">
+        <h2>🏃 포치타 빌딩 점프!</h2>
+        <p class="hint">빌딩에 적힌 낱말을 타이핑하고 <b>엔터</b>를 누르면 포치타가 점프해요. 빌딩이 높을수록 긴 낱말이에요!</p>
+      </div>
+      <div class="cs-jump-stats">
+        <div class="cs-jump-stat">⭐ <b id="csJumpScore">0</b></div>
+        <div class="cs-jump-stat">💀 <b id="csJumpLives">3</b></div>
+        <div class="cs-jump-stat">🔥 최고 <b id="csJumpBest">0</b></div>
+      </div>
+      <div class="cs-jump-stage" id="csJumpStage">
+        <div class="cs-jump-bg"></div>
+        <div class="cs-jump-ground"></div>
+        <img class="cs-jump-pochita" id="csJumpPochita" src="" alt="포치타">
+        <div class="cs-jump-buildings" id="csJumpBuildings"></div>
+        <div class="cs-jump-overlay" id="csJumpOverlay"></div>
+      </div>
+      <div class="cs-jump-input-row">
+        <div class="cs-jump-current" id="csJumpCurrent">⏳ 첫 빌딩 대기중...</div>
+        <input type="text" id="csJumpInput" class="cs-jump-input" placeholder="여기에 낱말 입력 + Enter" autocomplete="off" autocapitalize="off">
+      </div>
+      <button class="btn ghost" id="csJumpRestart" onclick="csJumpStart()" style="margin-top:10px">🔁 다시 시작</button>
+    </div>
+    <div id="wdGameLegacy">
     <h2>🎮 낱말 떨어뜨리기</h2>
     <p class="hint">낱말이 땅에 닿기 전에 타이핑해서 막아요! 15초마다 점점 빨라져요 🔥</p>
 
@@ -11132,6 +11159,255 @@ function wdShowSpeedUp() {
     lastX = e.clientX; lastY = e.clientY;
     spawn(e.clientX, e.clientY);
   }, { passive: true });
+})();
+</script>
+
+
+<script>
+/* ============= 체인소맨 점프 게임 (너구리 스타일) ============= */
+(function() {
+  var stage, pochita, buildingsEl, scoreEl, livesEl, bestEl, inputEl, currentEl, overlayEl;
+  var raf = null;
+  var lastT = 0;
+  var state = null;
+  var SPEED = 130; // 픽셀/초
+  var GRAVITY = 1400; // 픽셀/초^2
+  var GROUND_Y = 50; // ground 높이
+  var POCHITA_X = 80;
+  var POCHITA_W = 60;
+  var POCHITA_H = 60;
+  var BLD_W = 78;
+  var SPAWN_MIN = 1.6;
+  var SPAWN_MAX = 2.6;
+  function pickWord() {
+    var pool = (typeof WORLD_WORDS !== 'undefined' && WORLD_WORDS.chainsaw) ? WORLD_WORDS.chainsaw :
+      ['덴지','파워','마키마','포치타','체인소','악마','계약','잼','토스트','용기'];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function init() {
+    stage = document.getElementById('csJumpStage');
+    pochita = document.getElementById('csJumpPochita');
+    buildingsEl = document.getElementById('csJumpBuildings');
+    scoreEl = document.getElementById('csJumpScore');
+    livesEl = document.getElementById('csJumpLives');
+    bestEl = document.getElementById('csJumpBest');
+    inputEl = document.getElementById('csJumpInput');
+    currentEl = document.getElementById('csJumpCurrent');
+    overlayEl = document.getElementById('csJumpOverlay');
+    if (!stage || !inputEl) return;
+    pochita.src = encodeURI('체인소맨/pochita_trail.png') + '?v=' + Math.floor(Date.now()/300000);
+    inputEl.addEventListener('keydown', onKeyDown);
+    inputEl.addEventListener('input', onInput);
+    bestEl.textContent = parseInt(localStorage.getItem('csJumpBest') || '0', 10);
+  }
+  function csJumpStart() {
+    if (!stage) init();
+    if (!stage) return;
+    state = {
+      score: 0, lives: 3,
+      pochitaY: 0, vy: 0, jumping: false,
+      buildings: [],
+      spawnTimer: 0.5,
+      gameOver: false,
+      typed: ''
+    };
+    buildingsEl.innerHTML = '';
+    overlayEl.classList.remove('show');
+    overlayEl.innerHTML = '';
+    inputEl.value = '';
+    inputEl.disabled = false;
+    inputEl.focus();
+    pochita.classList.add('run');
+    updateUI();
+    lastT = performance.now();
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+  function loop(t) {
+    if (!state) return;
+    var dt = Math.min(0.04, (t - lastT) / 1000);
+    lastT = t;
+    update(dt);
+    render();
+    if (state.gameOver) return;
+    raf = requestAnimationFrame(loop);
+  }
+  function update(dt) {
+    // pochita physics
+    if (state.jumping || state.pochitaY > 0) {
+      state.vy -= GRAVITY * dt;
+      state.pochitaY += state.vy * dt;
+      if (state.pochitaY <= 0) {
+        state.pochitaY = 0; state.vy = 0; state.jumping = false;
+      }
+    }
+    // building spawn
+    state.spawnTimer -= dt;
+    if (state.spawnTimer <= 0) {
+      var word = pickWord();
+      var height = Math.min(180, 36 + word.length * 18);
+      state.buildings.push({
+        x: stage.clientWidth + 10,
+        word: word, height: height, typed: '', cleared: false, hit: false
+      });
+      state.spawnTimer = SPAWN_MIN + Math.random() * (SPAWN_MAX - SPAWN_MIN);
+    }
+    // move buildings
+    for (var i = 0; i < state.buildings.length; i++) {
+      var b = state.buildings[i];
+      b.x -= SPEED * dt;
+      // collision check: when building's right edge passes pochita's left
+      if (!b.cleared && !b.hit) {
+        var bldLeft = b.x;
+        var bldRight = b.x + BLD_W;
+        var pLeft = POCHITA_X;
+        var pRight = POCHITA_X + POCHITA_W;
+        var overlapping = bldRight > pLeft && bldLeft < pRight;
+        if (overlapping) {
+          // pochita 발 위치
+          var pochitaBottom = state.pochitaY;
+          if (pochitaBottom < b.height) {
+            // 충돌!
+            b.hit = true;
+            state.lives--;
+            // shake effect
+            stage.style.animation = 'csShake 0.3s';
+            setTimeout(function(){ if (stage) stage.style.animation = ''; }, 320);
+            if (state.lives <= 0) gameOver();
+          }
+        }
+        // passed without hit
+        if (!b.hit && bldRight < pLeft) {
+          b.cleared = true;
+          state.score++;
+          updateUI();
+        }
+      }
+    }
+    // remove off-screen
+    state.buildings = state.buildings.filter(function(b){ return b.x > -100; });
+  }
+  function render() {
+    // pochita
+    pochita.style.bottom = (GROUND_Y + state.pochitaY) + 'px';
+    // buildings
+    var html = '';
+    var activeIdx = -1;
+    for (var i = 0; i < state.buildings.length; i++) {
+      var b = state.buildings[i];
+      if (!b.cleared && !b.hit && activeIdx === -1) activeIdx = i;
+    }
+    for (var j = 0; j < state.buildings.length; j++) {
+      var b2 = state.buildings[j];
+      if (b2.cleared || b2.hit) continue;
+      var typedPart = b2.word.substring(0, b2.typed.length);
+      var restPart = b2.word.substring(b2.typed.length);
+      var activeClass = (j === activeIdx) ? ' active' : '';
+      html += '<div class="cs-jump-bld' + activeClass + '" style="left:' + Math.round(b2.x) + 'px; height:' + b2.height + 'px">' +
+        '<div class="cs-jump-bld-word"><span class="cs-jump-bld-typed">' + escapeHtml(typedPart) + '</span>' + escapeHtml(restPart) + '</div>' +
+        '</div>';
+    }
+    buildingsEl.innerHTML = html;
+    // current word display
+    var active = activeIdx >= 0 ? state.buildings[activeIdx] : null;
+    if (active) {
+      currentEl.innerHTML = '🎯 <b>' + escapeHtml(active.word) + '</b> (' + active.word.length + '글자) → 입력 후 Enter';
+    } else {
+      currentEl.textContent = '⏳ 다음 빌딩 대기...';
+    }
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[c]; }); }
+  function onInput(e) {
+    if (!state || state.gameOver) return;
+    var typed = inputEl.value;
+    var active = getActiveBuilding();
+    if (!active) return;
+    // typed가 word의 prefix가 아니면 잘못된 입력 — 무시 (또는 시각 표시)
+    if (active.word.indexOf(typed) === 0) {
+      active.typed = typed;
+    } else {
+      // 잘못된 키 → 그냥 두면 prefix 안 맞음
+      active.typed = '';
+    }
+  }
+  function onKeyDown(e) {
+    if (!state || state.gameOver) return;
+    if (e.key === 'Enter') {
+      var active = getActiveBuilding();
+      if (active && inputEl.value === active.word) {
+        // jump! 점프 높이를 빌딩 높이보다 살짝 더
+        var jumpH = active.height + 50;
+        // jumpH = (vy^2)/(2g)  →  vy = sqrt(2*g*h)
+        state.vy = Math.sqrt(2 * GRAVITY * jumpH);
+        state.jumping = true;
+        active.cleared = true;
+        state.score++;
+        updateUI();
+        inputEl.value = '';
+        // 점프 사운드
+        try { if (typeof successSound === 'function') successSound(); } catch(_) {}
+      } else {
+        // 미완료 시 입력 클리어 (잘못된 단어 방지)
+        inputEl.value = '';
+        if (active) active.typed = '';
+      }
+      e.preventDefault();
+    }
+  }
+  function getActiveBuilding() {
+    for (var i = 0; i < state.buildings.length; i++) {
+      if (!state.buildings[i].cleared && !state.buildings[i].hit) return state.buildings[i];
+    }
+    return null;
+  }
+  function updateUI() {
+    scoreEl.textContent = state.score;
+    livesEl.textContent = state.lives;
+  }
+  function gameOver() {
+    state.gameOver = true;
+    pochita.classList.remove('run');
+    inputEl.disabled = true;
+    var best = parseInt(localStorage.getItem('csJumpBest') || '0', 10);
+    if (state.score > best) {
+      localStorage.setItem('csJumpBest', String(state.score));
+      bestEl.textContent = state.score;
+    }
+    overlayEl.innerHTML = '<div class="big">GAME OVER</div><div>점수: ' + state.score + '</div><div class="sub">다시 시작 버튼을 눌러요</div>';
+    overlayEl.classList.add('show');
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+  }
+  // shake keyframes
+  var styleEl = document.createElement('style');
+  styleEl.textContent = '@keyframes csShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }';
+  document.head.appendChild(styleEl);
+  // 탭 진입 시 자동 시작 — body.world-chainsaw 이고 #tab-game 이 보일 때
+  function maybeAutostart() {
+    if (!document.body.classList.contains('world-chainsaw')) return;
+    var tab = document.getElementById('tab-game');
+    if (!tab || tab.style.display === 'none') return;
+    if (!stage) init();
+    if (!state || state.gameOver) csJumpStart();
+  }
+  // 노출 함수
+  window.csJumpStart = function() {
+    if (!stage) init();
+    csJumpStart();
+  };
+  // showTab 호출 후 자동 시작 — showTab을 hook
+  var origShowTab = window.showTab;
+  if (typeof origShowTab === 'function') {
+    window.showTab = function(name) {
+      var r = origShowTab.apply(this, arguments);
+      if (name === 'game') setTimeout(maybeAutostart, 200);
+      return r;
+    };
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(maybeAutostart, 600); });
+  }
+  // 초기화 시도
+  if (document.readyState !== 'loading') setTimeout(function(){ init(); }, 100);
+  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(init, 100); });
 })();
 </script>
 
