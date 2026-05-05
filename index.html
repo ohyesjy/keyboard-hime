@@ -7744,9 +7744,15 @@ function makeGame(opts) {
       const xp = Math.round(this.text.length * (acc/100) * 0.5 + 10);
       state.xp += xp;
       save();
-      // Clear input so lingering keystrokes don't carry over
-      this.inputEl.blur();
+      // 값만 클리어 — blur는 Enter 키 캐치 막아서 deferResult 게임에서 멈춤. completed 플래그가 타이핑 차단함
       this.inputEl.value = '';
+      if (!this.deferResult) {
+        // 손가락자리 등 기존 게임은 결과 모달 뜨므로 blur해서 입력 차단
+        this.inputEl.blur();
+      } else {
+        // 다음 진행 위해 포커스 유지
+        try { this.inputEl.focus(); } catch(_) {}
+      }
       // 결과 저장 (Enter 시 표시용)
       this._lastResult = { wpm: wpm, acc: acc, xp: xp };
       if (!this.deferResult) {
