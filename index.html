@@ -11393,7 +11393,7 @@ function wdShowSpeedUp() {
     lastT = performance.now();
     // 배경은 게임 시작 시점부터 60초마다 순환 (매 게임 시작 시 첫 배경부터)
     state.bgIndex = 0;
-    state.bgChangeAt = performance.now() + 60000;
+    state.bgChangeAt = performance.now() + 30000;
     setStageBg(0);
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(loop);
@@ -11425,7 +11425,7 @@ function wdShowSpeedUp() {
     if (t >= state.bgChangeAt) {
       state.bgIndex = (state.bgIndex + 1) % 7;
       setStageBg(state.bgIndex);
-      state.bgChangeAt = state.bgChangeAt + 60000; // 정확히 60초 더
+      state.bgChangeAt = state.bgChangeAt + 30000; // 정확히 30초 더
       console.log('[csJump] bg change at', Math.floor(t/1000) + 's, next at', Math.floor(state.bgChangeAt/1000) + 's');
     }
     update(dt);
