@@ -6097,6 +6097,17 @@ function grantRookieCardReward() {
   if (!state.dailyRookieGrantDate) state.dailyRookieGrantDate = '';
   const today = new Date().toDateString();
   if (state.dailyRookieGrantDate === today) return; // 하루 1번만
+  // ⭐ 미획득 뱃지 1개를 무작위로 지급 (오늘 미션 완료 보상)
+  if (typeof BADGES !== 'undefined') {
+    const unearned = BADGES.filter(b => !state.badges.includes(b.id));
+    if (unearned.length > 0) {
+      const newBadge = unearned[Math.floor(Math.random() * unearned.length)];
+      state.badges.push(newBadge.id);
+      pop('🏅 새 뱃지! ' + newBadge.icon + ' ' + newBadge.name);
+      try { if (typeof renderBadges === 'function') renderBadges(); } catch(_) {}
+      try { if (typeof renderStats === 'function') renderStats(); } catch(_) {}
+    }
+  }
   // 현재 월드의 C 루키 멤버 중 미획득 1명 랜덤 선택
   const collection = WORLD_COLLECTIONS[currentWorldId];
   if (!collection) return;
@@ -6175,6 +6186,8 @@ function renderStats() {
 }
 
 function checkBadges() {
+  // 자동 임계값 기반 뱃지 지급 비활성화 — 오늘 미션 완료 시에만 1개씩 지급
+  return;
   BADGES.forEach(b => {
     if (!state.badges.includes(b.id) && b.check()) {
       state.badges.push(b.id);
