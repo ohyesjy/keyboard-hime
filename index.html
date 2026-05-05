@@ -9169,8 +9169,15 @@ document.getElementById('wordInput').addEventListener('input', e => wordGame.han
 document.getElementById('wordInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && wordGame.completed) {
     e.preventDefault();
-    wordGame._lastResult = null;
-    nextWord();
+    if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
+      window.csSatisfyingSound();
+    }
+    if (wordGame._lastResult) {
+      const r = wordGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null, 700);
+      wordGame._lastResult = null;
+    }
+    setTimeout(() => nextWord(), 720);
   }
 });
 // 첫 포커스 시에만 startWord (이후에는 호출 안 함 — 큐 리셋 방지)
@@ -9236,8 +9243,15 @@ document.getElementById('shortInput').addEventListener('input', e => shortGame.h
 document.getElementById('shortInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && shortGame.completed) {
     e.preventDefault();
-    shortGame._lastResult = null;
-    nextShort();
+    if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
+      window.csSatisfyingSound();
+    }
+    if (shortGame._lastResult) {
+      const r = shortGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null, 500);
+      shortGame._lastResult = null;
+    }
+    setTimeout(() => nextShort(), 520);
   }
 });
 // 첫 포커스 시에만 startShort
@@ -9286,8 +9300,15 @@ document.getElementById('longInput').addEventListener('input', e => longGame.han
 document.getElementById('longInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && longGame.completed) {
     e.preventDefault();
-    longGame._lastResult = null;
-    nextLong();
+    if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
+      window.csSatisfyingSound();
+    }
+    if (longGame._lastResult) {
+      const r = longGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null, 500);
+      longGame._lastResult = null;
+    }
+    setTimeout(() => nextLong(), 520);
   }
 });
 document.getElementById('longInput').addEventListener('focus', () => {
