@@ -7764,7 +7764,7 @@ function pickPopupFace(acc) {
 // 다음 showResult에서 게임 해금 표시 여부
 let _showGameUnlockInModal = false;
 
-function showResult(wpm, acc, xp, img) {
+function showResult(wpm, acc, xp, img, durationMs) {
   document.getElementById('rWpm').textContent = wpm;
   document.getElementById('rAcc').textContent = acc + '%';
   document.getElementById('rXp').textContent = '+' + xp;
@@ -7788,8 +7788,8 @@ function showResult(wpm, acc, xp, img) {
   }
   const modal = document.getElementById('resultModal');
   modal.classList.add('show');
-  // Auto-dismiss after 0.7s
-  const AUTO_CLOSE_MS = 700;
+  // Auto-dismiss (default 0.7s, override via durationMs)
+  const AUTO_CLOSE_MS = (typeof durationMs === 'number' && durationMs > 0) ? durationMs : 700;
   document.getElementById('modalCountdown').textContent = '';
   clearInterval(window._modalTimer);
   clearTimeout(window._modalTimeout);
@@ -9181,10 +9181,10 @@ document.getElementById('shortInput').addEventListener('keydown', e => {
     e.preventDefault();
     if (shortGame._lastResult) {
       const r = shortGame._lastResult;
-      showResult(r.wpm, r.acc, r.xp, null);
+      showResult(r.wpm, r.acc, r.xp, null, 500);
       shortGame._lastResult = null;
     }
-    setTimeout(() => nextShort(), 720);
+    setTimeout(() => nextShort(), 520);
   }
 });
 // 첫 포커스 시에만 startShort
