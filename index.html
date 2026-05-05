@@ -2,6 +2,32 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<!-- 캐시 방지: 매번 최신 HTML 받아오게 (영석님이 매번 캐시 비우지 않게) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- PWA 매니페스트 — 맥북/iPad에서 앱처럼 설치 가능하게 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d6336c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="키보드히메">
+<link rel="apple-touch-icon" href="장송의프리렌/fern.jpg">
+<script>
+// 페이지 로드 즉시: 잔여 서비스 워커 + 캐시 모두 정리 (PWA 캐시 자동 해제)
+(function autoCleanCache(){
+  try {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+    }
+  } catch(e) {}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>키보드히메 - 타자연습</title>
 <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Poor+Story&display=swap" rel="stylesheet">
@@ -633,6 +659,174 @@
     50% { background-position: 100% 50%; box-shadow: 0 0 12px #e94560, 0 0 24px rgba(233,69,96,0.7); }
   }
 
+  /* 추가 슬래시(X자) */
+  .cs-slash-x1 { transform: translate(-50%, -50%) rotate(-65deg); animation: cs-cut 0.6s 0.5s ease-out forwards; }
+  .cs-slash-x2 { transform: translate(-50%, -50%) rotate(65deg); animation: cs-cut 0.6s 0.6s ease-out forwards; }
+  .cs-rip-flash {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--cx) var(--cy), rgba(255,212,0,0.5), rgba(233,69,96,0.3) 30%, transparent 60%);
+    opacity: 0; animation: cs-rip 0.5s 0.4s ease-out;
+  }
+  @keyframes cs-rip {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.3); }
+    100% { opacity: 0; transform: scale(1.6); }
+  }
+  /* 회전하는 톱날 SVG */
+  .cs-saw-wrap {
+    position: absolute; transform: translate(-50%,-50%) scale(0);
+    width: 280px; height: 280px;
+    animation: cs-saw-pop 2.4s 0.4s cubic-bezier(.17,.67,.35,1.2) forwards;
+    filter: drop-shadow(0 0 20px #ff8c00) drop-shadow(0 0 40px rgba(233,69,96,0.7));
+  }
+  .cs-saw {
+    width: 100%; height: 100%;
+    animation: cs-saw-spin 1.2s linear infinite;
+    transform-origin: center;
+  }
+  @keyframes cs-saw-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+  @keyframes cs-saw-pop {
+    0% { transform: translate(-50%,-50%) scale(0) rotate(-30deg); opacity: 0; }
+    25% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+    45% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+    75% { transform: translate(-50%,-50%) scale(1.05); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(0.4); opacity: 0; }
+  }
+  /* 노란 스파크 */
+  .cs-entrance .cs-spark {
+    position: absolute; width: 5px; height: 5px;
+    background: radial-gradient(circle, #ffd400, #ff8c00, transparent);
+    box-shadow: 0 0 8px #ffd400, 0 0 16px #ff8c00;
+    border-radius: 50%; opacity: 0;
+    animation: cs-spark-fly 0.9s ease-out forwards;
+  }
+  @keyframes cs-spark-fly {
+    0% { opacity: 0; transform: translate(0,0) scale(0.5); }
+    20% { opacity: 1; transform: scale(1.5); }
+    100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
+  }
+
+  /* 풀 테마 월드는 어플 배경 영상 숨김 (CSS 배경이 보이게) */
+  body.world-chainsaw #bgVideo,
+  body.world-kimetsu #bgVideo,
+  body.world-miku #bgVideo { display: none !important; }
+
+  /* ========= 체인소맨 월드 전체 테마 ========= */
+  body.world-chainsaw {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.15) 100%),
+      url("체인소맨/메인배경.png") center center / cover no-repeat fixed,
+      #1a1a1a !important;
+    background-attachment: fixed, fixed, fixed !important;
+    color: #1a1a1a !important;
+  }
+  body.world-chainsaw::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at top right, rgba(233,69,96,0.22), transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(255,140,0,0.18), transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  body.world-chainsaw .app { position: relative; z-index: 1; }
+  /* 체인 패턴 데코 — 페이지 모서리에 톱니 라인 */
+  body.world-chainsaw .app::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; height: 6px;
+    background: repeating-linear-gradient(90deg, #e94560 0 12px, #1a1a1a 12px 24px);
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(233,69,96,0.5);
+  }
+  body.world-chainsaw .app::after {
+    content: ''; position: fixed; bottom: 0; left: 0; right: 0; height: 6px;
+    background: repeating-linear-gradient(90deg, #1a1a1a 0 12px, #ff8c00 12px 24px);
+    z-index: 100;
+    box-shadow: 0 -2px 12px rgba(255,140,0,0.5);
+  }
+  body.world-chainsaw .topbar {
+    background: linear-gradient(135deg, rgba(20,10,15,0.92), rgba(40,15,20,0.88)) !important;
+    border: 2px solid #e94560 !important;
+    box-shadow: 0 4px 20px rgba(233,69,96,0.4), inset 0 0 30px rgba(233,69,96,0.1) !important;
+  }
+  body.world-chainsaw .topbar .logo { color: #ff6b6b !important; text-shadow: 0 0 8px #e94560; }
+  body.world-chainsaw .topbar .logo span { color: #ffd400 !important; }
+  body.world-chainsaw .stat { background: rgba(20,10,15,0.6) !important; color: #ffd400 !important; border: 1.5px solid #e94560; }
+  body.world-chainsaw .nav {
+    background: rgba(10,5,10,0.7) !important;
+    border: 2px solid rgba(233,69,96,0.4);
+  }
+  body.world-chainsaw .nav button {
+    color: #f0c0c0 !important;
+    border: 1px solid transparent;
+  }
+  body.world-chainsaw .nav button:hover {
+    background: rgba(233,69,96,0.15) !important;
+    border-color: #e94560;
+  }
+  body.world-chainsaw .nav button.active {
+    background: linear-gradient(135deg, #e94560, #ff8c00) !important;
+    color: #fff !important;
+    box-shadow: 0 0 14px rgba(233,69,96,0.7), 0 0 28px rgba(255,140,0,0.4);
+  }
+  /* 체인소맨 월드 패널 — 가운데는 깔끔한 흰색만 (이미지 일체 제거) */
+  body.world-chainsaw .panel,
+  body.world-chainsaw .panel.with-bg {
+    background: #ffffff !important;
+    background-image: none !important;
+    border: 4px solid #e94560 !important;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.5), 0 0 40px rgba(233,69,96,0.3) !important;
+    color: #1a1a1a;
+  }
+  /* with-bg 패널의 코너 캐릭터 이미지 (도쿄리벤저스 등) 제거 */
+  body.world-chainsaw .panel::before,
+  body.world-chainsaw .panel.with-bg::before {
+    display: none !important;
+    background: none !important;
+  }
+  body.world-chainsaw .panel h2 { color: #e94560 !important; }
+  body.world-chainsaw .panel h3 { color: #e94560 !important; }
+  body.world-chainsaw .panel .hint { color: #555 !important; }
+  body.world-chainsaw .panel p { color: #2a2a2a; }
+  body.world-chainsaw .btn {
+    background: linear-gradient(135deg, #e94560, #ff6b6b) !important;
+    box-shadow: 0 4px 14px rgba(233,69,96,0.5), 0 0 0 2px #1a0a0a !important;
+    border: 1px solid #ffd400 !important;
+  }
+  body.world-chainsaw .btn:hover {
+    background: linear-gradient(135deg, #ff4060, #ff8c00) !important;
+    box-shadow: 0 6px 20px rgba(255,140,0,0.6), 0 0 0 2px #ffd400 !important;
+  }
+  body.world-chainsaw .btn.ghost {
+    background: rgba(20,10,15,0.7) !important;
+    color: #ff8c00 !important;
+    border: 2px solid #ff8c00 !important;
+  }
+  body.world-chainsaw .target {
+    background: rgba(0,0,0,0.7) !important;
+    color: #ffd400 !important;
+    border-color: #e94560 !important;
+  }
+  body.world-chainsaw .target .correct { color: #ffd400 !important; }
+  body.world-chainsaw .input-area {
+    background: rgba(20,10,15,0.85) !important;
+    color: #ffd400 !important;
+    border-color: #e94560 !important;
+    caret-color: #ff8c00 !important;
+  }
+  body.world-chainsaw .input-area:focus { border-color: #ff8c00 !important; }
+  body.world-chainsaw .mission {
+    background: linear-gradient(135deg,#2a0a14,#1a0a1a) !important;
+    border-color: #e94560 !important;
+    color: #f0c0c0 !important;
+  }
+  body.world-chainsaw .mission.done { background: linear-gradient(135deg,#0a3a0a,#0a2a0a) !important; }
+  body.world-chainsaw .mission h4 { color: #ffd400 !important; }
+  body.world-chainsaw .keyboard { background: #0a0a0a !important; border: 2px solid #e94560; }
+
+  /* noFinger 월드 (체인소맨/귀멸/미쿠): 손가락자리 완전 제거 — 낱말/단문/장문/게임으로 연습 */
+  body.no-finger-tutorial .finger-tutorial-section { display: none !important; }
+  body.no-finger-tutorial .nav button[data-tab="finger"] { display: none !important; }
+  body.no-finger-tutorial #tab-finger { display: none !important; }
+  body.no-finger-tutorial .home-card[data-section="finger"] { display: none !important; }
+
   /* Game unlock popup */
   .game-unlock-overlay {
     position: fixed; inset: 0; z-index: 9998;
@@ -762,14 +956,17 @@
   .home-card.has-bg-img { position: relative; overflow: hidden; background-image: none !important; }
   .home-card.has-bg-img .card-char-img {
     position: absolute; right: 0; top: 0; width: 50%; height: 100%;
-    object-fit: cover; object-position: center top; z-index: 0;
+    object-fit: cover; object-position: center top;
+    z-index: 1;  /* 코믹 테마의 ::after 도트 패턴보다 위로 */
+    display: block; opacity: 1 !important;
+    pointer-events: none;
   }
   .home-card.has-bg-img::before {
     content: ''; position: absolute; right: 30%; top: 0; width: 30%; height: 100%;
     background: linear-gradient(to right, var(--c1), transparent);
-    z-index: 1;
+    z-index: 2;
   }
-  .home-card.has-bg-img > *:not(.card-char-img) { position: relative; z-index: 2; }
+  .home-card.has-bg-img > *:not(.card-char-img) { position: relative; z-index: 3; }
   .home-card.has-bg-img .emoji { display: none; }
 
   .level-pill { display: inline-block; background: rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 999px; font-size: 12px; margin-top: 8px; }
@@ -1187,24 +1384,30 @@
      ================================================================= */
 
   body {
-    background:
-      radial-gradient(#000 1px, transparent 1.3px) 0 0/18px 18px,
-      radial-gradient(#000 1px, transparent 1.3px) 9px 9px/18px 18px,
-      linear-gradient(180deg,#f6f1e7,#ece3d1) !important;
-    background-attachment: fixed !important;
+    background: #0a0e1a !important;
     color: #111 !important;
     font-family: 'Noto Sans KR','Nanum Gothic','Malgun Gothic',sans-serif !important;
   }
-  /* soft paper vignette overlay */
+  /* 🎬 풀화면 배경 영상 */
+  #bgVideo {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    background: #0a0e1a;
+  }
+  /* soft paper vignette overlay (영상 위에 살짝 얹기) */
   body::before {
     content:'';
     position: fixed; inset: 0;
     background:
-      radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.12) 100%);
+      radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.2) 100%);
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
   }
-  .app { position: relative; z-index: 1; }
+  .app { position: relative; z-index: 2; }
 
   /* === Topbar === */
   .topbar {
@@ -1271,6 +1474,21 @@
     background: #fff !important;
   }
   .panel.with-bg::before { display: none !important; }
+  /* 주요 패널 모두 반투명으로: 뒷배경(숲/테마)이 비치도록 */
+  .panel.home-panel,
+  #tab-dashboard.panel, #tab-dashboard.panel.with-bg,
+  #tab-finger.panel,    #tab-finger.panel.with-bg,
+  #tab-word.panel,      #tab-word.panel.with-bg,
+  #tab-short.panel,     #tab-short.panel.with-bg,
+  #tab-long.panel,      #tab-long.panel.with-bg,
+  #tab-chat.panel,      #tab-chat.panel.with-bg,
+  #tab-badges.panel,    #tab-badges.panel.with-bg {
+    background:
+      repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,0.02) 8px 9px),
+      rgba(255,255,255,0.55) !important;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
   .panel h2 {
     color: #111 !important;
     font-weight: 900 !important;
@@ -1451,6 +1669,22 @@
     background: rgba(255,214,224,0.92) !important;
   }
 
+  /* 사이키 쿠스오 — 초능력 / 텔레파시 그린 톤 채팅창 */
+  body.world-saiki .chat-box {
+    background-image: url('사이키쿠스오/쿠스오채팅방이미지.jpeg') !important;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(255,255,255,0.55) !important;
+    background-blend-mode: lighten;
+  }
+  body.world-saiki .msg .bubble {
+    background: rgba(255,255,255,0.92) !important;
+  }
+  body.world-saiki .msg.me .bubble {
+    background: rgba(200,255,220,0.92) !important;
+  }
+
   /* 체인소맨 — 어둡고 핏빛 채팅창 */
   body.world-chainsaw .chat-box {
     background: linear-gradient(180deg, #1a0a0e 0%, #2d0a15 50%, #1a0a0e 100%) !important;
@@ -1474,6 +1708,117 @@
   body.world-chainsaw .bubble-name { color: #ff6b6b !important; }
   body.world-chainsaw .chat-intro { color: #ffccd5 !important; }
   body.world-chainsaw .chat-intro-tag { color: #e94560 !important; }
+
+  /* 하츠네 미쿠 — 청록색/핑크 네온 디지털 채팅창 */
+  body.world-miku .chat-box {
+    background: linear-gradient(180deg, rgba(205,255,251,0.85) 0%, rgba(237,233,254,0.85) 50%, rgba(252,231,243,0.85) 100%) !important;
+    border-color: #06b6d4 !important;
+    box-shadow: 4px 4px 0 #111, 0 0 18px rgba(6,182,212,0.35), 0 0 36px rgba(236,72,153,0.25);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(6,182,212,0.08) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, rgba(205,255,251,0.85) 0%, rgba(237,233,254,0.85) 50%, rgba(252,231,243,0.85) 100%) !important;
+  }
+  body.world-miku .msg .bubble {
+    background: rgba(255,255,255,0.96) !important;
+    border-color: #06b6d4 !important;
+    color: #0f172a !important;
+    box-shadow: 2px 2px 0 rgba(6,182,212,0.45);
+  }
+  body.world-miku .msg.me .bubble {
+    background: rgba(207,250,254,0.95) !important;
+    border-color: #0891b2 !important;
+  }
+  body.world-miku .bubble-name { color: #0891b2 !important; }
+  body.world-miku .chat-intro-tag { color: #ec4899 !important; }
+
+  /* 미쿠 미션 진행바 — 청록 → 핑크 그라데이션 */
+  body.world-miku .mission .fill {
+    background: linear-gradient(90deg, #06b6d4, #22d3ee, #a7f3d0, #f9a8d4, #ec4899, #06b6d4) !important;
+    background-size: 200% 100%;
+    box-shadow: 0 0 8px #22d3ee, 0 0 16px rgba(236,72,153,0.4);
+    animation: miku-bar 2.4s ease-in-out infinite;
+  }
+  @keyframes miku-bar {
+    0%, 100% { background-position: 0% 50%; box-shadow: 0 0 6px #22d3ee, 0 0 12px rgba(6,182,212,0.4); }
+    50% { background-position: 100% 50%; box-shadow: 0 0 12px #ec4899, 0 0 24px rgba(236,72,153,0.6); }
+  }
+
+  /* 미쿠 입장 효과 — 홀로그램 + 음표 */
+  .miku-entrance {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    animation: mk-entrance 2.5s ease-out forwards;
+  }
+  @keyframes mk-entrance { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+  .miku-entrance .mk-dim {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at var(--cx) var(--cy), rgba(6,20,40,0.25) 0%, rgba(6,20,40,0.65) 70%);
+  }
+  .miku-entrance .mk-flash {
+    position: absolute; inset: 0; opacity: 0.9;
+    animation: mk-flash-fade 1.4s ease-out forwards;
+  }
+  @keyframes mk-flash-fade { 0% { opacity: 0.95 } 100% { opacity: 0 } }
+  .miku-entrance .mk-ring {
+    position: absolute;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 3px solid #22d3ee;
+    transform: translate(-50%,-50%); opacity: 0;
+    box-shadow: 0 0 20px #22d3ee, 0 0 60px rgba(236,72,153,0.55);
+    animation: mk-ring-burst 1.4s 0.2s ease-out forwards;
+  }
+  .miku-entrance .mk-ring:nth-child(4) { animation-delay: 0.0s; border-color: #ec4899; box-shadow: 0 0 18px #ec4899, 0 0 50px rgba(34,211,238,0.5); }
+  .miku-entrance .mk-ring:nth-child(5) { animation-delay: 0.25s; }
+  .miku-entrance .mk-ring:nth-child(6) { animation-delay: 0.5s; border-color: #a78bfa; }
+  @keyframes mk-ring-burst {
+    0% { width: 10px; height: 10px; opacity: 1; }
+    80% { opacity: 0.7; }
+    100% { width: 640px; height: 640px; opacity: 0; }
+  }
+  .miku-entrance .mk-scanlines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(34,211,238,0.08) 0 2px, transparent 2px 5px);
+    mix-blend-mode: screen; opacity: 0.9;
+    animation: mk-scan 1.6s linear infinite;
+  }
+  @keyframes mk-scan { 0%{background-position:0 0} 100%{background-position:0 20px} }
+  .miku-entrance .mk-grid {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(rgba(34,211,238,0.10) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, rgba(236,72,153,0.10) 1px, transparent 1px) 0 0/40px 40px;
+    mix-blend-mode: screen;
+    animation: mk-grid-move 1.8s ease-in-out forwards;
+    transform-origin: var(--cx) var(--cy);
+  }
+  @keyframes mk-grid-move {
+    0% { opacity: 0; transform: scale(0.6); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.6); }
+  }
+  .miku-entrance .mk-note {
+    position: absolute;
+    color: #ec4899;
+    text-shadow: 0 0 6px #22d3ee, 0 0 14px rgba(236,72,153,0.7);
+    font-weight: 900;
+    animation: mk-note-fly 1.8s ease-out forwards; opacity: 0;
+    will-change: transform, opacity;
+  }
+  @keyframes mk-note-fly {
+    0% { opacity: 0; transform: translate(0,0) scale(0.3) rotate(-20deg); }
+    20% { opacity: 1; transform: translate(calc(var(--nx) * 0.2), calc(var(--ny) * 0.2)) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--nx), var(--ny)) scale(1.2) rotate(30deg); }
+  }
+  .miku-entrance .mk-spark {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, #22d3ee 40%, #0891b2 70%, transparent);
+    box-shadow: 0 0 6px #22d3ee;
+    animation: mk-spark-fly 1.4s ease-out forwards; opacity: 0;
+  }
+  @keyframes mk-spark-fly {
+    0% { opacity: 0; transform: translate(0,0) scale(0.3); }
+    15% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.1); }
+  }
   .msg .bubble {
     background: #fff !important;
     border: 2.5px solid #111 !important;
@@ -1584,7 +1929,10 @@
     opacity: 0.07;
     pointer-events: none;
     border-radius: 18px;
+    z-index: 0; /* 버튼 캐릭터 이미지(z-index:1)보다 아래로 */
   }
+  /* 이미지 있는 카드에서는 도트 패턴 오버레이 제거 (이미지 가리기 방지) */
+  .home-card.has-bg-img::after { display: none !important; }
   .home-card:hover {
     transform: translate(-3px,-3px) rotate(-0.5deg) !important;
     box-shadow: 10px 10px 0 #111 !important;
@@ -1661,7 +2009,7 @@
 
   /* === Character collection ranking === */
   .collection-summary {
-    background: #fff3bf;
+    background: rgba(255,243,191,0.55);
     border: 3px solid #111;
     border-radius: 12px;
     padding: 10px 14px;
@@ -1670,24 +2018,29 @@
     margin: 8px 0 16px 0;
     box-shadow: 3px 3px 0 #111;
     transform: rotate(-1deg);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
   .collection-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 0;
     margin-top: 8px;
   }
+  /* 랭킹 구간은 박스 없이 라인(실선)으로만 구분 */
   .tier-row {
     display: grid;
     grid-template-columns: 90px 1fr;
     gap: 12px;
     align-items: stretch;
-    background: #fff;
-    border: 3.5px solid #111;
-    border-radius: 14px;
-    padding: 10px;
-    box-shadow: 5px 5px 0 #111;
+    background: transparent;
+    border: none;
+    border-bottom: 3px dashed #111;
+    border-radius: 0;
+    padding: 14px 4px;
+    box-shadow: none;
   }
+  .tier-row:last-child { border-bottom: none; }
   .tier-label {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -2646,9 +2999,421 @@
     .page-btn { min-width: 90px; padding: 10px 14px; font-size: 14px; }
     .page-indicator { font-size: 12px; padding: 5px 10px; }
   }
+
+  /* ========= ⚡ 일주일 뱃지 특별 모달 ========= */
+  .streak7-modal { position: fixed; inset: 0; z-index: 9999; }
+  .streak7-backdrop {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,212,59,0.4), rgba(0,0,0,0.85));
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .streak7-box {
+    background: linear-gradient(135deg, #fff9db, #fff0f6);
+    border: 4px solid #111;
+    border-radius: 24px;
+    padding: 28px 24px;
+    max-width: 460px; width: 92%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 8px 8px 0 #111;
+    animation: streak7Pop 0.5s cubic-bezier(.2,.8,.3,1.05);
+    max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes streak7Pop {
+    0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+    60% { transform: scale(1.05) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .streak7-confetti { font-size: 32px; letter-spacing: 6px; animation: bounce 1s infinite; }
+  .streak7-pw-confetti { font-size: 36px; letter-spacing: 8px; animation: bounce 0.8s infinite; }
+  .streak7-title {
+    font-size: 24px; font-weight: 900; color: #d6336c;
+    margin: 8px 0 12px; letter-spacing: -0.5px;
+  }
+  .streak7-msg {
+    font-size: 15px; line-height: 1.7; color: #2d2d4d;
+    font-weight: 700; margin-bottom: 18px;
+  }
+  .streak7-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin: 14px 0 10px;
+  }
+  .streak7-pick {
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 16px;
+    padding: 12px 8px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #111;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .streak7-pick:hover:not(:disabled) {
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 #d6336c;
+    background: #fff9db;
+  }
+  .streak7-pick:active:not(:disabled) {
+    transform: translate(2px,2px);
+    box-shadow: 2px 2px 0 #111;
+  }
+  .streak7-pick.locked {
+    background: #adb5bd !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: grayscale(1);
+    box-shadow: 2px 2px 0 #555 !important;
+  }
+  .streak7-pick.chosen {
+    background: linear-gradient(135deg,#ffd43b,#fab005) !important;
+    box-shadow: 4px 4px 0 #d6336c !important;
+    border-color: #d6336c !important;
+    animation: streak7Glow 1s infinite alternate;
+  }
+  @keyframes streak7Glow {
+    from { box-shadow: 4px 4px 0 #d6336c, 0 0 0 rgba(214,51,108,0); }
+    to { box-shadow: 4px 4px 0 #d6336c, 0 0 30px rgba(214,51,108,0.6); }
+  }
+  .streak7-pick-img {
+    width: 70px; height: 70px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffd89b, #ff8fa3);
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #111;
+  }
+  .streak7-pick-img img { width: 100%; height: 100%; object-fit: cover; }
+  .streak7-fallback { font-size: 36px; }
+  .streak7-pick-name {
+    font-size: 14px; font-weight: 900; color: #111; margin-top: 4px;
+  }
+  .streak7-pick-series { font-size: 11px; color: #666; font-weight: 700; }
+  .streak7-warn {
+    font-size: 12px; color: #c92a2a; font-weight: 800;
+    margin-top: 12px; padding: 8px;
+    background: rgba(255,107,107,0.15); border-radius: 10px;
+  }
+  .streak7-pw-display {
+    font-size: 56px; font-weight: 900;
+    color: #d6336c;
+    background: #fff;
+    border: 4px solid #111;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 14px 0;
+    letter-spacing: 16px;
+    box-shadow: 4px 4px 0 #111;
+    font-family: 'D2Coding', monospace;
+    animation: streak7PwReveal 1s ease-out;
+  }
+  @keyframes streak7PwReveal {
+    0% { opacity: 0; transform: scale(0.5); filter: blur(8px); }
+    50% { opacity: 1; transform: scale(1.1); filter: blur(0); }
+    100% { transform: scale(1); }
+  }
+  .streak7-pw-box { max-width: 400px; }
+
+  /* ========= 뱃지 D-day 표시 ========= */
+  .badge-item { position: relative; }
+  .badge-dday {
+    position: absolute; top: 6px; right: 6px;
+    background: linear-gradient(135deg,#ff6b6b,#d6336c);
+    color: #fff; font-weight: 900; font-size: 11px;
+    padding: 3px 7px; border-radius: 999px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+    animation: ddayPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes ddayPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  /* ========= 클라우드 동기화 ========= */
+  .cloud-status-badge {
+    background: #e9ecef; color: #555;
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 800;
+    cursor: pointer; border: 2px solid #adb5bd;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .cloud-status-badge:hover { background: #dee2e6; }
+  .cloud-status-badge.active {
+    background: linear-gradient(135deg,#74c0fc,#4dabf7);
+    color: #fff; border-color: #1971c2;
+    box-shadow: 0 2px 8px rgba(77,171,247,0.4);
+  }
+  .cloud-nick-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .cloud-nick-box {
+    background: #fff; border-radius: 20px;
+    padding: 26px 28px;
+    max-width: 380px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 3px solid #111;
+    text-align: center;
+  }
+  .cloud-nick-box h2 { font-size: 22px; font-weight: 900; color: #111; margin-bottom: 10px; }
+  .cloud-nick-sub { font-size: 13px; color: #555; margin-bottom: 18px; line-height: 1.6; }
+  .cloud-nick-sub b { color: #1971c2; }
+  #cloudNickInput {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 18px; font-weight: 700;
+    border: 3px solid #111; border-radius: 12px;
+    box-shadow: 3px 3px 0 #111;
+    text-align: center;
+    outline: none;
+  }
+  #cloudNickInput:focus { border-color: #4dabf7; box-shadow: 3px 3px 0 #4dabf7; }
+  .cloud-nick-actions {
+    display: flex; justify-content: center; gap: 10px;
+    margin-top: 18px;
+  }
+
+  /* ========= 낱말 떨어뜨리기 게임 ========= */
+  .wd-select { padding: 10px 0 24px 0; }
+  .wd-title {
+    text-align: center; font-size: 18px; font-weight: 900; color: #111;
+    margin-bottom: 14px;
+  }
+  .wd-stages {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+  }
+  .wd-stage-card {
+    background: linear-gradient(135deg,#fff9db,#ffe8a1);
+    border: 3px solid #111;
+    border-radius: 18px;
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #111;
+    transition: transform 0.15s, box-shadow 0.15s;
+    user-select: none;
+  }
+  .wd-stage-card:hover {
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 #111;
+    background: linear-gradient(135deg,#fff3bf,#ffd43b);
+  }
+  .wd-stage-card:active {
+    transform: translate(2px,2px);
+    box-shadow: 2px 2px 0 #111;
+  }
+  .wd-stage-ico { font-size: 36px; margin-bottom: 4px; }
+  .wd-stage-name { font-size: 16px; font-weight: 900; color: #111; margin-bottom: 4px; }
+  .wd-stage-desc { font-size: 12px; color: #555; line-height: 1.4; }
+
+  .wd-game { padding-top: 8px; }
+  .wd-hud {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .wd-hud-box {
+    background: #fff; border: 2.5px solid #111; border-radius: 12px;
+    padding: 6px 12px; font-size: 12px; font-weight: 800; color: #111;
+    box-shadow: 2px 2px 0 #111;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .wd-hud-box span { font-size: 11px; color: #777; font-weight: 700; }
+  .wd-hud-box b { font-size: 18px; color: #111; }
+  .wd-hud-score { background: #ffec99; }
+  .wd-hud-combo { background: #d0ebff; }
+  .wd-hud-lives { background: #ffe3e3; }
+  .wd-hud-speed { background: #d3f9d8; }
+
+  .wd-stage {
+    position: relative;
+    background: linear-gradient(180deg,#1a1d3a 0%, #2d1b4e 50%, #3d1b3d 100%);
+    border: 3px solid #111;
+    border-radius: 16px;
+    height: 440px;
+    overflow: hidden;
+    box-shadow: 5px 5px 0 #111, inset 0 0 40px rgba(0,0,0,0.6);
+  }
+  .wd-ground {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 18px;
+    background: repeating-linear-gradient(90deg,#ff6b6b 0 10px,#d6336c 10px 20px);
+    border-top: 4px solid #ffd43b;
+    box-shadow: 0 -10px 20px rgba(255,107,107,0.5);
+    z-index: 1;
+  }
+  .wd-ready {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; background: rgba(0,0,0,0.8); z-index: 5; text-align: center;
+  }
+  .wd-ready.hidden { display: none; }
+  .wd-ready-big {
+    font-size: 64px; font-weight: 900; color: #ffd43b;
+    text-shadow: 4px 4px 0 #d6336c, 8px 8px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    letter-spacing: 4px;
+    animation: readyBounce 1s infinite;
+  }
+  .wd-ready-sub { color: #fff; font-weight: 700; font-size: 15px; line-height: 1.7; }
+  .wd-ready-sub b { color: #ffd43b; }
+
+  /* Falling word block */
+  .wd-word {
+    position: absolute;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 18px;
+    background: linear-gradient(135deg,#fff,#ffe8a1);
+    border: 3px solid #111;
+    border-radius: 14px;
+    font-size: 22px; font-weight: 900; color: #111;
+    box-shadow: 3px 3px 0 #111, inset 0 -3px 0 rgba(0,0,0,0.1);
+    white-space: nowrap;
+    user-select: none;
+    z-index: 2;
+    transition: box-shadow 0.1s;
+  }
+  .wd-word .wd-typed { color: #2b8a3e; }
+  .wd-word .wd-rest { color: #111; }
+  .wd-word.wd-active {
+    background: linear-gradient(135deg,#fff,#b2f2bb);
+    box-shadow: 4px 4px 0 #2b8a3e, 0 0 16px rgba(64,192,87,0.7);
+    transform: scale(1.08);
+  }
+  .wd-word.wd-break {
+    animation: wdBreakAnim 0.45s forwards;
+    pointer-events: none;
+  }
+  @keyframes wdBreakAnim {
+    0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    30% { transform: scale(1.35) rotate(6deg); filter: brightness(1.8); }
+    100% { transform: scale(0.2) rotate(-20deg); opacity: 0; }
+  }
+  .wd-word.wd-miss {
+    animation: wdMissAnim 0.4s forwards;
+  }
+  @keyframes wdMissAnim {
+    0% { transform: scale(1); filter: brightness(1); }
+    40% { transform: scale(1.1); filter: brightness(0.5) hue-rotate(320deg); background: #ff6b6b; }
+    100% { transform: translateY(40px) scale(0.3); opacity: 0; }
+  }
+
+  .wd-shard {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: radial-gradient(circle,#ffd43b,#f76707);
+    border: 1.5px solid #111;
+    border-radius: 4px;
+    pointer-events: none;
+    animation: wdShardFly 0.6s ease-out forwards;
+    z-index: 3;
+  }
+  @keyframes wdShardFly {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr,360deg)); opacity: 0; }
+  }
+
+  .wd-speedup {
+    position: absolute; top: 40%; left: 0; right: 0;
+    text-align: center;
+    font-size: 48px; font-weight: 900; color: #ffd43b;
+    text-shadow: 4px 4px 0 #d6336c, 6px 6px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    pointer-events: none; opacity: 0; z-index: 4;
+    letter-spacing: 3px;
+  }
+  .wd-speedup.show { animation: wdSpeedPop 1.1s ease-out; }
+  @keyframes wdSpeedPop {
+    0% { opacity: 0; transform: scale(0.6); }
+    25% { opacity: 1; transform: scale(1.2); }
+    70% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  .wd-combo-popup {
+    position: absolute;
+    font-size: 32px; font-weight: 900; color: #ffd43b;
+    text-shadow: 3px 3px 0 #d6336c, 5px 5px 0 #111;
+    -webkit-text-stroke: 1.5px #111;
+    pointer-events: none;
+    animation: wdComboPop 0.9s ease-out forwards;
+    z-index: 4;
+  }
+  @keyframes wdComboPop {
+    0% { opacity: 0; transform: translateY(0) scale(0.6); }
+    30% { opacity: 1; transform: translateY(-20px) scale(1.15); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+  }
+
+  .wd-flash {
+    position: absolute; inset: 0;
+    background: #fff;
+    opacity: 0; pointer-events: none;
+    animation: wdFlashAnim 0.2s ease-out;
+    z-index: 4;
+  }
+  @keyframes wdFlashAnim {
+    0% { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
+  .wd-flash.red { background: #ff6b6b; }
+
+  .wd-gameover {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px;
+    background: rgba(0,0,0,0.88); z-index: 6;
+    text-align: center;
+  }
+  .wd-gameover-big {
+    font-size: 54px; font-weight: 900; color: #ff6b6b;
+    text-shadow: 4px 4px 0 #111;
+    -webkit-text-stroke: 2px #111;
+    letter-spacing: 3px;
+    animation: readyBounce 1.2s infinite;
+  }
+  .wd-gameover-stats {
+    display: flex; gap: 16px; color: #fff; font-weight: 800;
+  }
+  .wd-gameover-stats > div { background: rgba(255,255,255,0.12); padding: 10px 14px; border-radius: 12px; border: 2px solid #ffd43b; }
+  .wd-gameover-stats b { display: block; font-size: 22px; color: #ffd43b; }
+
+  .wd-input {
+    margin-top: 10px; font-size: 24px; text-align: center;
+    border: 3px solid #111; border-radius: 14px;
+    background: #fff; color: #111; padding: 14px;
+    box-shadow: 3px 3px 0 #111;
+    font-weight: 800;
+    font-family: 'D2Coding', 'Malgun Gothic', monospace;
+    letter-spacing: 1px;
+    caret-color: #2b8a3e;
+  }
+  .wd-input::placeholder { color: #adb5bd; font-weight: 500; }
+  .wd-input:focus { outline: none; box-shadow: 3px 3px 0 #2b8a3e; border-color: #2b8a3e; }
+  .wd-footer {
+    display: flex; justify-content: center; gap: 10px; margin-top: 12px;
+  }
+  @media (max-width: 520px) {
+    .wd-stage { height: 380px; }
+    .wd-word { font-size: 18px; padding: 8px 14px; }
+    .wd-ready-big { font-size: 48px; }
+    .wd-hud-box { padding: 5px 9px; font-size: 11px; }
+    .wd-hud-box b { font-size: 15px; }
+  }
 </style>
 </head>
 <body>
+<!-- 🎬 어플 전체 배경 영상 (Pinterest MP4 루프) -->
+<video id="bgVideo" autoplay loop muted playsinline preload="auto" aria-hidden="true">
+  <source src="어플배경.mp4" type="video/mp4">
+</video>
 <div class="app">
 
   <div class="topbar">
@@ -2657,6 +3422,7 @@
       <div class="stat streak">🔥 <span id="streak">0</span>일 연속</div>
       <div class="stat xp">⭐ <span id="xp">0</span> XP</div>
       <div class="stat badge">🏅 <span id="badgeCount">0</span>/8</div>
+      <div class="cloud-status-badge" id="cloudStatusBadge" onclick="cloudSync.showNickModal(false)" title="클라우드 동기화">☁️ 동기화 안됨</div>
     </div>
   </div>
 
@@ -2667,6 +3433,7 @@
     <button data-tab="short">✏️ 단문</button>
     <button data-tab="long">📖 장문</button>
     <button data-tab="chat">💬 채팅</button>
+    <button data-tab="game">🎮 게임</button>
     <button data-tab="badges">🏆 뱃지</button>
   </div>
 
@@ -2679,7 +3446,7 @@
     </div>
     <div id="worldGateGrid" class="world-gate-grid"></div>
     <div style="text-align:center;margin-top:20px;">
-      <button onclick="if(confirm('모든 학습 기록을 초기화할까요?')){localStorage.clear();location.reload();}" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;">학습 기록 초기화</button>
+      <button onclick="parentResetConfirm()" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;">학습 기록 초기화</button>
     </div>
     <!-- 비밀번호 입력 모달 -->
     <div class="world-pw-modal" id="worldPwModal">
@@ -2820,6 +3587,7 @@
     </div>
 
     <!-- Divider -->
+    <div class="finger-tutorial-section">
     <hr style="margin:30px 0 20px 0; border:none; border-top:3px dashed #dee2e6;">
     <h3 style="color:#d6336c; text-align:center; margin-bottom:14px;">📚 손 올리는 방법 배우기</h3>
 
@@ -3014,6 +3782,7 @@
         <text x="625" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#5f3dc4">오른손 🤚</text>
       </svg>
     </div>
+    </div><!-- /finger-tutorial-section -->
   </div>
 
   <!-- WORD -->
@@ -3088,6 +3857,65 @@
     <button class="btn ghost" onclick="startChat()" style="margin-top:10px">🔄 새 대화 시작</button>
   </div>
 
+  <!-- GAME: 낱말 떨어뜨리기 -->
+  <div class="panel" id="tab-game" style="display:none">
+    <h2>🎮 낱말 떨어뜨리기</h2>
+    <p class="hint">낱말이 땅에 닿기 전에 타이핑해서 막아요! 15초마다 점점 빨라져요 🔥</p>
+
+    <!-- Stage select -->
+    <div id="wdSelect" class="wd-select">
+      <div class="wd-title">단계를 선택하세요</div>
+      <div class="wd-stages">
+        <div class="wd-stage-card" onclick="wdStart('home')">
+          <div class="wd-stage-ico">🏠</div>
+          <div class="wd-stage-name">1단계 · 기본자리</div>
+          <div class="wd-stage-desc">ㅁㄴㅇㄹㅎ·ㅏㅓㅗㅣ로 만든 쉬운 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('top')">
+          <div class="wd-stage-ico">⬆️</div>
+          <div class="wd-stage-name">2단계 · 윗줄</div>
+          <div class="wd-stage-desc">ㅂㅈㄷㄱㅅ이 섞인 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('bottom')">
+          <div class="wd-stage-ico">⬇️</div>
+          <div class="wd-stage-name">3단계 · 아랫줄</div>
+          <div class="wd-stage-desc">ㅋㅌㅊㅍ이 섞인 낱말</div>
+        </div>
+        <div class="wd-stage-card" onclick="wdStart('mix')">
+          <div class="wd-stage-ico">🌈</div>
+          <div class="wd-stage-name">4단계 · 섞인 낱말</div>
+          <div class="wd-stage-desc">모든 글자가 섞여서 떨어져요!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game play area -->
+    <div id="wdGame" class="wd-game" style="display:none">
+      <div class="wd-hud">
+        <div class="wd-hud-box"><span>단계</span><b id="wdStageLbl">기본자리</b></div>
+        <div class="wd-hud-box wd-hud-score"><span>점수</span><b id="wdScore">0</b></div>
+        <div class="wd-hud-box wd-hud-combo"><span>콤보</span><b id="wdCombo">0</b></div>
+        <div class="wd-hud-box wd-hud-lives"><span>생명</span><b id="wdLives">3</b></div>
+        <div class="wd-hud-box wd-hud-speed"><span>속도</span><b id="wdSpeedLvl">1</b></div>
+        <div class="wd-hud-box"><span>시간</span><b id="wdTime">0s</b></div>
+      </div>
+      <div class="wd-stage" id="wdStage">
+        <div class="wd-ready" id="wdReady">
+          <div class="wd-ready-big">READY?</div>
+          <div class="wd-ready-sub"><b id="wdReadyStage">기본자리</b>의 낱말이 떨어져요!<br>땅에 닿기 전에 정확히 입력하세요 ⚡</div>
+          <button class="btn" onclick="wdBegin()">▶ 시작!</button>
+        </div>
+        <div class="wd-speedup" id="wdSpeedUp">SPEED UP!</div>
+        <div class="wd-ground"></div>
+      </div>
+      <input type="text" class="input-area wd-input" id="wdInput" placeholder="여기에 낱말을 입력!" autocomplete="off" style="display:none">
+      <div class="wd-footer">
+        <button class="btn ghost" onclick="wdShowSelect()">← 단계 선택</button>
+        <button class="btn" id="wdRestartBtn" onclick="wdRestart()" style="display:none">다시 도전!</button>
+      </div>
+    </div>
+  </div>
+
   <!-- BADGES -->
   <div class="panel" id="tab-badges" style="display:none">
     <h2>🏆 내 뱃지</h2>
@@ -3154,7 +3982,7 @@
       <div><strong id="rXp">+0</strong><span>XP</span></div>
     </div>
     <p id="modalMsg" style="margin-bottom:6px;color:#666;"></p>
-    <div id="modalGameUnlock" style="display:none;background:linear-gradient(135deg,#ffd43b,#fab005);color:#111;font-weight:900;font-size:16px;padding:10px 20px;border-radius:12px;margin:8px 0;border:2.5px solid #111;animation:newGet 0.8s ease-out">🎮 게임 가능!</div>
+    <button id="modalGameUnlock" type="button" onclick="openGameFromUnlock()" style="display:none;background:linear-gradient(135deg,#ffd43b,#fab005);color:#111;font-weight:900;font-size:16px;padding:10px 20px;border-radius:12px;margin:8px 0;border:2.5px solid #111;animation:newGet 0.8s ease-out;cursor:pointer;box-shadow:3px 3px 0 #111;">🎮 게임 시작하기!</button>
     <button class="btn" onclick="closeModal()">좋아요! (Space)</button>
   </div>
 </div>
@@ -3237,10 +4065,203 @@
   </div>
 </div>
 
+<!-- Firebase SDK (compat — works with global `firebase` object) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
+/* ================================================================
+   ☁️  Cloud Sync (Firebase Realtime Database)
+   - 닉네임 기반: 데이터는 users/<nickname>/ 에 저장
+   - 로드시: 클라우드가 로컬보다 새 데이터면 클라우드로 복원
+   - 저장시: allState + worldState 를 debounced push
+   ================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA0AZAmvQ9j6qY8" + "LRcvtynimGgaM5k6-YM",
+  authDomain: "keyboard-hime.firebaseapp.com",
+  databaseURL: "https://keyboard-hime-default-rtdb.firebaseio.com",
+  projectId: "keyboard-hime",
+  storageBucket: "keyboard-hime.firebasestorage.app",
+  messagingSenderId: "689509113310",
+  appId: "1:689509113310:web:e" + "fc38dc4b4f9b8def0514f",
+  measurementId: "G-GTLX5H57QV"
+};
+
+const cloudSync = {
+  enabled: false,
+  nickname: null,
+  db: null,
+  ref: null,
+  pushTimer: null,
+  lastPushed: 0,
+  cloudLoaded: false,
+
+  init() {
+    if (typeof firebase === 'undefined') { console.warn('[cloud] firebase SDK not loaded'); return; }
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      this.db = firebase.database();
+      this.enabled = true;
+    } catch(e) { console.error('[cloud] init failed:', e); }
+  },
+
+  sanitizeNick(n) {
+    // Firebase paths forbid: . $ # [ ] / and control chars
+    return (n || '').trim().replace(/[.$#\[\]\/\s]+/g, '_').slice(0, 30);
+  },
+
+  getNick() {
+    return localStorage.getItem('khime_nick') || null;
+  },
+
+  async setNick(n) {
+    const clean = this.sanitizeNick(n);
+    if (!clean || clean.length < 2) { alert('닉네임은 2글자 이상이에요'); return false; }
+    localStorage.setItem('khime_nick', clean);
+    this.nickname = clean;
+    if (this.enabled) this.ref = this.db.ref('users/' + clean);
+    await this.pull();
+    return true;
+  },
+
+  // Open nickname prompt modal
+  showNickModal(force) {
+    const existing = document.getElementById('cloudNickModal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'cloudNickModal';
+    modal.innerHTML = `
+      <div class="cloud-nick-backdrop">
+        <div class="cloud-nick-box">
+          <h2>☁️ 클라우드 동기화</h2>
+          <p class="cloud-nick-sub">닉네임을 입력하면 어느 기기에서든 같은 기록을 쓸 수 있어요!<br>
+          <b>iPad, 노트북에서 같은 닉네임</b>으로 로그인하면 자동으로 기록이 따라와요.</p>
+          <input type="text" id="cloudNickInput" placeholder="예: 예은" autocomplete="off" />
+          <div class="cloud-nick-actions">
+            ${force ? '' : '<button class="btn ghost" onclick="cloudSync.skipNick()">나중에</button>'}
+            <button class="btn" onclick="cloudSync.submitNick()">시작!</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    setTimeout(() => document.getElementById('cloudNickInput').focus(), 100);
+    document.getElementById('cloudNickInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') cloudSync.submitNick();
+    });
+  },
+
+  async submitNick() {
+    const inp = document.getElementById('cloudNickInput');
+    if (!inp) return;
+    const ok = await this.setNick(inp.value);
+    if (ok) {
+      const m = document.getElementById('cloudNickModal');
+      if (m) m.remove();
+      this.updateStatusBadge();
+      try { pop('☁️ 클라우드 동기화 켜짐!'); } catch(e) {}
+    }
+  },
+
+  skipNick() {
+    const m = document.getElementById('cloudNickModal');
+    if (m) m.remove();
+    localStorage.setItem('khime_nick_skipped', '1');
+  },
+
+  updateStatusBadge() {
+    let b = document.getElementById('cloudStatusBadge');
+    if (!b) return;
+    if (this.nickname) {
+      b.textContent = '☁️ ' + this.nickname;
+      b.classList.add('active');
+      b.title = '클라우드 동기화됨 — ' + this.nickname + ' (클릭해 변경)';
+    } else {
+      b.textContent = '☁️ 동기화 안됨';
+      b.classList.remove('active');
+      b.title = '클릭해서 클라우드 동기화 켜기';
+    }
+  },
+
+  // Fetch cloud data & apply if newer
+  async pull() {
+    if (!this.enabled || !this.ref) return;
+    try {
+      const snap = await this.ref.once('value');
+      const cloud = snap.val();
+      this.cloudLoaded = true;
+      if (!cloud) {
+        // Cloud empty — push local as initial
+        console.log('[cloud] no cloud data, pushing initial');
+        this.pushNow();
+        return;
+      }
+      const cloudTs = cloud.updatedAt || 0;
+      const localTs = parseInt(localStorage.getItem('khime_updated_at') || '0', 10);
+      if (cloudTs > localTs + 500) {
+        // Cloud is newer — adopt
+        console.log('[cloud] applying cloud data (cloud:' + cloudTs + ' > local:' + localTs + ')');
+        if (cloud.allState) {
+          localStorage.setItem('khime_v2', JSON.stringify(cloud.allState));
+        }
+        if (cloud.worldState) {
+          localStorage.setItem('khime_worlds', JSON.stringify(cloud.worldState));
+        }
+        localStorage.setItem('khime_updated_at', String(cloudTs));
+        try { pop('☁️ 클라우드에서 기록을 불러왔어요!'); } catch(e) {}
+        // Reload to reinitialize all state from storage
+        setTimeout(() => location.reload(), 800);
+      } else {
+        console.log('[cloud] local is newer or equal, pushing');
+        this.pushNow();
+      }
+    } catch(e) { console.error('[cloud] pull failed:', e); }
+  },
+
+  // Debounced push
+  push() {
+    if (!this.enabled || !this.ref) return;
+    if (this.pushTimer) clearTimeout(this.pushTimer);
+    this.pushTimer = setTimeout(() => this.pushNow(), 1200);
+  },
+
+  async pushNow() {
+    if (!this.enabled || !this.ref) return;
+    try {
+      const all = JSON.parse(localStorage.getItem('khime_v2') || '{}');
+      const wst = JSON.parse(localStorage.getItem('khime_worlds') || '{}');
+      const ts = Date.now();
+      localStorage.setItem('khime_updated_at', String(ts));
+      await this.ref.set({
+        allState: all,
+        worldState: wst,
+        updatedAt: ts,
+        nickname: this.nickname,
+      });
+      this.lastPushed = ts;
+      console.log('[cloud] pushed @' + ts);
+    } catch(e) { console.error('[cloud] push failed:', e); }
+  },
+
+  // Called after DOMContentLoaded
+  async start() {
+    this.init();
+    if (!this.enabled) return;
+    const saved = this.getNick();
+    if (saved) {
+      this.nickname = saved;
+      this.ref = this.db.ref('users/' + saved);
+      await this.pull();
+    } else if (!localStorage.getItem('khime_nick_skipped')) {
+      // First visit — prompt for nickname
+      setTimeout(() => this.showNickModal(false), 500);
+    }
+    this.updateStatusBadge();
+  }
+};
+
 /* ========= Data ========= */
 // 기본자리: ㅁㄴㅇㄹㅎ + ㅏㅓㅗㅣ 만 사용하는 낱말
-const WORDS_HOME = ['나','너','말','알','안','인','날','님','한','힘','남','몸','놈','얼','혼','놀','나라','머리','하나','아이','나이','오리','하마','놀이','얼마','만남','놀란','머리말','어머니','어린이','놀라운','이마','하늘이','아름','한마리','몰라','나만','하나님','어린','놀림'];
+// 기본자리 엄격: 자음 ㅁㄴㅇㄹㅎ + 모음 ㅏㅓㅗㅣ 만 쓰는 낱말 (Python 검증 완료)
+const WORDS_HOME = ['나','너','말','알','안','인','날','님','한','힘','남','몸','놈','얼','혼','놀','나라','머리','하나','아이','나이','오리','하마','놀이','얼마','만남','놀란','머리말','어머니','어린이','이마','한마리','몰라','나만','하나님','어린','놀림','마라','어린아이','나라말','오리알','어머','아니','마리','아마','아나','이만','라라','미아','마마','나온','어린말','나일','혼나','한놈','알몸','놀아','노란','남이','아미','아라','리모','라임','미나리','만만','이리','임','한림','만리','나리','인어'];
 // 윗줄: ㅂㅈㄷㄱㅅ + ㅛㅕㅑㅐㅔ 포함 낱말
 const WORDS_TOP = ['사과','바나나','학교','가방','선생님','사자','가게','바다','새','시간','소녀','소년','사랑','세계','기사','도시','가족','다리','바보','자기','대사','서비스','자동','가져','세상','비서','기대','새벽','지도','소개','대기','교사','기본','시대','자연'];
 // 아랫줄: ㅋㅌㅊㅍ + ㅠㅜㅡ 포함 낱말
@@ -3288,6 +4309,81 @@ const SENT_LONG = [
   '나는 장래희망이 요리사예요. 맛있는 음식을 만들어서 사람들을 행복하게 해 주고 싶거든요. 지금은 엄마를 도와 계란 프라이를 만들 수 있어요. 라면도 끓일 줄 알고 샌드위치도 만들 수 있습니다. 앞으로 더 많이 배워서 세계 여러 나라의 음식을 만드는 요리사가 될 거예요.',
   '독도는 우리나라 동쪽 끝에 있는 아름다운 섬이에요. 동도와 서도 두 개의 큰 섬과 작은 바위섬들로 이루어져 있습니다. 독도에는 괭이갈매기와 강치 같은 동물들이 살고 있어요. 맑은 바닷물 아래에는 다양한 물고기와 해조류가 자랍니다. 독도는 우리가 꼭 지켜야 할 소중한 땅이에요.',
 ];
+
+/* ========= 월드별 전용 콘텐츠 ========= */
+// 체인소맨(덴지 월드)과 귀멸의칼날(탄지로 월드)은 애니 전용 콘텐츠를 사용.
+// 월드 id가 이 표에 없으면 기본 WORD_MODES / SENT_SHORT / SENT_LONG 사용.
+const WORLD_WORDS = {
+  chainsaw: [
+    '덴지','파워','마키마','아키','포치타','체인소','악마','데빌헌터',
+    '톱','피','심장','계약','공안','하수인','잼','토스트','라멘','우동',
+    '담배','커피','편의점','지하철','도쿄','시골','돈','꿈','잠','심부름',
+    '여자친구','뽀뽀','영화','게임','친구','가족','정의','복수','용기',
+  ],
+  kimetsu: [
+    '탄지로','네즈코','젠이츠','이노스케','기유','시노부','무이치로','렌고쿠',
+    '귀살대','혈귀','일륜도','전집중','호흡','물','불꽃','번개','바람','안개',
+    '나비','꽃','달','독','숯','산','마을','여동생','오빠','가족','친구',
+    '용기','수련','집중','대나무','대롱','따뜻','정의','의지','훈련',
+  ],
+};
+
+const WORLD_SHORTS = {
+  chainsaw: [
+    '나는 그냥 평범하게 살고 싶어.',
+    '잼 바른 토스트가 먹고 싶어!',
+    '포치타, 우리 계약하자.',
+    '나는 체인소맨이야.',
+    '마키마 씨, 따라갈게요.',
+    '덴지는 오늘도 잠만 자고 있다.',
+    '파워는 피를 무서워하지 않는다.',
+    '아키는 커피를 좋아한다.',
+    '포치타가 덴지의 심장이 되었다.',
+    '데빌헌터는 악마를 사냥한다.',
+    '꿈이 단순해도 괜찮아.',
+    '여자친구를 사귀고 싶다고!',
+    '공안 대 악마 4과에 들어갔다.',
+    '파워가 내 샴푸를 다 써버렸다.',
+    '덴지의 가슴에서 톱이 튀어나온다.',
+  ],
+  kimetsu: [
+    '전집중 호흡!',
+    '여동생을 인간으로 되돌릴 거야.',
+    '물의 호흡 일형, 수면 베기.',
+    '탄지로는 따뜻한 마음을 가졌다.',
+    '네즈코는 대나무 대롱을 물고 있다.',
+    '젠이츠는 잠들면 강해진다.',
+    '이노스케는 산속에서 자랐다.',
+    '기유는 과묵한 물의 주자이다.',
+    '시노부는 독으로 귀를 무찌른다.',
+    '가족을 지키기 위해 싸운다.',
+    '숨을 크게 들이쉬고 집중해라.',
+    '포기하지 마, 조금만 더 힘내자!',
+    '렌고쿠는 끝까지 마음을 불태웠다.',
+    '탄지로는 숯을 팔아 가족을 먹여 살렸다.',
+    '코쵸 시노부의 나비 저택에서 수련했다.',
+  ],
+};
+
+const WORLD_LONGS = {
+  chainsaw: [
+    '덴지는 아버지의 빚을 갚기 위해 시골에서 악마 사냥을 하고 있었다. 그의 유일한 친구는 체인소 악마 포치타뿐이었다. 매일 굶주리면서도 잼 바른 토스트 한 조각을 꿈꾸는 그의 삶은 결코 평범하지 않았다.',
+    '오늘도 학교에서 친구들이 MBTI 얘기로 난리였다. 나는 I형이라 쉬는 시간에 혼자 음악 듣는 게 좋은데 친구들은 너는 E야 하고 우긴다. 결국 점심시간에 같이 편의점에 가서 삼각김밥 먹는 걸로 타협 봤다.',
+    '파워는 덴지의 방에서 또 무언가를 훔쳐 먹고 있었다. 냉장고는 이미 텅 비어 있었고 샴푸까지 다 써 버린 상태였다. 하지만 덴지는 화를 내지 않았다. 이런 시끌벅적한 일상도 혼자일 때보다는 훨씬 나았기 때문이다.',
+    '요즘 틱톡에서 유행하는 춤을 따라 해 봤는데 생각보다 어려웠다. 5초짜리 영상을 찍는 데 50번은 재촬영했고 발목까지 살짝 삐끗했다. 그래도 친구들이 좋아요를 눌러주니 어색한 영상도 조금은 멋져 보이는 것 같았다.',
+    '마키마 씨는 언제나 부드럽게 웃으며 덴지를 대했다. 그녀의 손을 잡고 데이트하는 상상만으로도 덴지는 행복했다. 하지만 그녀의 미소 뒤에는 아무도 모르는 무서운 비밀이 숨어 있었고, 덴지는 그것을 너무 늦게 깨닫게 된다.',
+    '어제 학원 끝나고 친구랑 코인노래방에 갔는데 2시간 순삭이었다. 최신 K팝부터 옛날 애니송까지 다 불렀고 목이 다 쉴 정도였다. 집에 돌아오는 길에 떡볶이까지 먹어서 오늘 하루 만큼은 진짜 행복했다고 느꼈다.',
+  ],
+  kimetsu: [
+    '탄지로는 숯을 팔러 마을에 내려갔다가 집에 돌아와 가족이 몰살당한 것을 발견했다. 유일하게 살아남은 여동생 네즈코는 혈귀로 변해 있었다. 그날부터 탄지로는 네즈코를 인간으로 되돌리기 위해 귀살대에 들어가기로 결심했다.',
+    '오늘 학교에서 체육 시간에 오래달리기를 했는데 숨이 턱까지 차올랐다. 마치 전집중 호흡이 필요한 순간 같았다. 친구들과 서로 파이팅을 외치며 결국 다 같이 완주했고 끝나고 먹은 아이스크림 맛은 정말 최고였다.',
+    '젠이츠는 평소에는 겁쟁이에 울보였지만 잠에 빠지면 완전히 다른 사람이 되었다. 번개의 호흡 일형은 그의 최강기였다. 탄지로와 이노스케는 그런 젠이츠의 양면성에 언제나 놀라면서도 든든한 동료로서 그를 지켜 주었다.',
+    '주말에 친구들이랑 피씨방에서 밤새 게임을 하기로 했다. 부모님한테는 독서실 간다고 둘러댔지만 사실 신작 게임을 꼭 해보고 싶었다. 집에 돌아와서 침대에 쓰러지자 마치 귀살대 최종 선별에서 살아 돌아온 기분이 들었다.',
+    '렌고쿠 쿄쥬로는 염주의 이름에 걸맞게 언제나 마음을 뜨겁게 불태웠다. 그는 약한 자를 지키는 것이 강한 자의 책임이라고 믿었다. 마지막 순간까지도 자신의 임무를 완수한 그의 모습은 탄지로에게 깊은 울림을 주었다.',
+    '요즘 밤만 되면 SNS 피드가 끝이 없어서 잠을 못 잔다. 아침에 일어나면 눈이 다크서클로 판다가 된다. 그래서 이번 주부터는 자정이 되면 핸드폰을 거실에 두고 자기로 결심했고 오늘은 웬일로 잠이 잘 왔다.',
+  ],
+};
+
 // 각 스크립트는 하나의 대화 주제로 자연스럽게 흐르도록 설계됨.
 // 봇의 대답은 "사용자가 뭐라 하든" 자연스럽게 이어지는 새 화제/반응으로 구성.
 const CHAT_SCRIPTS = [
@@ -3428,6 +4524,7 @@ const WORLDS = [
   {
     id: 'chainsaw',
     name: '체인소맨',
+    alwaysLocked: true,  // 항상 비밀번호 필요 (시윤이만 입장 가능)
     char: { id: 'pochita', name: '포치타', role: '데빌헌터', tagline: '체인소의 악마와 함께!',
             series: '체인소맨', img: '체인소맨/포치타도감.jpeg', fallback: '🐕' },
     chars: [
@@ -3437,6 +4534,7 @@ const WORLDS = [
     ],
     password: '2847',
     nextWorldPassword: '5391',
+    noFinger: true, // 손가락자리연습 없음 (덴지월드부터)
     theme: {
       bg: 'linear-gradient(135deg, #1a1a2e 0%, #e94560 50%, #16213e 100%)',
       accent: '#e94560', accentAlt: '#0f3460',
@@ -3457,6 +4555,7 @@ const WORLDS = [
     ],
     password: '5391',
     nextWorldPassword: '7720',
+    noFinger: true, // 손가락자리연습 없음 (탄지로월드부터)
     theme: {
       bg: 'linear-gradient(135deg, #0d1b2a 0%, #1b4332 50%, #52b788 100%)',
       accent: '#52b788', accentAlt: '#2d6a4f',
@@ -3464,6 +4563,27 @@ const WORLDS = [
       btnGrad: 'linear-gradient(135deg, #52b788, #95d5b2)',
     },
     gateEmoji: '🎋',
+  },
+  {
+    id: 'miku',
+    name: '하츠네 미쿠',
+    char: { id: 'miku', name: '미쿠', role: '디지털 디바', tagline: '노래하는 보컬로이드 아이돌',
+            series: '하츠네 미쿠', img: '미쿠/메인캐릭터.jpeg', fallback: '🎤' },
+    chars: [
+      { id: 'miku_play', name: '미쿠', role: '디지털 디바', roleClass: 'eldest',
+        tagline: '노래하는 보컬로이드 아이돌', series: '하츠네 미쿠',
+        img: '미쿠/메인캐릭터.jpeg', fallback: '🎤', unlocked: true },
+    ],
+    password: '7720',
+    nextWorldPassword: '9203',
+    noFinger: true, // 손가락자리연습 없음 (미쿠월드부터)
+    theme: {
+      bg: 'linear-gradient(135deg, #0ea5e9 0%, #22d3ee 40%, #a7f3d0 80%, #fbcfe8 100%)',
+      accent: '#0891b2', accentAlt: '#db2777',
+      cardBg: 'linear-gradient(135deg,#cffafe,#fce7f3)',
+      btnGrad: 'linear-gradient(135deg, #06b6d4, #38bdf8, #ec4899)',
+    },
+    gateEmoji: '🎤',
   },
 ];
 
@@ -3557,6 +4677,28 @@ const WORLD_COLLECTIONS = {
       { id: 'nezuko_col', name: '네즈코', img: '귀멸의칼날/네즈코도감.jpeg', need: 1, quote: '오빠를 지키는 혈귀 소녀.', quoteLock: '뱃지 1개 모으기' },
     ]},
   ],
+  miku: [
+    { tier: 'S', tierName: 'LEGEND', members: [
+      { id: 'miku_full', name: '미쿠 (완전체)', img: '미쿠/완전체카드.jpeg', need: 7,
+        quote: '세상의 모든 노래를 부를게. 너만을 위해서.', quoteLock: '뱃지 7개 모으기' },
+    ]},
+    { tier: 'A', tierName: 'ELITE', members: [
+      { id: 'miku_col', name: '하츠네 미쿠', img: '미쿠/미쿠도감.jpeg', need: 5,
+        quote: '내 목소리가 들려? 디지털 세계의 노래야.', quoteLock: '뱃지 5개 모으기' },
+      { id: 'teto_col', name: '카사네 테토', img: '미쿠/카사네테토도감.jpeg', need: 5,
+        quote: '프랑스빵을 사랑하는 31살 키메라!', quoteLock: '뱃지 5개 모으기' },
+    ]},
+    { tier: 'B', tierName: 'HUNTER', members: [
+      { id: 'himiko_col', name: '히미코', img: '미쿠/토가히미코도감.jpeg', need: 3,
+        quote: '좋아하는 사람이 되고 싶어♡', quoteLock: '뱃지 3개 모으기' },
+    ]},
+    { tier: 'C', tierName: 'ROOKIE', members: [
+      { id: 'miku_friend1', name: '미쿠 친구 1', img: '미쿠/채팅대상1.jpeg', need: 1,
+        quote: '같이 노래 부르자!', quoteLock: '뱃지 1개 모으기' },
+      { id: 'miku_friend3', name: '미쿠 친구 2', img: '미쿠/채팅대상3.jpeg', need: 1,
+        quote: '스테이지는 언제나 빛나고 있어.', quoteLock: '뱃지 1개 모으기' },
+    ]},
+  ],
 };
 
 /* 월드별 팝업 얼굴 */
@@ -3576,6 +4718,10 @@ const WORLD_POPUP_FACES = {
   kimetsu: {
     good: ['귀멸의칼날/탄지로도감.jpeg', '귀멸의칼날/네즈코도감.jpeg', '귀멸의칼날/미츠리도감.jpeg'],
     bad: ['귀멸의칼날/젠이치도감.jpeg', '귀멸의칼날/이노스케도감.jpeg'],
+  },
+  miku: {
+    good: ['미쿠/메인캐릭터.jpeg', '미쿠/미쿠도감.jpeg', '미쿠/완전체카드.jpeg', '미쿠/카사네테토도감.jpeg'],
+    bad: ['미쿠/토가히미코도감.jpeg', '미쿠/채팅대상1.jpeg'],
   },
 };
 
@@ -3620,7 +4766,8 @@ function EMPTY_CHAR_STATE() {
     missions: null, missionDate: null,
     fingerCompletes: { basic: 0, top: 0, bottom: 0, mix: 0 },
     practiceCompletes: { word: 0, short: 0, long: 0 },
-    collectionSeen: []
+    collectionSeen: [],
+    vaultOpened: []
   };
 }
 
@@ -3683,6 +4830,8 @@ function save() {
   // Persist the entire multi-character container (v2). Also keep legacy 'khime'
   // key in sync for backward-compat if any external code reads it.
   localStorage.setItem('khime_v2', JSON.stringify(allState));
+  localStorage.setItem('khime_updated_at', String(Date.now()));
+  try { cloudSync.push(); } catch(e) {}
 }
 
 /* ========= World Gate System ========= */
@@ -3699,6 +4848,8 @@ if (!worldState.unlockedWorlds.includes('saiki')) {
 }
 function saveWorldState() {
   localStorage.setItem('khime_worlds', JSON.stringify(worldState));
+  localStorage.setItem('khime_updated_at', String(Date.now()));
+  try { cloudSync.push(); } catch(e) {}
 }
 
 function switchWorld(worldId) {
@@ -3718,16 +4869,49 @@ function switchWorld(worldId) {
   buildCharacters();
   // 도감 재할당
   COLLECTION = WORLD_COLLECTIONS[worldId] || WORLD_COLLECTIONS.frieren;
-  // 테마 색상 적용
-  document.body.style.background = w.theme.bg;
+  // 테마 색상 적용 — 풀 CSS 테마가 있는 월드는 인라인 배경 안 입힘
+  const hasFullTheme = ['chainsaw','kimetsu','miku'].includes(worldId);
+  if (hasFullTheme) {
+    document.body.style.removeProperty('background');
+  } else {
+    document.body.style.background = w.theme.bg;
+  }
   // body에 월드 클래스 세팅 (CSS 분기용)
-  document.body.classList.remove('world-frieren','world-saiki','world-chainsaw','world-kimetsu');
+  document.body.classList.remove('world-frieren','world-saiki','world-chainsaw','world-kimetsu','world-miku','no-finger-tutorial');
   document.body.classList.add('world-' + worldId);
+  if (w && w.noFinger) document.body.classList.add('no-finger-tutorial');
   // 월드 자막 업데이트
   const sub = document.getElementById('worldSubtitle');
   if (sub) sub.textContent = `🌍 ${w.name} 월드`;
   // 월드 바뀌면 대시보드 버튼 이미지도 갱신 (renderDashboard 전에라도 안전하게)
   try { if (typeof applyButtonImages === 'function') applyButtonImages(); } catch(e) { console.error('switchWorld→applyButtonImages:', e); }
+  // 월드 전환 시 미션도 해당 월드용으로 재생성 (손가락자리 유무에 따라)
+  try { if (typeof ensureMissions === 'function') { ensureMissions(); if (typeof renderMissions === 'function') renderMissions(); } } catch(e) { console.error('switchWorld→ensureMissions:', e); }
+}
+
+// 미공개 월드의 캐릭터를 클릭했을 때
+function pickLockedChar(worldId, charId, event) {
+  // 보상 이벤트에서 선택 안 한 월드는 잠금 (다음 보상까지 못 봄)
+  if (state.streak7Locked && state.streak7Locked.includes(worldId)) {
+    alert('🔒 이 친구는 다음 보상에서 만날 수 있어!\n\n다른 친구를 골라봐~ ⚡');
+    return;
+  }
+  const w = WORLDS.find(x => x.id === worldId);
+  const c = (w && (w.chars || [w.char])).find(ch => ch.id === charId);
+  if (!w || !c) return;
+  // 비밀번호가 있는 월드는 비번 입력 팝업 (가챠로 받은 비번을 직접 입력하는 재미)
+  if (w.password) {
+    openWorldPw(worldId);
+    return;
+  }
+  // 비번 없는 월드는 직접 해금
+  const ok = confirm(`🔓 ${c.name} 캐릭터로 놀고 싶어?\n\n"${w.name}" 월드를 열고 ${c.name}와 함께 연습할게요!`);
+  if (!ok) return;
+  if (!worldState.unlockedWorlds.includes(worldId)) {
+    worldState.unlockedWorlds.push(worldId);
+    saveWorldState();
+  }
+  enterWorldAsChar(worldId, charId, event);
 }
 
 function renderWorldGate() {
@@ -3735,15 +4919,23 @@ function renderWorldGate() {
   if (!grid) return;
   // 각 월드의 캐릭터를 개별 카드로 표시
   let cards = '';
+  // 안전 가드 — worldState 필드가 누락된 경우 기본값 보강
+  if (!worldState || typeof worldState !== 'object') {
+    worldState = { unlockedWorlds: ['frieren','saiki'], completedWorlds: [], currentWorld: null };
+  }
+  if (!Array.isArray(worldState.unlockedWorlds)) worldState.unlockedWorlds = ['frieren','saiki'];
+  if (!Array.isArray(worldState.completedWorlds)) worldState.completedWorlds = [];
   WORLDS.forEach(w => {
-    const isUnlocked = worldState.unlockedWorlds.includes(w.id);
+    // alwaysLocked 월드(체인소맨)는 항상 비번 입력 필요 — 영구 해금 안 됨
+    const isUnlocked = !w.alwaysLocked && worldState.unlockedWorlds.includes(w.id);
     const isCompleted = worldState.completedWorlds.includes(w.id);
     const chars = w.chars || [w.char];
     chars.forEach(c => {
       const cls = isCompleted ? 'completed' : (isUnlocked ? '' : 'locked');
+      // 미공개 캐릭터도 직접 클릭해서 들어갈 수 있게 (확인 후 자동 해금)
       const clickAction = isUnlocked
         ? `enterWorldAsChar('${w.id}','${c.id}',event)`
-        : (w.password ? `openWorldPw('${w.id}')` : '');
+        : `pickLockedChar('${w.id}','${c.id}',event)`;
       cards += `
         <div class="world-gate-card ${cls}" onclick="${clickAction}">
           <div class="world-gate-emoji">
@@ -3940,33 +5132,181 @@ function chainsawEntrance(cx, cy) {
   if (!cy) cy = window.innerHeight / 2;
   const overlay = document.createElement('div');
   overlay.className = 'cs-entrance';
+  overlay.style.setProperty('--cx', cx + 'px');
+  overlay.style.setProperty('--cy', cy + 'px');
+  // 거대한 SVG 톱날 + 빨간 슬래시 + 노란 스파크 + 핏방울
   overlay.innerHTML = `
     <div class="cs-dim"></div>
+    <div class="cs-rip-flash"></div>
     <div class="cs-slash cs-slash-l"></div>
     <div class="cs-slash cs-slash-r"></div>
-    <div class="cs-img-wrap">
-      <img src="${encodeURI('체인소맨/입장팝업효과.jpeg')}" class="cs-popup-img" alt="">
+    <div class="cs-slash cs-slash-x1"></div>
+    <div class="cs-slash cs-slash-x2"></div>
+    <div class="cs-saw-wrap" style="left:${cx}px;top:${cy}px">
+      <svg viewBox="-100 -100 200 200" class="cs-saw" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="csCenter" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffd400"/>
+            <stop offset="60%" stop-color="#ff8c00"/>
+            <stop offset="100%" stop-color="#7a1a1a"/>
+          </radialGradient>
+          <linearGradient id="csTooth" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e0e0e0"/>
+            <stop offset="50%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#888"/>
+          </linearGradient>
+        </defs>
+        <!-- 톱날 외곽 -->
+        <g class="cs-saw-blade">
+          ${Array.from({length:24},(_,i)=>{
+            const a = (i/24)*Math.PI*2;
+            const x1 = Math.cos(a)*70, y1 = Math.sin(a)*70;
+            const x2 = Math.cos(a+0.13)*92, y2 = Math.sin(a+0.13)*92;
+            const x3 = Math.cos(a+0.26)*70, y3 = Math.sin(a+0.26)*70;
+            return `<polygon points="${x1.toFixed(1)},${y1.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)} ${x3.toFixed(1)},${y3.toFixed(1)}" fill="url(#csTooth)" stroke="#222" stroke-width="1.5"/>`;
+          }).join('')}
+          <circle cx="0" cy="0" r="70" fill="#1a1a1a" stroke="#444" stroke-width="3"/>
+          <circle cx="0" cy="0" r="50" fill="url(#csCenter)" stroke="#7a1a1a" stroke-width="2"/>
+          <circle cx="0" cy="0" r="22" fill="#0a0a0a" stroke="#ffd400" stroke-width="2"/>
+          <!-- 풀줄(체인) 라인 -->
+          ${Array.from({length:8},(_,i)=>{
+            const a = (i/8)*Math.PI*2;
+            return `<line x1="0" y1="0" x2="${(Math.cos(a)*40).toFixed(1)}" y2="${(Math.sin(a)*40).toFixed(1)}" stroke="#ff8c00" stroke-width="2" opacity="0.6"/>`;
+          }).join('')}
+        </g>
+      </svg>
     </div>
-    <div class="cs-spark-ring"></div>
+    <div class="cs-spark-ring" style="left:${cx}px;top:${cy}px"></div>
   `;
   // 피 튀기는 파티클
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 50; i++) {
     const p = document.createElement('div');
     p.className = 'cs-blood';
     const angle = Math.random() * Math.PI * 2;
-    const dist = 80 + Math.random() * 250;
+    const dist = 80 + Math.random() * 350;
     p.style.left = cx + 'px';
     p.style.top = cy + 'px';
     p.style.setProperty('--bx', (Math.cos(angle) * dist) + 'px');
     p.style.setProperty('--by', (Math.sin(angle) * dist) + 'px');
-    p.style.animationDelay = (Math.random() * 0.5) + 's';
-    const size = 3 + Math.random() * 8;
+    p.style.animationDelay = (Math.random() * 0.6) + 's';
+    const size = 4 + Math.random() * 12;
     p.style.width = size + 'px';
     p.style.height = size + 'px';
     overlay.appendChild(p);
   }
+  // 노란 스파크 (체인 마찰)
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'cs-spark';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 50 + Math.random() * 180;
+    s.style.left = cx + 'px';
+    s.style.top = cy + 'px';
+    s.style.setProperty('--sx', (Math.cos(angle) * dist) + 'px');
+    s.style.setProperty('--sy', (Math.sin(angle) * dist) + 'px');
+    s.style.animationDelay = (Math.random() * 0.4) + 's';
+    overlay.appendChild(s);
+  }
   document.body.appendChild(overlay);
+  // 톱 사운드 효과 (있으면)
+  try { chainsawSound && chainsawSound(); } catch(e) {}
   setTimeout(() => overlay.remove(), 3200);
+}
+
+// 체인소맨 효과음 — 그르릉~ 사운드
+function chainsawSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    // 톱 시동: 저음 노이즈 + 톱니 같은 사각파
+    const noiseSize = Math.floor(ctx.sampleRate * 0.7);
+    const buf = ctx.createBuffer(1, noiseSize, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < noiseSize; i++) {
+      const env = Math.min(1, i / (ctx.sampleRate * 0.1)) * Math.pow(1 - i/noiseSize, 0.6);
+      d[i] = (Math.random()*2-1) * env * 0.6;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
+    const ng = ctx.createGain(); ng.gain.value = 0.4;
+    noise.connect(lp).connect(ng).connect(ctx.destination);
+    noise.start(now); noise.stop(now + 0.75);
+    // 톱 회전 사각파 — 거칠게 그르릉
+    const o = ctx.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(80, now);
+    o.frequency.linearRampToValueAtTime(180, now + 0.15);
+    o.frequency.linearRampToValueAtTime(160, now + 0.7);
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(0, now);
+    og.gain.linearRampToValueAtTime(0.18, now + 0.06);
+    og.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+    const obp = ctx.createBiquadFilter(); obp.type = 'bandpass'; obp.frequency.value = 600; obp.Q.value = 3;
+    o.connect(obp).connect(og).connect(ctx.destination);
+    o.start(now); o.stop(now + 0.78);
+    // 챙 소리 — 처음 0.05초
+    const chime = ctx.createOscillator(); chime.type = 'square';
+    chime.frequency.value = 1800;
+    const cg = ctx.createGain();
+    cg.gain.setValueAtTime(0.18, now);
+    cg.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+    chime.connect(cg).connect(ctx.destination);
+    chime.start(now); chime.stop(now + 0.08);
+  } catch(e) {}
+}
+
+/* 하츠네 미쿠 입장 효과 — 홀로그램 + 음표 + 디지털 파티클 */
+function mikuEntrance(cx, cy) {
+  console.log('[entrance] mikuEntrance', cx, cy);
+  if (!cx) cx = window.innerWidth / 2;
+  if (!cy) cy = window.innerHeight / 2;
+  const overlay = document.createElement('div');
+  overlay.className = 'miku-entrance';
+  overlay.style.setProperty('--cx', cx + 'px');
+  overlay.style.setProperty('--cy', cy + 'px');
+  overlay.innerHTML = `
+    <div class="mk-dim"></div>
+    <div class="mk-flash" style="background:radial-gradient(circle at ${cx}px ${cy}px, rgba(34,211,238,0.7), rgba(14,165,233,0.3) 40%, transparent 70%)"></div>
+    <div class="mk-ring" style="left:${cx}px;top:${cy}px"></div>
+    <div class="mk-ring" style="left:${cx}px;top:${cy}px"></div>
+    <div class="mk-ring" style="left:${cx}px;top:${cy}px"></div>
+    <div class="mk-scanlines"></div>
+    <div class="mk-grid"></div>
+  `;
+  // 음표와 디지털 파티클
+  const notes = ['♪','♫','♬','𝄞','♩','🎵','🎶'];
+  for (let i = 0; i < 22; i++) {
+    const n = document.createElement('div');
+    n.className = 'mk-note';
+    n.textContent = notes[Math.floor(Math.random() * notes.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 80 + Math.random() * 260;
+    n.style.left = cx + 'px';
+    n.style.top = cy + 'px';
+    n.style.setProperty('--nx', (Math.cos(angle) * dist) + 'px');
+    n.style.setProperty('--ny', (Math.sin(angle) * dist - 60) + 'px');
+    n.style.animationDelay = (Math.random() * 0.7) + 's';
+    n.style.fontSize = (18 + Math.random() * 24) + 'px';
+    overlay.appendChild(n);
+  }
+  // 청록색 반짝이
+  for (let i = 0; i < 30; i++) {
+    const s = document.createElement('div');
+    s.className = 'mk-spark';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 40 + Math.random() * 220;
+    s.style.left = cx + 'px';
+    s.style.top = cy + 'px';
+    s.style.setProperty('--sx', (Math.cos(angle) * dist) + 'px');
+    s.style.setProperty('--sy', (Math.sin(angle) * dist) + 'px');
+    s.style.animationDelay = (Math.random() * 0.8) + 's';
+    const size = 3 + Math.random() * 6;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    overlay.appendChild(s);
+  }
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2600);
 }
 
 function showGameUnlockPopup() {
@@ -3977,7 +5317,7 @@ function showGameUnlockPopup() {
       <div class="unlock-icon">💎</div>
       <h3>게임이 열렸어요!</h3>
       <p>5회 연습 완료! 이제 게임에 도전해보세요</p>
-      <button class="go-btn" onclick="this.closest('.game-unlock-overlay').remove(); showTab('game');">🎮 게임 시작하기!</button>
+      <button class="go-btn" onclick="this.closest('.game-unlock-overlay').remove(); openGameFromUnlock();">🎮 게임 시작하기!</button>
     </div>`;
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
@@ -3985,11 +5325,55 @@ function showGameUnlockPopup() {
   emojiBurst(['💎','🎮','⭐','🔥']);
 }
 
+/* 모든 잠금해제 팝업에서 공용으로 쓰는 게임창 진입 함수
+   - 결과 모달이 떠 있으면 먼저 닫고
+   - 게임 모달을 띄운 뒤 게임 선택 화면을 표시 */
+function openGameFromUnlock() {
+  try { closeModal(); } catch(e) {}
+  const modal = document.getElementById('fingerGameModal');
+  if (!modal) return;
+  modal.classList.add('show');
+  try { showGameSelect(); } catch(e) { console.error('[openGameFromUnlock] showGameSelect 실패', e); }
+}
+
+// 월드 테마 클래스를 body에 부여 (CSS로 전체 룩 변경)
+function applyWorldThemeClass(worldId) {
+  const body = document.body;
+  // 모든 world-* 클래스 제거
+  Array.from(body.classList).forEach(cls => {
+    if (cls.startsWith('world-') || cls === 'no-finger-tutorial') body.classList.remove(cls);
+  });
+  if (worldId) {
+    body.classList.add('world-' + worldId);
+    const w = WORLDS.find(x => x.id === worldId);
+    if (w && w.noFinger) body.classList.add('no-finger-tutorial');
+    // 인라인 배경 스타일 제거 — CSS가 우선되도록
+    // chainsaw/kimetsu/miku 같은 풀 테마 월드는 body.world-* 클래스 CSS만 사용
+    if (worldId === 'chainsaw' || worldId === 'kimetsu' || worldId === 'miku') {
+      body.style.removeProperty('background');
+    }
+  }
+}
+
 function enterWorldAsChar(worldId, charId, evt) {
+  // 클릭 위치 캡처 (try 밖으로 빼서 어떤 경우에도 사용 가능)
+  const cx = evt ? evt.clientX : null;
+  const cy = evt ? evt.clientY : null;
+  applyWorldThemeClass(worldId);
+
+  // 입장 효과 먼저 재생 — renderDashboard가 실패해도 애니메이션은 반드시 보이도록
+  const entranceEffects = {
+    saiki: typeof telepathyEntrance === 'function' ? telepathyEntrance : null,
+    frieren: typeof frierenMagicEntrance === 'function' ? frierenMagicEntrance : null,
+    kimetsu: typeof kimetsuEntrance === 'function' ? kimetsuEntrance : null,
+    chainsaw: typeof chainsawEntrance === 'function' ? chainsawEntrance : null,
+    miku: typeof mikuEntrance === 'function' ? mikuEntrance : null,
+  };
   try {
-    // 클릭 위치 캡처
-    const cx = evt ? evt.clientX : null;
-    const cy = evt ? evt.clientY : null;
+    if (entranceEffects[worldId]) entranceEffects[worldId](cx, cy);
+  } catch (eFx) { console.error('[entrance effect error]', eFx); }
+
+  try {
     switchWorld(worldId);
     activateCharState(charId);
     save();
@@ -3998,13 +5382,12 @@ function enterWorldAsChar(worldId, charId, evt) {
     document.getElementById('tab-dashboard').style.display = 'block';
     currentTab = 'home';
     renderDashboard();
+    // renderDashboard가 일찍 return 해도 버튼 이미지는 반드시 적용
+    try { applyButtonImages(); } catch (eImg) { console.error('[applyButtonImages after render]', eImg); }
     const c = getCurrentChar();
     const w = getWorld();
-    const entranceEffects = { saiki: telepathyEntrance, frieren: frierenMagicEntrance, kimetsu: kimetsuEntrance, chainsaw: chainsawEntrance };
-    if (entranceEffects[worldId]) {
-      entranceEffects[worldId](cx, cy);
-    } else {
-      if (c) pop(`🌟 ${c.name}와 함께 ${w.name} 월드에 입장!`);
+    if (!entranceEffects[worldId] && c && w) {
+      pop(`🌟 ${c.name}와 함께 ${w.name} 월드에 입장!`);
     }
     if (typeof updatePageNav === 'function') updatePageNav();
   } catch(e) {
@@ -4018,14 +5401,22 @@ function enterWorldAsChar(worldId, charId, evt) {
 }
 
 function enterWorld(worldId) {
+  // 입장 효과를 먼저 재생 — 이후 로직에서 에러가 나도 애니메이션은 반드시 보이도록
+  const entranceEffects = {
+    saiki: typeof telepathyEntrance === 'function' ? telepathyEntrance : null,
+    frieren: typeof frierenMagicEntrance === 'function' ? frierenMagicEntrance : null,
+    kimetsu: typeof kimetsuEntrance === 'function' ? kimetsuEntrance : null,
+    chainsaw: typeof chainsawEntrance === 'function' ? chainsawEntrance : null,
+    miku: typeof mikuEntrance === 'function' ? mikuEntrance : null,
+  };
+  try {
+    if (entranceEffects[worldId]) entranceEffects[worldId]();
+  } catch(eFx) { console.error('[entrance effect error]', eFx); }
   try {
     switchWorld(worldId);
     document.getElementById('tab-worldgate').style.display = 'none';
     showTab('home');
-    const entranceEffects = { saiki: telepathyEntrance, frieren: frierenMagicEntrance, kimetsu: kimetsuEntrance, chainsaw: chainsawEntrance };
-    if (entranceEffects[worldId]) {
-      entranceEffects[worldId]();
-    } else {
+    if (!entranceEffects[worldId]) {
       const w = getWorld();
       pop(`🌟 ${w.name} 월드에 입장!`);
     }
@@ -4096,13 +5487,15 @@ function checkPw() {
   if (!w) return;
   if (pwInput === w.password) {
     // 정답!
-    worldState.unlockedWorlds.push(w.id);
-    saveWorldState();
+    // alwaysLocked 월드는 영구 해금하지 않음 (매번 비번 입력 필요 — 시윤이만 입장 가능)
+    if (!w.alwaysLocked) {
+      worldState.unlockedWorlds.push(w.id);
+      saveWorldState();
+    }
     closeWorldPw();
     pop(`🎉 ${w.name} 월드가 열렸어요!`);
     try { comboSound(10); } catch(e) {}
     renderWorldGate();
-    // 바로 입장
     setTimeout(() => enterWorld(w.id), 800);
   } else {
     // 틀림! 흔들기 효과
@@ -4161,29 +5554,64 @@ function showPasswordReveal(password, nextWorld) {
 }
 
 /* ========= Streak ========= */
+// 클라우드 sync 동기화 끝난 후에만 streak reset 허용 (안 그러면 빈 상태에서 cloud를 1로 덮어씀)
 function updateStreak() {
   const today = new Date().toDateString();
-  if (state.lastPlayed !== today) {
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (state.lastPlayed === yesterday) state.streak++;
-    else state.streak = 1;
-    state.lastPlayed = today;
-    save();
+  if (state.lastPlayed === today) return; // 오늘 이미 카운트됨
+  // 만약 lastPlayed가 없거나 빈 상태인데 cloud sync가 아직 안 끝났다면 스트릭 reset 보류
+  // (cloudSync가 cloudLoaded=true가 되기 전엔 함부로 reset하지 않음)
+  const cloudPending = (typeof cloudSync !== 'undefined' && cloudSync.enabled && !cloudSync.cloudLoaded);
+  if (cloudPending && !state.lastPlayed) {
+    // cloud pull 끝난 후 다시 시도
+    setTimeout(updateStreak, 1500);
+    return;
   }
+  // 어제 했으면 +1, 아니면 1로 리셋, 단 lastPlayed가 today와 어제 둘다 아닐 때만 리셋
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  const dayBefore = new Date(Date.now() - 86400000 * 2).toDateString(); // 그저께 — 1일 빠진 것 허용
+  if (state.lastPlayed === yesterday) {
+    state.streak = (state.streak || 0) + 1;
+  } else if (state.lastPlayed === dayBefore) {
+    // 1일 빠뜨려도 streak 유지 (초등학생 배려)
+    state.streak = (state.streak || 1);
+  } else if (!state.lastPlayed) {
+    state.streak = 1;
+  } else {
+    // 2일 이상 빠짐 → reset
+    state.streak = 1;
+  }
+  state.lastPlayed = today;
+  save();
 }
-updateStreak();
+// 페이지 로드시 첫 번째 호출은 cloud sync 끝난 후로 미룸
+setTimeout(updateStreak, 100);
 
 /* ========= Missions ========= */
 function ensureMissions() {
   const today = new Date().toDateString();
-  if (state.missionDate !== today) {
-    state.missions = [
-      { id: 'm1', name: '🖐️ 기본자리 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_basic' },
-      { id: 'm2', name: '☝️ 윗줄 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_top' },
-      { id: 'm3', name: '👇 아랫줄 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_bottom' },
-      { id: 'm4', name: '🔀 한글낱자 섞기 5번', target: 5, progress: 0, reward: 30, type: 'finger_mix' },
-    ];
+  // 현재 월드에 손가락자리연습이 없으면 다른 미션 세트 사용
+  const curWorld = (typeof WORLDS !== 'undefined' && currentWorldId)
+    ? WORLDS.find(w => w.id === currentWorldId) : null;
+  const noFinger = !!(curWorld && curWorld.noFinger);
+  // 월드별로 미션 세트를 다르게 주기 위해 missionWorldId도 키로 사용
+  if (state.missionDate !== today || state.missionWorldId !== currentWorldId) {
+    if (noFinger) {
+      state.missions = [
+        { id: 'm1', name: '🍎 낱말 5번 연습', target: 5, progress: 0, reward: 30, type: 'practice_word' },
+        { id: 'm2', name: '✏️ 단문 5번 연습', target: 5, progress: 0, reward: 30, type: 'practice_short' },
+        { id: 'm3', name: '📖 장문 3번 연습', target: 3, progress: 0, reward: 40, type: 'practice_long' },
+        { id: 'm4', name: '💬 채팅 1번 완료', target: 1, progress: 0, reward: 30, type: 'practice_chat' },
+      ];
+    } else {
+      state.missions = [
+        { id: 'm1', name: '🖐️ 기본자리 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_basic' },
+        { id: 'm2', name: '☝️ 윗줄 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_top' },
+        { id: 'm3', name: '👇 아랫줄 5번 연습', target: 5, progress: 0, reward: 30, type: 'finger_bottom' },
+        { id: 'm4', name: '🔀 한글낱자 섞기 5번', target: 5, progress: 0, reward: 30, type: 'finger_mix' },
+      ];
+    }
     state.missionDate = today;
+    state.missionWorldId = currentWorldId;
     save();
   }
 }
@@ -4222,7 +5650,17 @@ const MISSION_MODE_MAP = {
   finger_bottom: 'bottom',
   finger_mix: 'mix',
 };
+/* 미션 → 탭 매핑 (미쿠월드 이후 전용) */
+const MISSION_TAB_MAP = {
+  practice_word: 'word',
+  practice_short: 'short',
+  practice_long: 'long',
+  practice_chat: 'chat',
+};
 function goToMission(type) {
+  // 연습 탭 미션 우선 처리
+  const tab = MISSION_TAB_MAP[type];
+  if (tab) { showTab(tab); return; }
   const mode = MISSION_MODE_MAP[type];
   if (!mode) return;
   showTab('finger');
@@ -4262,19 +5700,310 @@ function checkBadges() {
       state.badges.push(b.id);
       pop(`🏅 뱃지 획득! ${b.icon} ${b.name}`);
       save();
+      // ⚡ 일주일 뱃지 특별 이벤트 — 잠긴 월드 중 1개를 직접 선택 + 비밀번호 공개
+      if (b.id === 'streak7' && !state.streak7CelebrationDone) {
+        setTimeout(() => showStreak7Celebration(), 1200);
+      }
     }
   });
   // 뱃지 획득 후 월드 완성 체크
   checkWorldCompletion();
 }
 
+/* ========= ⚡ 일주일 뱃지 특별 보상: 캐릭터 1명 골라서 비밀번호 받기 ========= */
+function showStreak7Celebration() {
+  // 잠긴 월드(비밀번호 있는 것) 중 미선택 항목만 후보
+  const candidates = WORLDS.filter(w => w.password && !worldState.unlockedWorlds.includes(w.id));
+  if (!candidates.length) {
+    state.streak7CelebrationDone = true;
+    save();
+    return;
+  }
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // 모달 생성
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎉🎊⚡🎉🎊</div>
+        <h2 class="streak7-title">${nick}짱 축하해!! ⚡</h2>
+        <p class="streak7-msg">
+          여기까지 오다니 정말 꾸준히 노력했구나 ^^<br>
+          ${nick}짱이 <b>먼저 캐릭터를 고를 수 있어</b> ^^ !!<br>
+          원하는 캐릭터를 <b>한 개</b> 선택하면<br>
+          <span style="color:#d6336c;font-weight:900">${nick}짱에게만 비밀번호를 알려줄게!!!</span>
+        </p>
+        <div class="streak7-grid">
+          ${candidates.map(w => {
+            const c = (w.chars && w.chars[0]) || w.char;
+            return `
+              <button class="streak7-pick" data-world="${w.id}" onclick="pickStreak7Reward('${w.id}')">
+                <div class="streak7-pick-img">
+                  ${c.img ? `<img src="${encodeURI(c.img)}" alt="${c.name}" onerror="this.outerHTML='<span class=streak7-fallback>${c.fallback||w.gateEmoji}</span>'">` : `<span class="streak7-fallback">${c.fallback||w.gateEmoji}</span>`}
+                </div>
+                <div class="streak7-pick-name">${c.name}</div>
+                <div class="streak7-pick-series">${w.name}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="streak7-warn">⚠️ 한 번 선택하면 나머지 캐릭터는 잠겨. 신중히 골라!</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function pickStreak7Reward(worldId) {
+  const w = WORLDS.find(x => x.id === worldId);
+  if (!w) return;
+  // 다른 후보들의 버튼 잠그기 — 비밀번호 못 보게
+  const modal = document.querySelector('.streak7-modal');
+  if (modal) {
+    modal.querySelectorAll('.streak7-pick').forEach(btn => {
+      if (btn.dataset.world !== worldId) {
+        btn.classList.add('locked');
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="streak7-pick-img"><span class="streak7-fallback">🔒</span></div>
+          <div class="streak7-pick-name">잠김</div>
+          <div class="streak7-pick-series">선택 못 함</div>
+        `;
+      } else {
+        btn.classList.add('chosen');
+      }
+    });
+  }
+  // 상태 저장: 선택한 월드 + 차단된 월드들
+  if (!state.streak7Locked) state.streak7Locked = [];
+  WORLDS.forEach(other => {
+    if (other.password && other.id !== worldId && !worldState.unlockedWorlds.includes(other.id)) {
+      if (!state.streak7Locked.includes(other.id)) state.streak7Locked.push(other.id);
+    }
+  });
+  state.streak7Choice = worldId;
+  state.streak7CelebrationDone = true;
+  // ⚠️ 자동 해금 안 함 — 비밀번호 직접 입력하는 재미를 위해
+  save();
+  // 1.5초 후 비밀번호 공개 팝업
+  setTimeout(() => {
+    if (modal) modal.remove();
+    showStreak7Password(w);
+  }, 1500);
+}
+
+/* ========= 🎰 시윤 깜짝 이벤트 (시윤 입장 시 1회 발동)
+   단문 3회 연습 → 축하 + 덴지(체인소맨) 월드 비번 직접 공개 (선택 단계 없음) */
+function checkSpecialEvent() {
+  try {
+    const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
+    if (nick !== '시윤') return; // 시윤 전용
+    state.eventGacha = state.eventGacha || { announced: false, shortDone: 0, gachaDone: false };
+    if (state.eventGacha.gachaDone) return;
+    if (state.eventGacha.announced) return;
+    state.eventGacha.announced = true;
+    save();
+    setTimeout(showEventGachaAnnounce, 1500);
+  } catch(e) { console.error('checkSpecialEvent:', e); }
+}
+
+function showEventGachaAnnounce() {
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // ✨ 프리렌 마법진 효과
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎁✨💖✨🎁</div>
+        <h2 class="streak7-title">${nick}짱 깜짝 선물!! 🎁</h2>
+        <p class="streak7-msg">
+          ${nick}짱! 오늘 특별 이벤트야 ✨<br><br>
+          <b style="color:#d6336c;font-size:18px">✏️ 단문 3회 연습</b>을 끝내면<br>
+          <b>새 캐릭터의 비밀번호를 알려줄게!</b> 🔐
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove();showTab('short')" style="font-size:16px">단문 연습 시작하기 →</button>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
+}
+
+// 단문 완료 시 호출 (이벤트 카운터)
+function onShortCompleteForEvent() {
+  if (!state.eventGacha || !state.eventGacha.announced || state.eventGacha.gachaDone) return;
+  state.eventGacha.shortDone = (state.eventGacha.shortDone || 0) + 1;
+  save();
+  const remain = 3 - state.eventGacha.shortDone;
+  if (remain > 0) {
+    pop(`🎁 보상까지 ${remain}회 남음! (${state.eventGacha.shortDone}/3)`);
+  } else {
+    state.eventGacha.gachaDone = true;
+    // 덴지(체인소맨) 월드 자동 차단 해제하지 말고, 비번만 직접 알려줌 (시윤이 직접 입력하는 재미 유지)
+    save();
+    setTimeout(showEventGiftDenji, 1500);
+  }
+}
+
+// 단문 3회 완료 → 덴지 월드 비번 직접 공개 (선택 단계 없음, 시윤 전용 기프트)
+function showEventGiftDenji() {
+  const w = WORLDS.find(x => x.id === 'chainsaw');
+  if (!w) return;
+  const c = (w.chars && w.chars[0]) || w.char;
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // 프리렌 마법진 효과
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box streak7-pw-box">
+        <div class="streak7-pw-confetti">🎁✨🎁</div>
+        <h2 class="streak7-title">${nick}짱 단문 3회 완료!! 🎉</h2>
+        <p class="streak7-msg">
+          정말 잘했어 ^^ 약속한 선물을 줄게 🎁<br>
+          오늘부터 <b style="color:#d6336c;font-size:18px">${c.name}</b>(${w.name})와 친해질 수 있어!<br><br>
+          ${c.name}와 만나려면 비밀번호가 필요해 🔐
+        </p>
+        <div class="streak7-pw-display">${w.password}</div>
+        <p class="streak7-msg" style="font-size:13px;color:#666">
+          이 비밀번호를 외워둬!<br>
+          월드 변경 → 덴지 카드 → 비밀번호 ${w.password} 입력하면 입장 💖
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove()" style="margin-top:14px">알겠어! (${nick}만의 비밀)</button>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
+}
+
+function showEventGacha() {
+  const candidates = WORLDS.filter(w => w.password && !worldState.unlockedWorlds.includes(w.id));
+  if (!candidates.length) {
+    pop('🎁 이미 모든 친구를 만났어! 축하해 ✨');
+    return;
+  }
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  // ✨ 프리렌 마법진 — 캐릭터 가챠 등장 시
+  try { frierenMagicEntrance(window.innerWidth/2, window.innerHeight/2); } catch(e) {}
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box">
+        <div class="streak7-confetti">🎰🎉🎁🎉🎰</div>
+        <h2 class="streak7-title">${nick}짱 단문 3회 완료!! 🎉</h2>
+        <p class="streak7-msg">
+          짠! 오늘의 가챠 시간이야!<br>
+          <b>한 캐릭터를 골라봐</b> ✨
+        </p>
+        <div class="streak7-grid">
+          ${candidates.map(w => {
+            const c = (w.chars && w.chars[0]) || w.char;
+            return `
+              <button class="streak7-pick" data-world="${w.id}" onclick="pickEventGachaReward('${w.id}')">
+                <div class="streak7-pick-img">
+                  ${c.img ? `<img src="${encodeURI(c.img)}" alt="${c.name}" onerror="this.outerHTML='<span class=streak7-fallback>${c.fallback||w.gateEmoji}</span>'">` : `<span class="streak7-fallback">${c.fallback||w.gateEmoji}</span>`}
+                </div>
+                <div class="streak7-pick-name">${c.name}</div>
+                <div class="streak7-pick-series">${w.name}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="streak7-warn">⚠️ 한 번 선택하면 나머지는 잠겨! 신중히 골라!</div>
+      </div>
+    </div>`;
+  // 마법진 효과 후 등장
+  setTimeout(() => {
+    document.body.appendChild(modal);
+    try { successSound(); } catch(e) {}
+  }, 1200);
+}
+
+function pickEventGachaReward(worldId) {
+  const w = WORLDS.find(x => x.id === worldId);
+  if (!w) return;
+  const modal = document.querySelector('.streak7-modal');
+  if (modal) {
+    modal.querySelectorAll('.streak7-pick').forEach(btn => {
+      if (btn.dataset.world !== worldId) {
+        btn.classList.add('locked');
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="streak7-pick-img"><span class="streak7-fallback">🔒</span></div>
+          <div class="streak7-pick-name">잠김</div>
+          <div class="streak7-pick-series">선택 못 함</div>
+        `;
+      } else {
+        btn.classList.add('chosen');
+      }
+    });
+  }
+  // 선택 안 한 후보들은 영구 잠금
+  if (!state.streak7Locked) state.streak7Locked = [];
+  WORLDS.forEach(other => {
+    if (other.password && other.id !== worldId && !worldState.unlockedWorlds.includes(other.id)) {
+      if (!state.streak7Locked.includes(other.id)) state.streak7Locked.push(other.id);
+    }
+  });
+  // ⚠️ 자동 해금 안 함 — 사용자가 비밀번호 직접 입력하는 재미 살리기
+  save();
+  setTimeout(() => {
+    if (modal) modal.remove();
+    showStreak7Password(w); // 비밀번호 공개 — 기존 함수 재활용
+  }, 1500);
+}
+
+function showStreak7Password(w) {
+  const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  const c = (w.chars && w.chars[0]) || w.char;
+  const modal = document.createElement('div');
+  modal.className = 'streak7-modal';
+  modal.innerHTML = `
+    <div class="streak7-backdrop">
+      <div class="streak7-box streak7-pw-box">
+        <div class="streak7-pw-confetti">🎁✨🎁</div>
+        <h2 class="streak7-title">너만 알고 있어~~ 🤫</h2>
+        <p class="streak7-msg">
+          ${nick}짱이 고른 친구는<br>
+          <b style="font-size:22px;color:#d6336c">${c.name}</b> (${w.name})<br><br>
+          ${c.name}와 친해지려면 비밀번호가 필요해!
+        </p>
+        <div class="streak7-pw-display">${w.password}</div>
+        <p class="streak7-msg" style="font-size:13px;color:#666">
+          이 비밀번호를 외워둬!<br>
+          월드 입장할 때 입력하면 ${c.name}와 같이 놀 수 있어 💖
+        </p>
+        <button class="btn" onclick="this.closest('.streak7-modal').remove()" style="margin-top:14px">알겠어! (${nick}만의 비밀)</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  try { successSound(); } catch(e) {}
+  try { emojiBurst && emojiBurst(); } catch(e) {}
+}
+
 function renderBadges() {
   const el = document.getElementById('badgesGrid');
   el.innerHTML = BADGES.map(b => {
     const earned = state.badges.includes(b.id);
+    // ⚡ 일주일 뱃지에 D-day 카운터 표시 (며칠 남았는지)
+    let dday = '';
+    if (b.id === 'streak7' && !earned) {
+      const remain = Math.max(0, 7 - (state.streak || 0));
+      dday = `<div class="badge-dday">D-${remain}</div>`;
+    }
     return `<div class="badge-item ${earned?'earned':''}">
       <div class="icon">${b.icon}</div>
       <div class="name">${b.name}</div>
+      ${dday}
     </div>`;
   }).join('');
   renderCollection();
@@ -4314,6 +6043,14 @@ const WORLD_BUTTON_IMAGES = {
     chat:   '귀멸의칼날/채팅버튼.jpeg',
     game:   '귀멸의칼날/게임버튼.jpeg',
   },
+  miku: {
+    // finger 없음 — 미쿠월드부터 손가락자리연습 제거
+    word:   '미쿠/낱말버튼.jpeg',
+    short:  '미쿠/단문버튼.jpeg',
+    long:   '미쿠/장문.jpeg',
+    chat:   '미쿠/채팅버튼.jpeg',
+    game:   '미쿠/게임버튼.jpeg',
+  },
 };
 
 function applyButtonImages() {
@@ -4325,8 +6062,15 @@ function applyButtonImages() {
       console.warn('[applyButtonImages] no .home-card[data-section] found in DOM');
       return;
     }
+    // 월드에 noFinger 플래그가 있으면 손가락자리 카드 자체를 숨김
+    const curWorld = WORLDS.find(w => w.id === currentWorldId);
+    const hideFinger = !!(curWorld && curWorld.noFinger);
     cards.forEach(card => {
       const section = card.dataset.section;
+      // 미쿠월드 이후: 손가락자리 카드 완전 숨김
+      if (section === 'finger') {
+        card.style.display = hideFinger ? 'none' : '';
+      }
       const emojiDiv = card.querySelector('.emoji');
       // 기존 캐릭터 이미지 제거
       const old = card.querySelector('.card-char-img');
@@ -4360,6 +6104,15 @@ function applyButtonImages() {
         if (emojiDiv) emojiDiv.textContent = emojiDiv.dataset.fallback || '';
       }
     });
+    // 월드 전용 단어/문장을 쓰는 월드에서는 낱말 탭 모드 선택 버튼 숨김
+    try {
+      const useWorldContent = !!WORLD_WORDS[currentWorldId];
+      const wordPanel = document.getElementById('tab-word');
+      if (wordPanel) {
+        const modeSelect = wordPanel.querySelector('.mode-select');
+        if (modeSelect) modeSelect.style.display = useWorldContent ? 'none' : '';
+      }
+    } catch(e) { console.warn('[mode-select toggle]', e); }
   } catch (e) {
     console.error('[applyButtonImages] error:', e);
   }
@@ -4426,15 +6179,17 @@ function renderCollection() {
     gpBtn.style.display = (unlocked >= all.length && all.length > 0) ? '' : 'none';
   }
 
-  // 카드 보관소 렌더링
+  // 카드 보관소 렌더링 — "직접 열어본(획득한)" 카드만 표시
+  if (!state.vaultOpened) state.vaultOpened = [];
   const vault = document.getElementById('cardVault');
   if (vault) {
-    const obtained = all.filter(m => bCount >= m.need);
+    const opened = state.vaultOpened || [];
+    const obtained = all.filter(m => opened.includes(m.id));
     if (obtained.length === 0) {
-      vault.innerHTML = '<div class="vault-empty">🔒 아직 획득한 카드가 없어요.<br>뱃지를 모아 캐릭터를 해금해보세요!</div>';
+      vault.innerHTML = '<div class="vault-empty">🔒 아직 획득한 카드가 없어요.<br>도감에서 해금된 캐릭터를 눌러 카드를 열어보세요!</div>';
     } else {
       vault.innerHTML = COLLECTION.map(t => {
-        return t.members.filter(m => bCount >= m.need).map(m => `
+        return t.members.filter(m => opened.includes(m.id)).map(m => `
           <div class="vault-card" onclick="showPhotoCard('${m.id}','${t.tier}')">
             <span class="vault-tier vault-tier-${t.tier}">${t.tier}</span>
             <img src="${m.img}" alt="${m.name}" onerror="this.style.display='none'">
@@ -4512,6 +6267,14 @@ function showPhotoCard(memberId, tier) {
   const all = COLLECTION.flatMap(t => t.members.map(m => ({ ...m, tier: t.tier })));
   const member = all.find(m => m.id === memberId);
   if (!member) return;
+  // 🗃️ 실제로 열어본 카드만 '카드 보관소'에 추가 (중복 방지)
+  if (!state.vaultOpened) state.vaultOpened = [];
+  if (!state.vaultOpened.includes(memberId)) {
+    state.vaultOpened.push(memberId);
+    save();
+    // 보관소 즉시 반영
+    try { renderCollection(); } catch(e) {}
+  }
   const t = member.tier || tier;
   const sparkles = [...Array(8)].map((_, i) => {
     const x = 10 + Math.random() * 80;
@@ -4640,83 +6403,94 @@ function showGroupPhoto() {
 let audioCtx;
 function getCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
 
-// Authentic typewriter sound: key lever snap + type-bar hitting platen + tiny spring ping
+// AudioContext는 사용자 제스처에서만 활성화 가능 (iOS Safari 등)
+// 모든 종류의 사용자 인터랙션에서 오디오 잠금 해제 + silent 버퍼 재생으로 확실히 resume
+function unlockAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    // 짧은 무음 버퍼 재생 — iOS에서 컨텍스트를 확실히 깨우는 트릭
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+  } catch(e) {}
+}
+['pointerdown','touchstart','mousedown','keydown','click'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { passive: true, capture: true });
+});
+
+// 적축(Red Switch / Linear) — 노이즈 기반. 날카로운 "택" + 나무통 같은 "톡".
 function clickSound() {
   try {
     const ctx = getCtx();
     const now = ctx.currentTime;
+    const pv = 0.94 + Math.random() * 0.12;
 
-    // Random variation so every keystroke feels hand-typed, not looped
-    const pv = 0.88 + Math.random() * 0.24;
-    const tinyDelay = Math.random() * 0.003; // micro-timing humanization
+    // 1. 상단 "택" — 3500Hz bandpass + 1600Hz highpass, 8ms (날카로운 키캡 접촉)
+    const tackSize = Math.floor(ctx.sampleRate * 0.008);
+    const tackBuf = ctx.createBuffer(1, tackSize, ctx.sampleRate);
+    const td = tackBuf.getChannelData(0);
+    for (let i = 0; i < tackSize; i++) td[i] = (Math.random()*2-1) * Math.pow(1 - i/tackSize, 1.4);
+    const tack = ctx.createBufferSource();
+    tack.buffer = tackBuf;
+    const tackHp = ctx.createBiquadFilter(); tackHp.type = 'highpass'; tackHp.frequency.value = 1600;
+    const tackBp = ctx.createBiquadFilter(); tackBp.type = 'bandpass'; tackBp.frequency.value = 3500 * pv; tackBp.Q.value = 2.2;
+    const tackG = ctx.createGain();
+    tackG.gain.setValueAtTime(0.34, now);
+    tackG.gain.exponentialRampToValueAtTime(0.001, now + 0.008);
+    tack.connect(tackHp).connect(tackBp).connect(tackG).connect(ctx.destination);
+    tack.start(now); tack.stop(now + 0.01);
 
-    // 1. KEY LEVER SNAP — sharp, bright click at the very start (typebar releasing)
-    const snapSize = Math.floor(ctx.sampleRate * 0.008);
-    const snapBuf = ctx.createBuffer(1, snapSize, ctx.sampleRate);
-    const sd = snapBuf.getChannelData(0);
-    for (let i = 0; i < snapSize; i++) sd[i] = (Math.random()*2-1) * Math.pow(1 - i/snapSize, 4);
-    const snap = ctx.createBufferSource();
-    snap.buffer = snapBuf;
-    const snapHp = ctx.createBiquadFilter();
-    snapHp.type = 'highpass';
-    snapHp.frequency.value = 3800;
-    const snapG = ctx.createGain();
-    snapG.gain.setValueAtTime(0.5, now);
-    snapG.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
-    snap.connect(snapHp).connect(snapG).connect(ctx.destination);
-    snap.start(now); snap.stop(now + 0.015);
-
-    // 2. TYPE-BAR HITTING PLATEN — the solid THOCK against rubber roller
-    //    Mid-frequency noise burst through a resonant bandpass for woody thunk
-    const thockStart = now + 0.004 + tinyDelay;
-    const thockSize = Math.floor(ctx.sampleRate * 0.045);
-    const thockBuf = ctx.createBuffer(1, thockSize, ctx.sampleRate);
-    const td = thockBuf.getChannelData(0);
-    for (let i = 0; i < thockSize; i++) {
-      const env = Math.pow(1 - i/thockSize, 2.5);
-      td[i] = (Math.random()*2-1) * env;
-    }
-    const thock = ctx.createBufferSource();
-    thock.buffer = thockBuf;
-    const thockBp = ctx.createBiquadFilter();
-    thockBp.type = 'bandpass';
-    thockBp.frequency.value = 650 * pv;
-    thockBp.Q.value = 2.2;
-    const thockG = ctx.createGain();
-    thockG.gain.setValueAtTime(0.65, thockStart);
-    thockG.gain.exponentialRampToValueAtTime(0.001, thockStart + 0.06);
-    thock.connect(thockBp).connect(thockG).connect(ctx.destination);
-    thock.start(thockStart); thock.stop(thockStart + 0.07);
-
-    // 3. RESONANT BODY — dampened low sine for the machine's metal frame vibration
-    const body = ctx.createOscillator();
+    // 2. 본체 "톡" — 780Hz bandpass Q=5, 45ms (나무통 울림)
+    const bodySize = Math.floor(ctx.sampleRate * 0.045);
+    const bodyBuf = ctx.createBuffer(1, bodySize, ctx.sampleRate);
+    const bd = bodyBuf.getChannelData(0);
+    for (let i = 0; i < bodySize; i++) bd[i] = (Math.random()*2-1);
+    const body = ctx.createBufferSource();
+    body.buffer = bodyBuf;
+    const bodyBp = ctx.createBiquadFilter(); bodyBp.type = 'bandpass'; bodyBp.frequency.value = 780 * pv; bodyBp.Q.value = 5;
     const bodyG = ctx.createGain();
-    body.type = 'sine';
-    body.frequency.setValueAtTime(180 * pv, thockStart);
-    body.frequency.exponentialRampToValueAtTime(95 * pv, thockStart + 0.05);
-    bodyG.gain.setValueAtTime(0.0, thockStart);
-    bodyG.gain.linearRampToValueAtTime(0.22, thockStart + 0.003);
-    bodyG.gain.exponentialRampToValueAtTime(0.001, thockStart + 0.09);
-    body.connect(bodyG).connect(ctx.destination);
-    body.start(thockStart); body.stop(thockStart + 0.1);
+    bodyG.gain.setValueAtTime(0.0, now);
+    bodyG.gain.linearRampToValueAtTime(0.32, now + 0.002);
+    bodyG.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+    body.connect(bodyBp).connect(bodyG).connect(ctx.destination);
+    body.start(now); body.stop(now + 0.06);
 
-    // 4. SPRING PING — faint high metallic overtone (the key spring recoiling)
-    if (Math.random() < 0.55) {
-      const ping = ctx.createOscillator();
-      const pingG = ctx.createGain();
-      ping.type = 'triangle';
-      ping.frequency.setValueAtTime(2400 + Math.random()*400, thockStart + 0.005);
-      const pingStart = thockStart + 0.005;
-      pingG.gain.setValueAtTime(0.0, pingStart);
-      pingG.gain.linearRampToValueAtTime(0.05, pingStart + 0.002);
-      pingG.gain.exponentialRampToValueAtTime(0.001, pingStart + 0.04);
-      ping.connect(pingG).connect(ctx.destination);
-      ping.start(pingStart); ping.stop(pingStart + 0.05);
-    }
+    // 3. 클릭감 — 1650Hz bandpass Q=6, 20ms (스위치 금속음)
+    const hiSize = Math.floor(ctx.sampleRate * 0.02);
+    const hiBuf = ctx.createBuffer(1, hiSize, ctx.sampleRate);
+    const hd = hiBuf.getChannelData(0);
+    for (let i = 0; i < hiSize; i++) hd[i] = (Math.random()*2-1);
+    const hi = ctx.createBufferSource();
+    hi.buffer = hiBuf;
+    const hiBp = ctx.createBiquadFilter(); hiBp.type = 'bandpass'; hiBp.frequency.value = 1650 * pv; hiBp.Q.value = 6;
+    const hiG = ctx.createGain();
+    hiG.gain.setValueAtTime(0.0, now);
+    hiG.gain.linearRampToValueAtTime(0.18, now + 0.001);
+    hiG.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+    hi.connect(hiBp).connect(hiG).connect(ctx.destination);
+    hi.start(now); hi.stop(now + 0.03);
+
+    // 4. Sub — 155Hz bandpass Q=4, 25ms (살짝 묵직함)
+    const subSize = Math.floor(ctx.sampleRate * 0.025);
+    const subBuf = ctx.createBuffer(1, subSize, ctx.sampleRate);
+    const sd = subBuf.getChannelData(0);
+    for (let i = 0; i < subSize; i++) sd[i] = (Math.random()*2-1);
+    const sub = ctx.createBufferSource();
+    sub.buffer = subBuf;
+    const subBp = ctx.createBiquadFilter(); subBp.type = 'bandpass'; subBp.frequency.value = 155; subBp.Q.value = 4;
+    const subG = ctx.createGain();
+    subG.gain.setValueAtTime(0.0, now);
+    subG.gain.linearRampToValueAtTime(0.09, now + 0.003);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    sub.connect(subBp).connect(subG).connect(ctx.destination);
+    sub.start(now); sub.stop(now + 0.05);
   } catch(e) {}
 }
 
@@ -4741,23 +6515,137 @@ function typewriterBell() {
 }
 
 // Error buzz (soft, not harsh)
+// 오타 소리 — 밝고 또렷한 "삐-빅" (먹먹 X). 빠르고 살짝 불쾌하지만 짧음.
 function errorSound() {
   try {
     const ctx = getCtx();
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(220, now);
-    osc.frequency.exponentialRampToValueAtTime(110, now + 0.15);
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 800;
-    osc.connect(filter).connect(gain).connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.22);
+    // 1st chirp — bright 880Hz → 550Hz, 60ms
+    const o1 = ctx.createOscillator();
+    o1.type = 'triangle';
+    o1.frequency.setValueAtTime(880, now);
+    o1.frequency.exponentialRampToValueAtTime(550, now + 0.06);
+    const g1 = ctx.createGain();
+    g1.gain.setValueAtTime(0.0, now);
+    g1.gain.linearRampToValueAtTime(0.22, now + 0.004);
+    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    // High-pass to keep it crisp (no lowpass muffling)
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 400;
+    o1.connect(hp).connect(g1).connect(ctx.destination);
+    o1.start(now); o1.stop(now + 0.09);
+    // 2nd chirp — dropped a minor 3rd for "wrong" vibe, 60ms after
+    const o2 = ctx.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(660, now + 0.07);
+    o2.frequency.exponentialRampToValueAtTime(420, now + 0.13);
+    const g2 = ctx.createGain();
+    g2.gain.setValueAtTime(0.0, now + 0.07);
+    g2.gain.linearRampToValueAtTime(0.2, now + 0.074);
+    g2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    const hp2 = ctx.createBiquadFilter();
+    hp2.type = 'highpass';
+    hp2.frequency.value = 400;
+    o2.connect(hp2).connect(g2).connect(ctx.destination);
+    o2.start(now + 0.07); o2.stop(now + 0.16);
+  } catch(e) {}
+}
+
+// 🎆 낱말 파괴 쾌감 사운드 — 밝은 벨 + 샤이머 + 서브 펀치 (게임 전용)
+function wordBreakSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+
+    // Master compressor-like shape
+    const master = ctx.createGain();
+    master.gain.value = 0.85;
+    master.connect(ctx.destination);
+
+    // Slight pitch variance so repeats don't feel robotic
+    const pv = 0.96 + Math.random() * 0.09;
+
+    // 1. CRISP ATTACK — super short white noise burst (instant "pop")
+    const atkSize = Math.floor(ctx.sampleRate * 0.01);
+    const atkBuf = ctx.createBuffer(1, atkSize, ctx.sampleRate);
+    const ad = atkBuf.getChannelData(0);
+    for (let i = 0; i < atkSize; i++) ad[i] = (Math.random()*2-1) * (1 - i/atkSize);
+    const atk = ctx.createBufferSource();
+    atk.buffer = atkBuf;
+    const atkHp = ctx.createBiquadFilter();
+    atkHp.type = 'highpass';
+    atkHp.frequency.value = 3500;
+    const atkG = ctx.createGain();
+    atkG.gain.setValueAtTime(0.45, now);
+    atkG.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+    atk.connect(atkHp).connect(atkG).connect(master);
+    atk.start(now); atk.stop(now + 0.015);
+
+    // 2. BRIGHT BELL — major triad (C5+E5+G5) for joyful reward
+    // Frequencies: C5=523, E5=659, G5=784
+    [523.25 * pv, 659.25 * pv, 783.99 * pv].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = i === 0 ? 'sine' : 'triangle';
+      o.frequency.setValueAtTime(f, now);
+      // Slight detune slide for richness
+      o.frequency.exponentialRampToValueAtTime(f * 1.01, now + 0.3);
+      const g = ctx.createGain();
+      const vol = 0.22 - i * 0.04; // root loudest
+      g.gain.setValueAtTime(0.0, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      o.connect(g).connect(master);
+      o.start(now); o.stop(now + 0.5);
+    });
+
+    // 3. SHIMMER ARPEGGIO — quick upward 4-note sparkle (C6, E6, G6, C7)
+    const shimmerNotes = [1046.5, 1318.5, 1568, 2093];
+    shimmerNotes.forEach((f, i) => {
+      const t = now + 0.015 + i * 0.022;
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f * pv;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0, t);
+      g.gain.linearRampToValueAtTime(0.11, t + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + 0.1);
+    });
+
+    // 4. SUB PUNCH — warm body thump for weight
+    const sub = ctx.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(130 * pv, now);
+    sub.frequency.exponentialRampToValueAtTime(55, now + 0.12);
+    const subG = ctx.createGain();
+    subG.gain.setValueAtTime(0.0, now);
+    subG.gain.linearRampToValueAtTime(0.4, now + 0.004);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    sub.connect(subG).connect(master);
+    sub.start(now); sub.stop(now + 0.2);
+
+    // 5. HIGH SHIMMER NOISE — bandpass-filtered noise for "sparkle dust"
+    const noiseSize = Math.floor(ctx.sampleRate * 0.15);
+    const noiseBuf = ctx.createBuffer(1, noiseSize, ctx.sampleRate);
+    const nd = noiseBuf.getChannelData(0);
+    for (let i = 0; i < noiseSize; i++) {
+      const env = Math.pow(1 - i/noiseSize, 2);
+      nd[i] = (Math.random()*2-1) * env;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuf;
+    const nBp = ctx.createBiquadFilter();
+    nBp.type = 'bandpass';
+    nBp.frequency.value = 7000;
+    nBp.Q.value = 2;
+    const nG = ctx.createGain();
+    nG.gain.setValueAtTime(0.0, now);
+    nG.gain.linearRampToValueAtTime(0.18, now + 0.008);
+    nG.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    noise.connect(nBp).connect(nG).connect(master);
+    noise.start(now); noise.stop(now + 0.17);
   } catch(e) {}
 }
 
@@ -4943,17 +6831,21 @@ function changeCharacter() {
   renderCharacterSelect();
   currentTab = 'home';
   if (typeof updatePageNav === 'function') updatePageNav();
+  // 헤더도 비워진 throwaway state 로 동기화
+  try { renderStats(); } catch(e) {}
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function changeWorld() {
-  // 월드 게이트로 돌아가기
+  // 월드 게이트로 돌아가기 — 테마도 함께 리셋
   activateCharState(null);
   currentWorldId = null;
   worldState.currentWorld = null;
   saveWorldState();
   save();
+  try { applyWorldThemeClass(null); } catch(e) {}
   showTab('home');
+  try { renderStats(); } catch(e) {}
 }
 
 function selectCharacter(id) {
@@ -4998,36 +6890,52 @@ function getCurrentChar() {
 
 function renderDashboard() {
   const c = getCurrentChar();
-  if (!c) return;
-  const portrait = document.getElementById('dashPortrait');
-  const img = document.getElementById('dashImg');
-  if (c.img) {
-    img.onload = () => { portrait.classList.add('has-img'); };
-    img.onerror = () => { portrait.classList.remove('has-img'); };
-    img.src = encodeURI(c.img) + '?v=' + Date.now(); // cache-bust for updated images
-    portrait.classList.add('has-img');
-  } else {
-    img.removeAttribute('src');
-    portrait.classList.remove('has-img');
+  // 캐릭터가 없어도 버튼 이미지는 적용해야 하므로 여기서 return 하지 않음
+  try {
+    if (c) {
+      const portrait = document.getElementById('dashPortrait');
+      const img = document.getElementById('dashImg');
+      if (portrait && img) {
+        if (c.img) {
+          img.onload = () => { portrait.classList.add('has-img'); };
+          img.onerror = () => { portrait.classList.remove('has-img'); };
+          img.src = encodeURI(c.img) + '?v=' + Date.now();
+          portrait.classList.add('has-img');
+        } else {
+          img.removeAttribute('src');
+          portrait.classList.remove('has-img');
+        }
+      }
+      const dashName = document.getElementById('dashName');
+      if (dashName) dashName.textContent = c.name;
+      const xp = state.xp || 0;
+      const level = Math.floor(xp / 100) + 1;
+      const curLevelXp = xp - (level - 1) * 100;
+      const nextLevelXp = 100;
+      const dashLevel = document.getElementById('dashLevel');
+      const dashXp = document.getElementById('dashXp');
+      const dashXpNext = document.getElementById('dashXpNext');
+      const dashXpFill = document.getElementById('dashXpFill');
+      if (dashLevel) dashLevel.textContent = level;
+      if (dashXp) dashXp.textContent = curLevelXp;
+      if (dashXpNext) dashXpNext.textContent = nextLevelXp;
+      if (dashXpFill) dashXpFill.style.width = (curLevelXp / nextLevelXp * 100) + '%';
+      try { ensureMissions(); } catch(e) { console.error('[ensureMissions]', e); }
+      try { renderMissions(); } catch(e) { console.error('[renderMissions]', e); }
+    }
+  } catch (e) {
+    console.error('[renderDashboard] 부분 렌더링 오류:', e);
   }
-  document.getElementById('dashName').textContent = c.name;
-  // Simple level curve: every 100 XP = 1 level (for now — Step 2 will refine)
-  const xp = state.xp;
-  const level = Math.floor(xp / 100) + 1;
-  const curLevelXp = xp - (level - 1) * 100;
-  const nextLevelXp = 100;
-  document.getElementById('dashLevel').textContent = level;
-  document.getElementById('dashXp').textContent = curLevelXp;
-  document.getElementById('dashXpNext').textContent = nextLevelXp;
-  document.getElementById('dashXpFill').style.width = (curLevelXp / nextLevelXp * 100) + '%';
-  ensureMissions();
-  renderMissions();
-  applyButtonImages();
+  // 캐릭터/상태와 무관하게 항상 버튼 이미지 적용
+  try { applyButtonImages(); } catch (e) { console.error('[applyButtonImages]', e); }
+  // ★ 상단 헤더(연속/XP/뱃지)를 현재 활성 캐릭터의 state로 동기화
+  //   — 캐릭터 전환 시 헤더가 이전 값으로 남아있어 "초기화된 것처럼" 보이는 문제 수정
+  try { renderStats(); } catch (e) { console.error('[renderStats from renderDashboard]', e); }
 }
 
 /* ========= Tabs ========= */
 // Ordered page flow for the prev/next buttons
-const PAGE_ORDER = ['home','finger','word','short','long','chat','badges'];
+const PAGE_ORDER = ['home','finger','word','short','long','chat','game','badges'];
 const PAGE_LABELS = {
   home: '🏠 홈',
   finger: '✋ 손가락자리',
@@ -5035,11 +6943,29 @@ const PAGE_LABELS = {
   short: '✏️ 단문',
   long: '📖 장문',
   chat: '💬 채팅',
+  game: '🎮 게임',
   badges: '🏆 뱃지'
 };
 let currentTab = 'home';
 
 function showTab(tab) {
+  // 월드 테마는 대시보드/연습 페이지에서만 — 월드게이트(첫화면)는 항상 기본 테마
+  try {
+    if (tab === 'home' && !currentWorldId) {
+      applyWorldThemeClass(null);
+    } else if (currentWorldId) {
+      applyWorldThemeClass(currentWorldId);
+    } else {
+      applyWorldThemeClass(null);
+    }
+  } catch(e) {}
+  // noFinger 월드에서 손가락자리 접근 시도 → 낱말로 자동 우회
+  try {
+    const curW = WORLDS.find(w => w.id === currentWorldId);
+    if (curW && curW.noFinger && tab === 'finger') {
+      tab = 'word';
+    }
+  } catch(e) {}
   document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   // Home routes: world gate → character select → dashboard
@@ -5094,6 +7020,14 @@ function showTab(tab) {
   } else if (tab === 'chat' && chatState.active && !chatState.ended && !chatState.timerId) {
     // Resume timer when returning to chat without restarting
     chatState.timerId = setInterval(updateChatTimer, 500);
+  }
+  // Leaving word-drop game: stop loops & show stage select next time
+  if (tab !== 'game' && typeof wordDropGame !== 'undefined' && wordDropGame.running) {
+    try { wdStop(); } catch(e) {}
+  }
+  if (tab === 'game' && typeof wordDropGame !== 'undefined' && !wordDropGame.running && !wordDropGame.ended) {
+    // If freshly entering and no game in progress, show the stage selection
+    try { wdShowSelect(); } catch(e) {}
   }
   currentTab = tab;
   updatePageNav();
@@ -5344,7 +7278,13 @@ function makeGame(opts) {
       }
       if (val.length === 0) { this.pos = 0; this.render(); return; }
       const expected = this.text[val.length-1];
-      if (last === expected) {
+      // 처음부터 val.length까지 전부 정확히 일치해야 진짜 정답으로 인정
+      // (중간에 오타가 있는데 마지막 글자만 맞아서 통과되는 버그 방지)
+      let allMatch = true;
+      for (let i = 0; i < val.length; i++) {
+        if (val[i] !== this.text[i]) { allMatch = false; break; }
+      }
+      if (last === expected && allMatch) {
         this.pos = val.length;
         clickSound();
         state.totalChars++;
@@ -5352,6 +7292,13 @@ function makeGame(opts) {
         this.updateLive();
         if (this.pos === this.text.length) this.complete();
       } else {
+        // 오타: pos는 정확하게 친 데까지만 표시 (앞쪽부터 틀린 위치 찾기)
+        let correctLen = 0;
+        for (let i = 0; i < val.length; i++) {
+          if (val[i] === this.text[i]) correctLen = i + 1;
+          else break;
+        }
+        this.pos = correctLen;
         this.errors++;
         errorSound();
         this.updateLive();
@@ -5406,11 +7353,13 @@ function showResult(wpm, acc, xp, img) {
   else { msg = '괜찮아요! 천천히 정확하게 다시 해봐요.'; }
   document.getElementById('modalTitle').textContent = acc >= 95 ? '대박! 완벽해!' : '잘했어요!';
   document.getElementById('modalMsg').textContent = msg;
-  // 게임 해금 배너 표시
+  // 게임 해금 배너 — 인라인 배너는 항상 숨김.
+  // 5회 달성 시에는 showGameUnlockPopup()이 큰 팝업으로 1회 축하,
+  // 각 탭에는 상시 게임 버튼이 있으므로 결과 모달 내 중복 배너는 불필요.
   const unlockBanner = document.getElementById('modalGameUnlock');
   if (unlockBanner) {
-    unlockBanner.style.display = _showGameUnlockInModal ? '' : 'none';
-    _showGameUnlockInModal = false; // 1회성 리셋
+    unlockBanner.style.display = 'none';
+    _showGameUnlockInModal = false;
   }
   const modal = document.getElementById('resultModal');
   modal.classList.add('show');
@@ -5437,6 +7386,23 @@ function closeModal() {
     window._nextAfterModal = null;
     setTimeout(fn, 200);
   }
+  // 모달 닫힌 뒤 현재 탭의 입력창으로 자동 포커스 (사용자가 마우스 클릭 안 하게)
+  setTimeout(() => {
+    const inputId = ({
+      finger: 'fingerInput',
+      word: 'wordInput',
+      short: 'shortInput',
+      long: 'longInput',
+      chat: 'chatInput',
+      game: 'wdInput',
+    })[currentTab];
+    if (inputId) {
+      const inp = document.getElementById(inputId);
+      if (inp && inp.offsetParent !== null && !inp.disabled) {
+        inp.focus();
+      }
+    }
+  }, 250);
 }
 // Space key closes the result modal (capture phase to beat input handlers).
 // If Space isn't pressed, the modal auto-closes after 2.5s.
@@ -5548,6 +7514,25 @@ const rockGame = {
   mode: 'basic',
 };
 
+// 단계별 난이도 설정 — 쉬운 기본자리부터 점점 상승
+// 기본자리: 영석님 지정값 (간격 5초 고정, 속도 22~80, 점수당 +1)
+// 2단계(윗줄)부터도 양 대폭 감소 — 간격 크게, 화면 동시 돌 2개로 제한
+const ROCK_DIFFICULTY = {
+  basic:  { lives: 5, time: 45, spawnStart: 5000, spawnMin: 5000,
+            speedBase: 20, speedMax: 42, speedPerScore: 0.25, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 2 },
+  top:    { lives: 5, time: 50, spawnStart: 7000, spawnMin: 7000,
+            speedBase: 20, speedMax: 65, speedPerScore: 0.7, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 2 },
+  bottom: { lives: 4, time: 45, spawnStart: 4800, spawnMin: 4800,
+            speedBase: 30, speedMax: 90, speedPerScore: 1.2, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 2 },
+  mix:    { lives: 4, time: 40, spawnStart: 4200, spawnMin: 4200,
+            speedBase: 34, speedMax: 95, speedPerScore: 1.5, speedRandom: 0,
+            rampMode: 'score', maxOnScreen: 3 },
+};
+function getRockDiff() { return ROCK_DIFFICULTY[rockGame.mode] || ROCK_DIFFICULTY.basic; }
+
 function openFingerGame() {
   const count = state.fingerCompletes[currentFingerMode] || 0;
   if (count < 5) {
@@ -5565,17 +7550,19 @@ function closeFingerGame() {
 }
 
 function fingerGameStart() {
-  // Reset state
+  // Reset state — 단계별 난이도 적용 (기본자리 가장 쉬움)
+  const diff = getRockDiff();
   rockGame.running = true;
   rockGame.ended = false;
-  rockGame.score = 0; rockGame.combo = 0; rockGame.lives = 3;
-  rockGame.timeLeft = 30;
+  rockGame.score = 0; rockGame.combo = 0;
+  rockGame.lives = diff.lives;
+  rockGame.timeLeft = diff.time;
   rockGame.rocks = [];
   rockGame.startedAt = performance.now();
   document.getElementById('gScore').textContent = '0';
   document.getElementById('gCombo').textContent = '0';
-  document.getElementById('gLives').textContent = '3';
-  document.getElementById('gTime').textContent = '30';
+  document.getElementById('gLives').textContent = String(diff.lives);
+  document.getElementById('gTime').textContent = String(diff.time);
   document.getElementById('gReady').classList.add('hidden');
   document.getElementById('gRestartBtn').style.display = 'none';
   // Remove any stale rocks/overlays
@@ -5601,15 +7588,24 @@ function fingerGameStart() {
 }
 
 function scheduleSpawns() {
-  // Spawn rocks periodically; rate increases as score goes up
+  // Spawn rocks periodically — 단계별로 간격이 달라짐
+  // 화면에 돌이 maxOnScreen 이상 있으면 스폰 건너뛰어서 쌓임 방지 (단계별 설정)
+  const diff = getRockDiff();
+  const capRocks = diff.maxOnScreen || 3;
   const spawn = () => {
     if (!rockGame.running) return;
-    spawnRock();
-    // Dynamic interval: 2000ms → 700ms as score grows (더 천천히 빨라짐)
-    const interval = Math.max(700, 2000 - rockGame.score * 15);
+    const currentRocks = rockGame.rocks.length;
+    if (currentRocks < capRocks) {
+      spawnRock();
+    }
+    // rampMode='score'는 간격 고정, 그 외는 점수따라 감소
+    const interval = diff.rampMode === 'score'
+      ? diff.spawnStart
+      : Math.max(diff.spawnMin, diff.spawnStart - rockGame.score * 8);
     rockGame.spawnId = setTimeout(spawn, interval);
   };
-  rockGame.spawnId = setTimeout(spawn, 1200);
+  // 첫 돌은 1.5초 뒤 (준비 시간)
+  rockGame.spawnId = setTimeout(spawn, 1500);
 }
 
 function spawnRock() {
@@ -5625,9 +7621,16 @@ function spawnRock() {
   const x = 20 + Math.random() * Math.max(20, w - 110);
   rock.style.left = x + 'px';
   rock.style.top = '-80px';
-  // Speed scales with elapsed time (35~90 px/s, 더 천천히)
-  const elapsed = (performance.now() - rockGame.startedAt) / 1000;
-  const speed = 35 + Math.min(55, elapsed * 1.5) + Math.random() * 15;
+  // 단계별 낙하 속도 (기본자리: 점수 기반 램프, 나머지: 경과시간 기반)
+  const diff = getRockDiff();
+  let speed;
+  if (diff.rampMode === 'score') {
+    // 점수 1점당 speedPerScore px/s 증가, speedMax까지
+    speed = Math.min(diff.speedMax, diff.speedBase + rockGame.score * diff.speedPerScore) + Math.random() * diff.speedRandom;
+  } else {
+    const elapsed = (performance.now() - rockGame.startedAt) / 1000;
+    speed = diff.speedBase + Math.min(diff.speedMaxAdd, elapsed * diff.speedRampPerSec) + Math.random() * diff.speedRandom;
+  }
   rock._y = -80;
   rock._speed = speed;
   rock._id = Math.random().toString(36).slice(2);
@@ -6015,6 +8018,7 @@ function raceStart() {
   document.getElementById('raceBarFill').style.width = '0%';
   document.getElementById('raceRivalFill').style.width = '0%';
   gameStartSound();
+  raceBgmStart();
   raceNextWord();
   // Timer
   if (raceGame.timerId) clearInterval(raceGame.timerId);
@@ -6087,7 +8091,7 @@ function raceCheckInput(char) {
       void runner.offsetWidth; // reflow to retrigger
       runner.classList.add('bounce');
       document.getElementById('raceBarFill').style.width = raceGame.progress + '%';
-      rockBreakSound();
+      whooshSound();  // 🏃 시원한 돌진 효과음
       if (raceGame.combo >= 3 && raceGame.combo % 3 === 0) comboSound(raceGame.combo);
       if (raceGame.progress >= 100) {
         raceGameOver('🏆 1등! 완주 성공!');
@@ -6107,6 +8111,7 @@ function raceGameOver(title) {
   raceGame.running = false; raceGame.ended = true;
   if (raceGame.timerId) { clearInterval(raceGame.timerId); raceGame.timerId = null; }
   if (raceGame.rivalId) { clearInterval(raceGame.rivalId); raceGame.rivalId = null; }
+  raceBgmStop();
   const xp = Math.floor(raceGame.score / 5);
   if (xp > 0) { state.xp += xp; save(); renderStats(); }
   gameOverSound();
@@ -6127,6 +8132,7 @@ function raceStop() {
   raceGame.running = false;
   if (raceGame.timerId) { clearInterval(raceGame.timerId); raceGame.timerId = null; }
   if (raceGame.rivalId) { clearInterval(raceGame.rivalId); raceGame.rivalId = null; }
+  raceBgmStop();
 }
 
 /* Hangul jamo → English key mapping (두벌식)
@@ -6448,6 +8454,178 @@ function tickSound() {
   } catch(e) {}
 }
 
+/* 🏃 시원한 "슈우웅~" 돌진 효과음 — 캐릭터가 앞으로 나아갈 때 */
+function whooshSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    const dur = 0.32;
+
+    // 1. BAND-PASS NOISE SWEEP — wind rush (저→고 주파수로 쓸어올림)
+    const bufSize = Math.floor(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      const env = Math.sin(Math.PI * i / bufSize); // bell shape
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 1.8;
+    bp.frequency.setValueAtTime(400, now);
+    bp.frequency.exponentialRampToValueAtTime(3800, now + dur);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.0, now);
+    ng.gain.linearRampToValueAtTime(0.55, now + 0.035);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    noise.connect(bp).connect(ng).connect(ctx.destination);
+    noise.start(now); noise.stop(now + dur + 0.02);
+
+    // 2. 도플러 상승 톤 — 지나가는 느낌
+    const zoom = ctx.createOscillator();
+    const zoomG = ctx.createGain();
+    zoom.type = 'sawtooth';
+    zoom.frequency.setValueAtTime(220, now);
+    zoom.frequency.exponentialRampToValueAtTime(700, now + dur * 0.85);
+    const zoomLp = ctx.createBiquadFilter();
+    zoomLp.type = 'lowpass';
+    zoomLp.frequency.setValueAtTime(1500, now);
+    zoomLp.frequency.exponentialRampToValueAtTime(4800, now + dur);
+    zoomG.gain.setValueAtTime(0.0, now);
+    zoomG.gain.linearRampToValueAtTime(0.2, now + 0.04);
+    zoomG.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    zoom.connect(zoomLp).connect(zoomG).connect(ctx.destination);
+    zoom.start(now); zoom.stop(now + dur + 0.02);
+
+    // 3. 마무리 "팡" — 앞서 나간 순간의 상승 포인트
+    const ping = ctx.createOscillator();
+    const pingG = ctx.createGain();
+    ping.type = 'sine';
+    ping.frequency.setValueAtTime(1300, now + 0.06);
+    ping.frequency.exponentialRampToValueAtTime(2600, now + 0.2);
+    pingG.gain.setValueAtTime(0.0, now + 0.06);
+    pingG.gain.linearRampToValueAtTime(0.14, now + 0.08);
+    pingG.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    ping.connect(pingG).connect(ctx.destination);
+    ping.start(now + 0.06); ping.stop(now + 0.28);
+  } catch(e) {}
+}
+
+/* 🎵 레이싱 게임 BGM — 140BPM 드라이빙 루프 (Web Audio 합성) */
+let raceBgm = null;
+function raceBgmStart() {
+  try {
+    raceBgmStop();
+    const ctx = getCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.0;
+    master.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.6);
+    master.connect(ctx.destination);
+
+    const bpm = 140;
+    const beat = 60 / bpm;            // 한 비트 = 0.4285s
+    const stepsPerBar = 8;            // 8분음표 기준
+    const loopDur = beat * stepsPerBar;
+
+    // A마이너 진행 (8스텝 반복)
+    const bassNotes = [55.00, 55.00, 82.41, 55.00, 65.41, 65.41, 82.41, 55.00];
+    const leadNotes = [440.0, 523.25, 659.25, 880.0, 659.25, 523.25, 659.25, 880.0];
+
+    raceBgm = { running: true, master, timerId: null };
+
+    const scheduleBar = () => {
+      if (!raceBgm || !raceBgm.running) return;
+      const start = ctx.currentTime;
+
+      for (let i = 0; i < stepsPerBar; i++) {
+        const t = start + i * beat;
+
+        // 킥 드럼 (짝수 비트)
+        if (i % 2 === 0) {
+          const k = ctx.createOscillator();
+          const kg = ctx.createGain();
+          k.type = 'sine';
+          k.frequency.setValueAtTime(130, t);
+          k.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+          kg.gain.setValueAtTime(0.0, t);
+          kg.gain.linearRampToValueAtTime(0.7, t + 0.005);
+          kg.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+          k.connect(kg).connect(master);
+          k.start(t); k.stop(t + 0.22);
+        }
+
+        // 하이햇 (홀수 비트)
+        if (i % 2 === 1) {
+          const hhSize = Math.floor(ctx.sampleRate * 0.05);
+          const hhBuf = ctx.createBuffer(1, hhSize, ctx.sampleRate);
+          const hd = hhBuf.getChannelData(0);
+          for (let j = 0; j < hhSize; j++) hd[j] = (Math.random()*2-1) * (1 - j/hhSize);
+          const hh = ctx.createBufferSource();
+          hh.buffer = hhBuf;
+          const hp = ctx.createBiquadFilter();
+          hp.type = 'highpass';
+          hp.frequency.value = 6500;
+          const hg = ctx.createGain();
+          hg.gain.value = 0.13;
+          hh.connect(hp).connect(hg).connect(master);
+          hh.start(t);
+        }
+
+        // 베이스 라인
+        const b = ctx.createOscillator();
+        const bg = ctx.createGain();
+        b.type = 'triangle';
+        b.frequency.setValueAtTime(bassNotes[i], t);
+        bg.gain.setValueAtTime(0.0, t);
+        bg.gain.linearRampToValueAtTime(0.24, t + 0.01);
+        bg.gain.exponentialRampToValueAtTime(0.001, t + beat * 0.9);
+        b.connect(bg).connect(master);
+        b.start(t); b.stop(t + beat);
+
+        // 리드 아르페지오 (소프트)
+        const l = ctx.createOscillator();
+        const lg = ctx.createGain();
+        l.type = 'sawtooth';
+        l.frequency.setValueAtTime(leadNotes[i], t);
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 2600;
+        lg.gain.setValueAtTime(0.0, t);
+        lg.gain.linearRampToValueAtTime(0.08, t + 0.01);
+        lg.gain.exponentialRampToValueAtTime(0.001, t + beat * 0.75);
+        l.connect(lp).connect(lg).connect(master);
+        l.start(t); l.stop(t + beat);
+      }
+
+      // 다음 마디 예약
+      raceBgm.timerId = setTimeout(scheduleBar, loopDur * 1000);
+    };
+
+    scheduleBar();
+  } catch(e) {}
+}
+
+function raceBgmStop() {
+  try {
+    if (!raceBgm) return;
+    raceBgm.running = false;
+    if (raceBgm.timerId) clearTimeout(raceBgm.timerId);
+    const m = raceBgm.master;
+    if (m) {
+      try {
+        const ctx = getCtx();
+        m.gain.cancelScheduledValues(ctx.currentTime);
+        m.gain.setValueAtTime(m.gain.value, ctx.currentTime);
+        m.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+        setTimeout(() => { try { m.disconnect(); } catch(e) {} }, 500);
+      } catch(e) {}
+    }
+    raceBgm = null;
+  } catch(e) {}
+}
+
 /* JAMO_TO_KEY + jamoToKey() were moved above the game-input IIFE
    (search for "Hangul jamo → English key mapping") to avoid a
    Temporal Dead Zone ReferenceError that was killing script init. */
@@ -6457,11 +8635,17 @@ function trackPracticeComplete(type) {
   if (!state.practiceCompletes) state.practiceCompletes = { word: 0, short: 0, long: 0 };
   state.practiceCompletes[type] = (state.practiceCompletes[type] || 0) + 1;
   save();
+  // 손가락자리가 없는 월드의 데일리 미션 진행
+  try { addMission('practice_' + type, 1); } catch(e) {}
   updatePracticeGameUI(type);
-  // 5회 달성 시 현재 표시 중인 모달에 게임해금 배너 추가
-  if (state.practiceCompletes[type] === 5) {
+  // 5회 이상이면 현재 표시 중인 결과 모달에 게임해금 배너 즉시 표시
+  if (state.practiceCompletes[type] >= 5) {
     const unlockBanner = document.getElementById('modalGameUnlock');
     if (unlockBanner) unlockBanner.style.display = '';
+  }
+  // 최초 5회 달성 시(정확히 5) 한 번만 큰 해금 팝업 띄움
+  if (state.practiceCompletes[type] === 5) {
+    setTimeout(() => { try { showGameUnlockPopup(); } catch(e) {} }, 600);
   }
   return state.practiceCompletes[type];
 }
@@ -6518,13 +8702,18 @@ function selectWordMode(btn, mode) {
   wordQueue = [];
   startWord();
 }
+function getWordList() {
+  // 월드별 전용 단어 리스트가 있으면 우선 사용 (모드 무시)
+  if (WORLD_WORDS[currentWorldId]) return WORLD_WORDS[currentWorldId];
+  return WORD_MODES[currentWordMode] || WORDS_MIX;
+}
 function startWord() {
-  const list = WORD_MODES[currentWordMode] || WORDS_MIX;
+  const list = getWordList();
   wordQueue = [...list].sort(() => Math.random()-0.5);
   nextWord();
 }
 function nextWord() {
-  const list = WORD_MODES[currentWordMode] || WORDS_MIX;
+  const list = getWordList();
   if (!wordQueue.length) wordQueue = [...list].sort(() => Math.random()-0.5);
   wordGame.start(wordQueue.shift());
 }
@@ -6551,6 +8740,8 @@ const shortGame = makeGame({
     if (count === 5) {
       setTimeout(() => pop('🎮 게임 가능! 단문 게임이 열렸어요!'), 500);
     }
+    // 🎰 가챠 이벤트 단문 카운터
+    try { onShortCompleteForEvent(); } catch(e) {}
     setTimeout(() => nextShort(), 800);
   }
 });
@@ -6561,12 +8752,15 @@ document.getElementById('shortInput').addEventListener('focus', () => {
     startShort();
   }
 });
+function getShortList() {
+  return WORLD_SHORTS[currentWorldId] || SENT_SHORT;
+}
 function startShort() {
-  shortQueue = [...SENT_SHORT].sort(() => Math.random()-0.5);
+  shortQueue = [...getShortList()].sort(() => Math.random()-0.5);
   nextShort();
 }
 function nextShort() {
-  if (!shortQueue.length) shortQueue = [...SENT_SHORT].sort(() => Math.random()-0.5);
+  if (!shortQueue.length) shortQueue = [...getShortList()].sort(() => Math.random()-0.5);
   shortGame.start(shortQueue.shift());
 }
 function skipShort() { nextShort(); }
@@ -6599,8 +8793,11 @@ document.getElementById('longInput').addEventListener('focus', () => {
     startLong();
   }
 });
+function getLongList() {
+  return WORLD_LONGS[currentWorldId] || SENT_LONG;
+}
 function startLong() {
-  if (!longQueue.length) longQueue = [...SENT_LONG].sort(() => Math.random()-0.5);
+  if (!longQueue.length) longQueue = [...getLongList()].sort(() => Math.random()-0.5);
   longGame.start(longQueue.shift());
 }
 function openLongGame() {
@@ -7000,6 +9197,7 @@ const WORLD_CHAT_CHARS = {
       scripts: [
         ['야 왔냐!', '나 배고파... 식빵이라도 있냐', '포치타가 있었으면 좋겠다 ㅠ', '꿈이 뭐냐고? 맛있는거 매일 먹는거!', '잼 바른 식빵이 세상에서 제일 맛있어', '학교생활 해보고 싶었는데 이렇게 힘든줄 몰랐어', '그래도 재밌다 친구라는게 있으니까', '내일도 같이 놀자!'],
         ['오늘 뭐해? 나는 할일 없어~', '아키가 또 잔소리해... 공부하라고', '파워는 또 사고쳤어 맨날이야', '근데 얘네 없으면 심심해', '너는 같이 사는 사람 있어?', '가족은 소중한거야 진짜로', '나는 포치타가 가족이야', '아무튼 오늘도 파이팅이다!'],
+        ['심장에서 줄 잡아당기면 톱이 나와!', '멋있지 않냐? 나는 체인소맨이야!', '근데 변신하고 나면 엄청 배고파져...', '마키마 씨랑 데이트하는 게 꿈이야', '그 사람 손잡고 영화관 가는 상상만 하는데도 행복해', '솔직히 공안 일은 어렵지만 돈은 벌어야지', '파워랑 같이 있으면 하루도 조용할 날이 없다', '그래도 이런 일상이 생겼다는게 믿기지 않아!'],
       ],
     },
     {
@@ -7007,6 +9205,8 @@ const WORLD_CHAT_CHARS = {
       img: '체인소맨/파워도감.jpeg',
       scripts: [
         ['이 파워님이 왔다!', '노벨상은 이 파워님의 것이다!', '뭐야 무시하는거냐! 이 파워님을!!', '고양이가 세상에서 제일 귀엽다!', '덴지보다 내가 훨씬 강하다!', '변기 물 안 내려도 되잖아... 왜 화내는거야', '난 거짓말 안한다! ...가끔만 한다!', '오늘도 이 파워님이 이겼다!'],
+        ['내 고양이 냥코의 이름은 냐~', '냥코가 세상에서 제일 소중하다!', '누가 냥코를 괴롭히면 이 파워님이 다 부숴버릴거다!', '덴지가 냥코 간식을 훔쳤다 확실해!', '아닌데... 진짜 아닌데... 흠', '나는 혈귀의 악마니까 피 뽑는 건 특기지!', '무기도 직접 만든다 이 파워님은!', '너도 이 파워님의 하수인이 되어라!'],
+        ['덴지랑 내기 했는데 내가 이겼다! 당연하지!', '이 파워님이 지는 일은 없어!', '...가끔 지는 건 봐주는 거야! 진짜야!', '아키는 맨날 잔소리야. 변기 물 내려라, 손 씻어라...', '근데 아키가 만든 밥은 맛있어. 그건 인정해주지!', '인간 음식은 신기해. 악마일 때는 몰랐는데', '특히 푸딩! 푸딩은 천재의 발명품이다!', '다음에 푸딩 사와라! 이 파워님의 명령이다!'],
       ],
     },
     {
@@ -7014,6 +9214,16 @@ const WORLD_CHAT_CHARS = {
       img: '체인소맨/akiangel.jpg',
       scripts: [
         ['...어, 안녕.', '오늘도 덴지가 말썽이야.', '파워는 또 변기물 안 내렸어...', '나는 복수를 위해 살고 있었는데', '요즘은 이 생활도 나쁘지 않다고 느껴.', '너는 소중한 사람 있어?', '있으면 꼭 지켜. 나중에 후회하지 않게.', '...커피 마실래?'],
+        ['담배 한 대 피우고 왔어. 스트레스가 많아서.', '덴지랑 파워는 아직 어리니까 내가 보살펴야지.', '총의 악마... 그 녀석에게 복수해야 해.', '가족을 잃은 슬픔은 시간이 지나도 지워지지 않아.', '하지만 지금의 가족도 중요해. 덴지, 파워... 그리고 너도.', '오늘 저녁은 내가 해줄게. 뭐 먹고 싶어?', '규동? 알았어. 기다려.', '잘 먹으면 내일도 열심히 할 수 있으니까.'],
+        ['여우의 악마와 계약했어. 이 줄 문신이 그거야.', '미래의 악마와도 계약했지. 대가는... 말 안 할게.', '너는 무슨 꿈을 꿔? 나는 요즘 평범한 꿈만 꿔.', '평범하다는 게 얼마나 소중한지 이제서야 알겠어.', '덴지처럼 단순하게 살고 싶다는 생각도 든다.', '복수는... 정말 의미가 있을까? 가끔 흔들려.', '그래도 결심한 건 끝까지 가야지.', '...이 이야기는 여기까지. 가서 쉬어.'],
+      ],
+    },
+    {
+      id: 'makima_npc', name: '마키마', tag: '공안 4과 1분대장, 부드러운 미소',
+      img: '체인소맨/포치타도감.jpeg',
+      scripts: [
+        ['어머, 덴지 군의 친구구나? 잘 왔어.', '나는 마키마라고 해. 공안 악마 사냥꾼이지.', '덴지 군은 요즘 어때? 밥은 잘 먹고 있어?', '저 아이는 단순해서 귀여워. 그치?', '너도 나를 도와주는 사람이 되어줄래?', '걱정 마, 내 하수인들은 전부 소중하니까.', '다음에 같이 라멘 먹으러 갈래? 덴지 군도 좋아해.', '그럼, 다음에 또 보자.'],
+        ['오늘 하루는 어땠어? 무슨 일 있었으면 말해봐.', '괜찮아, 나는 너의 이야기를 들어주는 사람이야.', '세상에는 악마가 많지만 무서워할 필요는 없어.', '나와 같이 있으면 아무것도 두려워할 게 없어.', '덴지 군은 언젠가 큰일을 해낼 거야. 나는 알아.', '너도 분명히 특별한 사람이야. 내가 느껴.', '오늘 저녁은 따뜻한 걸 먹어. 바깥이 추우니까.', '또 와. 언제든 기다리고 있을게.'],
       ],
     },
   ],
@@ -7024,6 +9234,7 @@ const WORLD_CHAT_CHARS = {
       scripts: [
         ['으아아아 무서워!!', '나는 벽력의 호흡 일의 형밖에 못해 ㅠ', '네즈코쨩!! 네즈코쨩은 천사야!!', '탄지로는 왜 이렇게 긍정적인거야...', '나는 겁쟁이야... 근데 잠들면 좀 달라져.', '너는 용감하구나... 부럽다.', '소리가 들려... 모든 것의 소리가.', '그래도 도망치지 않을 거야!'],
         ['할아버지... 나 잘하고 있죠...?', '지메이 할아버지가 나를 키워줬어.', '벽력의 호흡 일의 형. 이것만 완벽하게 하면 돼!', '한 가지밖에 못하면 그걸 극한까지 갈고 닦아라!', '나도 할 수 있어... 아마... 아마도...', '잠들면 되니까! 잠들면 엄청 강해져!', '너도 한 가지라도 잘하는 거 있지?', '그걸 계속 연습하면 천재가 되는 거야!'],
+        ['네즈코쨩이랑 결혼할 거야!! 진심이야!!', '탄지로가 형이 되는 건가 ㅎㅎ', '근데 탄지로 여동생인데 나 질투 안 해? 안 나?', '안 나나 보다... 탄지로는 너무 착해서 탈이야', '너는 좋아하는 사람 있어? 없어?', '있으면 용기 있게 말해! 후회하지 말고!', '나는 고백 백번쯤 했지만 다 거절당했어 ㅠ', '그래도 포기 안 해! 진정한 사랑은 포기하지 않는 거니까!'],
       ],
     },
     {
@@ -7032,6 +9243,15 @@ const WORLD_CHAT_CHARS = {
       scripts: [
         ['이노스케님이 왔다!! 떨어라!!', '뭐야! 너 싸움 걸려는 거냐!', '나는 산에서 멧돼지한테 키워졌어! 대단하지!', '짐승의 호흡! 이건 내가 직접 만든 거야!', '탄지로! 승부다 승부!!', '젠이츠는 맨날 울어서 시끄러워!', '근데 얘네랑 같이 다니는 거 나쁘지 않아.', '내일도 돌격이다!!'],
         ['배고파!! 밥 줘!!', '산에서는 직접 잡아먹었어! 진짜야!', '천장이 있는 집은 아직도 신기해.', '이불이라는 건 진짜 따뜻해... 좋아.', '근데 나는 밖에서 자는 게 더 편해!', '너 혹시 강해? 한판 붙자!', '나한테 이기면 인정해주지!', '좋아! 내일 승부다!'],
+        ['이노스케님의 칼날은 내가 직접 이빨 넣어서 만든 거다!', '멋있지!! 감상해라!!', '근데 가끔 칼날이 떨어져... 다시 박으면 돼!', '탄지로가 왜 자꾸 "칼 관리 좀 해" 하는지 모르겠어', '이노스케님은 관리 같은 거 모른다! 싸우면 되는 거야!', '너도 이노스케님의 제자가 되고 싶냐?', '안 돼! 이노스케님은 제자 안 받는다!', '...음 근데 너 뭔가 재밌어 보인다. 친구 해줄까?'],
+      ],
+    },
+    {
+      id: 'nezuko_npc', name: '네즈코', tag: '대나무 대롱을 문 혈귀 여동생',
+      img: '귀멸의칼날/카나에입장캐릭터.jpeg',
+      scripts: [
+        ['음... 음음!', '(대롱을 물고 고개를 갸웃거린다)', '탄지로 오빠가 제일 좋아.', '사람은 모두 가족이야. 지키고 싶어.', '햇빛은 이제 괜찮아. 혈귀인데 신기하지?', '오빠랑 같이 있으면 안심이 돼.', '너도 다치면 안 돼. 조심해.', '음음. (미소 짓는다)'],
+        ['꿈에서 가족들을 만났어... 엄마랑 동생들이랑.', '이제 말을 조금씩 배우고 있어. 오빠가 가르쳐 줘.', '젠이츠 오빠는 항상 시끄럽지만 착한 사람이야.', '이노스케 오빠는 돌진만 해. 근데 재밌어.', '나비 저택에서 수련했을 때 정말 힘들었지만 강해졌어.', '상자 안에 있는 건 답답하지만 낮에 잠을 잘 수 있어.', '너도 피곤하면 쉬어. 무리하지 말고.', '오빠가 부르네. 또 올게.'],
       ],
     },
     {
@@ -7047,6 +9267,86 @@ const WORLD_CHAT_CHARS = {
       img: '귀멸의칼날/채팅창이미지2.jpeg',
       scripts: [
         ['어서 오세요. 저는 타마요입니다.', '저도 귀신이지만... 무잔에게 반기를 든 몸이에요.', '의학을 공부해서 혈귀술로 사람을 치료해요.', '네즈코 같은 특별한 귀신을 연구하고 있어요.', '무잔을 쓰러뜨릴 약을 꼭 만들 거예요.', '유시로가 항상 도와줘요. 고마운 아이에요.', '당신도 소중한 사람을 지키기 위해 왔군요.', '같이 힘내요. 분명 좋은 결과가 있을 거예요.'],
+      ],
+    },
+  ],
+  miku: [
+    {
+      id: 'miku_npc', name: '하츠네 미쿠', tag: '노래하는 디지털 디바',
+      img: '미쿠/채팅대상.jpeg',
+      scripts: [
+        [
+          '안녕! 나는 미쿠야, 하츠네 미쿠 ♪',
+          '내 목소리가 디지털 세계에서 여기까지 닿았구나!',
+          '너는 무슨 노래 좋아해? 신나는 거? 잔잔한 거?',
+          '나는 빠른 비트가 좋아~ 무대 위에서 뛰어다닐 수 있거든!',
+          '무대에서 춤추는 거 상상해 봐. 심장이 막 두근거리지?',
+          '너도 무대 위에 올라와 볼래? 같이 부르자!',
+          '노래는 마음을 이어주는 마법 같은 거야 ♫',
+          '연습만 하면 누구나 가수가 될 수 있어! 파이팅!',
+        ],
+        [
+          '오늘은 무슨 곡을 연습해볼까?',
+          '나는 새 곡 녹음 중이야. 들어볼래?',
+          '가사는 반짝이는 별 같은 느낌으로 쓰고 있어.',
+          '네 이름으로 노래 만들어주면 재밌겠다 ㅎㅎ',
+          '너가 타자 빨리 치는 것도 일종의 리듬이야!',
+          '리듬이 맞으면 노래가 완성돼. 키보드도 악기지!',
+          '한 번 눌러볼래? 또각또각 소리 들어봐 ♩',
+          '너랑 같이 있으니까 오늘 노래 더 잘 써질 것 같아!',
+        ],
+        [
+          '파 맛 아이스크림 먹어봤어?',
+          '내 상징은 파(leek)야! 왜 파인지는 나도 몰라 ㅋㅋ',
+          '근데 이제는 익숙해! 파가 없으면 미쿠가 아니지!',
+          '너는 좋아하는 음식 있어?',
+          '오 좋은 취향이네~ 나도 그거 노래로 만들어볼게!',
+          '노래 제목은 "{name}이(가) 좋아하는 것들" 어때?',
+          '무대에서 이 곡 부르면 팬들이 환호할 것 같아!',
+          '콘서트 오면 앞줄 예약해줄게 ♡',
+        ],
+      ],
+    },
+    {
+      id: 'teto_npc', name: '카사네 테토', tag: '31살이지만 아이돌',
+      img: '미쿠/카사네테토도감.jpeg',
+      scripts: [
+        [
+          '안녕! 나는 카사네 테토! 31살이야!',
+          '...아, 아니! 15살! 아무튼 아이돌이야!',
+          '프랑스빵 좋아해? 나는 그게 최애야!',
+          '매일 빵 한 개씩 먹으면 키메라 파워가 생겨!',
+          '미쿠랑 친해. 같이 무대 서는 사이야!',
+          '드릴 머리는 내 자부심이야. 매일 정성껏 말아 ㅎㅎ',
+          '너도 꿈이 있지? 포기하지 말고 계속 달려!',
+          '같이 노래방 갈래? 내가 쏠게!',
+        ],
+        [
+          '최근에 새 안무 연습 중이야! 완전 힘들어 ㅠ',
+          '근데 춤추면서 노래하면 정말 기분 좋아!',
+          '무대 위에서는 세상이 다 반짝반짝 빛나보여.',
+          '너도 뭔가 열심히 하는 거 있어?',
+          '그래~ 열심히 하는 사람은 다 멋져!',
+          '연습은 배신 안 해! 내가 보증할게!',
+          '다음 콘서트 제목은 "드릴 파워!" 어때 ㅋㅋ',
+          '티켓 나오면 꼭 알려줄게!',
+        ],
+      ],
+    },
+    {
+      id: 'miku_friend_npc', name: '미쿠의 친구', tag: '무대 뒤 숨은 주역',
+      img: '미쿠/채팅대상3.jpeg',
+      scripts: [
+        [
+          '어 왔구나~ 여긴 미쿠의 무대 뒤야!',
+          '나는 미쿠 콘서트 스태프야. 조명 담당!',
+          '무대 뒤는 완전 난장판이지만 공연이 끝나면 최고야!',
+          '너도 공연 보러 온 거야? 무슨 곡이 제일 좋아?',
+          '오 좋은 선택이네. 그 곡 조명 세팅 내가 짰어 ㅎㅎ',
+          '공연 끝나고 뒤풀이 있는데 너도 올래?',
+          '케이크랑 피자 있어! 스태프 특권이야~',
+          '다음 공연도 기대해! 새 무대 장치 엄청나!',
+        ],
       ],
     },
   ],
@@ -8020,6 +10320,7 @@ function sendChat() {
   state.totalChars += text.length;
   addMission('chars', text.length);
   addMission('chat', 1);
+  addMission('practice_chat', 1);
   state.xp += 5;
   save(); renderStats();
 
@@ -8205,6 +10506,403 @@ try { renderStats(); } catch(e) { console.error('renderStats:', e); }
 try { renderBadges(); } catch(e) { console.error('renderBadges:', e); }
 try { renderKeyboard(); } catch(e) { console.error('renderKeyboard:', e); }
 try { updateAllPracticeGameUI(); } catch(e) { console.error('updateAllPracticeGameUI:', e); }
+// 월드 테마 클래스 즉시 적용 — 단, 캐릭터까지 골라진 상태에서만 (월드게이트/캐릭터선택 첫화면은 기본 테마 유지)
+try {
+  if (typeof currentWorldId !== 'undefined' && currentWorldId
+      && state && state.currentChar && typeof getCurrentChar === 'function' && getCurrentChar()) {
+    applyWorldThemeClass(currentWorldId);
+  } else {
+    applyWorldThemeClass(null);
+  }
+} catch(e) {}
+// 월드게이트 카드 강제 렌더링 (혹시 누락 방지)
+setTimeout(() => {
+  try {
+    const grid = document.getElementById('worldGateGrid');
+    if (grid && grid.children.length === 0) {
+      console.warn('[키보드히메] World gate empty — forcing re-render');
+      renderWorldGate();
+    }
+  } catch(e) { console.error('forced renderWorldGate:', e); }
+}, 1000);
+// Start cloud sync (will prompt for nickname on first visit)
+try { cloudSync.start(); } catch(e) { console.error('cloudSync.start:', e); }
+// 🎰 깜짝 이벤트 체크 (cloud sync 끝난 후 실행되도록 지연)
+setTimeout(() => { try { checkSpecialEvent(); } catch(e) { console.error('checkSpecialEvent:', e); } }, 2500);
+
+// Parent-password-protected reset (so kids can't accidentally nuke records)
+function parentResetConfirm() {
+  const ans = prompt('🔒 부모님 확인\n\n모든 학습 기록을 삭제하려면 아래 암산 문제를 푸세요:\n\n7 × 8 = ?');
+  if (ans === null) return;
+  if (String(ans).trim() !== '56') {
+    alert('❌ 정답이 아니에요. 부모님께 도움을 요청하세요.');
+    return;
+  }
+  if (!confirm('정말 모든 기록을 삭제하시겠어요? (클라우드에 저장된 것은 유지됩니다)')) return;
+  // Clear local only — cloud snapshot preserved as safety net
+  const nick = localStorage.getItem('khime_nick');
+  localStorage.clear();
+  if (nick) localStorage.setItem('khime_nick', nick);
+  location.reload();
+}
+
+/* ================================================================
+   🎮 낱말 떨어뜨리기 게임 (Word Drop Game)
+   - 4단계: home / top / bottom / mix
+   - 낱말이 위에서 떨어지면 정확히 타이핑해서 파괴
+   - 15초마다 스피드 레벨 +1 (스폰 간격 짧아지고 낙하 속도 증가)
+   - 생명 3개, 땅에 닿으면 -1
+   ================================================================ */
+const WD_STAGE_LABELS = { home: '기본자리', top: '윗줄', bottom: '아랫줄', mix: '복합' };
+const wordDropGame = {
+  running: false, ended: false,
+  stage: 'home',
+  score: 0, combo: 0, lives: 3,
+  elapsed: 0, speedLvl: 1,
+  words: [],
+  spawnId: null, tickId: null, timerId: null,
+  startedAt: 0,
+  activeWord: null, // the falling-word element currently being typed (lowest y that matches input)
+};
+
+function wdShowSelect() {
+  wdStop();
+  document.getElementById('wdSelect').style.display = '';
+  document.getElementById('wdGame').style.display = 'none';
+}
+
+function wdStart(stage) {
+  wordDropGame.stage = stage;
+  document.getElementById('wdSelect').style.display = 'none';
+  document.getElementById('wdGame').style.display = '';
+  document.getElementById('wdStageLbl').textContent = WD_STAGE_LABELS[stage] || stage;
+  document.getElementById('wdReadyStage').textContent = WD_STAGE_LABELS[stage] || stage;
+  document.getElementById('wdReady').classList.remove('hidden');
+  document.getElementById('wdRestartBtn').style.display = 'none';
+  // Remove any stale gameover overlay
+  document.querySelectorAll('.wd-gameover').forEach(n => n.remove());
+  // Reset HUD
+  document.getElementById('wdScore').textContent = '0';
+  document.getElementById('wdCombo').textContent = '0';
+  document.getElementById('wdLives').textContent = '3';
+  document.getElementById('wdSpeedLvl').textContent = '1';
+  document.getElementById('wdTime').textContent = '0s';
+  // Clear stage
+  const st = document.getElementById('wdStage');
+  st.querySelectorAll('.wd-word, .wd-shard, .wd-combo-popup, .wd-flash, .wd-gameover').forEach(n => n.remove());
+}
+
+function wdBegin() {
+  wordDropGame.running = true;
+  wordDropGame.ended = false;
+  wordDropGame.score = 0; wordDropGame.combo = 0; wordDropGame.lives = 3;
+  wordDropGame.elapsed = 0; wordDropGame.speedLvl = 1;
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  wordDropGame.startedAt = performance.now();
+  document.getElementById('wdReady').classList.add('hidden');
+  document.getElementById('wdRestartBtn').style.display = 'none';
+  const inp = document.getElementById('wdInput');
+  inp.style.display = '';
+  inp.value = ''; inp.disabled = false;
+  setTimeout(() => inp.focus(), 50);
+  try { gameStartSound(); } catch(e) {}
+  // Cleanup previous loops
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  wdScheduleSpawn();
+  wdTick();
+  wordDropGame.timerId = setInterval(() => {
+    if (!wordDropGame.running) return;
+    wordDropGame.elapsed++;
+    document.getElementById('wdTime').textContent = wordDropGame.elapsed + 's';
+    // Every 15 seconds, speed up
+    if (wordDropGame.elapsed > 0 && wordDropGame.elapsed % 15 === 0) {
+      wordDropGame.speedLvl++;
+      document.getElementById('wdSpeedLvl').textContent = wordDropGame.speedLvl;
+      wdShowSpeedUp();
+      try { comboSound(10); } catch(e) {}
+    }
+  }, 1000);
+}
+
+function wdStop() {
+  wordDropGame.running = false;
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  wordDropGame.spawnId = wordDropGame.timerId = wordDropGame.tickId = null;
+  wordDropGame.words.forEach(w => { if (w && w.el) w.el.remove(); });
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  const inp = document.getElementById('wdInput');
+  if (inp) inp.style.display = 'none';
+}
+
+function wdRestart() { wdStart(wordDropGame.stage); }
+
+function wdScheduleSpawn() {
+  const loop = () => {
+    if (!wordDropGame.running) return;
+    wdSpawnWord();
+    // Spawn interval: starts at 1800ms, shrinks with speedLvl and score.
+    const base = 1800;
+    const lvlBonus = (wordDropGame.speedLvl - 1) * 180;
+    const scoreBonus = wordDropGame.score * 4;
+    const interval = Math.max(550, base - lvlBonus - scoreBonus);
+    wordDropGame.spawnId = setTimeout(loop, interval);
+  };
+  wordDropGame.spawnId = setTimeout(loop, 900);
+}
+
+function wdSpawnWord() {
+  const stage = document.getElementById('wdStage');
+  if (!stage) return;
+  const pool = (typeof WORD_MODES !== 'undefined' && WORD_MODES[wordDropGame.stage]) || WORDS_HOME;
+  const text = pool[Math.floor(Math.random() * pool.length)];
+  // Avoid two words starting with the exact same first character on screen (so active word is unambiguous)
+  const existingStarts = new Set(wordDropGame.words.map(w => w.text.charAt(0)));
+  let word = text;
+  let tries = 0;
+  while (existingStarts.has(word.charAt(0)) && tries < 6) {
+    word = pool[Math.floor(Math.random() * pool.length)];
+    tries++;
+  }
+  const el = document.createElement('div');
+  el.className = 'wd-word';
+  el.innerHTML = `<span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
+  stage.appendChild(el);
+  // Position: random x within stage, accounting for word width
+  const stageW = stage.clientWidth;
+  const wordW = el.offsetWidth || 90;
+  const maxX = Math.max(10, stageW - wordW - 10);
+  const x = 10 + Math.random() * maxX;
+  el.style.left = x + 'px';
+  el.style.top = '-60px';
+  // Falling speed: scales with speedLvl. Level 1 ≈ 42 px/s, +18 per level, +small jitter.
+  const baseSpeed = 42 + (wordDropGame.speedLvl - 1) * 18;
+  const speed = baseSpeed + Math.random() * 14;
+  wordDropGame.words.push({ el, text: word, y: -60, speed, id: Math.random().toString(36).slice(2) });
+}
+
+function wdTick() {
+  const stage = document.getElementById('wdStage');
+  if (!stage) { wordDropGame.tickId = null; return; }
+  let last = performance.now();
+  const loop = (now) => {
+    if (!wordDropGame.running) { wordDropGame.tickId = null; return; }
+    const dt = Math.min(48, now - last) / 1000;
+    last = now;
+    const groundLine = stage.clientHeight - 38;
+    for (let i = wordDropGame.words.length - 1; i >= 0; i--) {
+      const w = wordDropGame.words[i];
+      w.y += w.speed * dt;
+      w.el.style.top = w.y + 'px';
+      if (w.y >= groundLine) {
+        wdMissWord(w);
+        wordDropGame.words.splice(i, 1);
+      }
+    }
+    wordDropGame.tickId = requestAnimationFrame(loop);
+  };
+  wordDropGame.tickId = requestAnimationFrame(loop);
+}
+
+function wdMissWord(w) {
+  const stage = document.getElementById('wdStage');
+  if (!w.el) return;
+  w.el.classList.add('wd-miss');
+  try { groundHitSound(); } catch(e) {}
+  setTimeout(() => { if (w.el) w.el.remove(); }, 420);
+  wordDropGame.combo = 0;
+  wordDropGame.lives--;
+  document.getElementById('wdCombo').textContent = '0';
+  document.getElementById('wdLives').textContent = wordDropGame.lives;
+  if (stage) {
+    const flash = document.createElement('div');
+    flash.className = 'wd-flash red';
+    stage.appendChild(flash);
+    setTimeout(() => flash.remove(), 220);
+  }
+  if (wordDropGame.activeWord === w) wordDropGame.activeWord = null;
+  // Reset input when we miss — current input may have matched this word
+  const inp = document.getElementById('wdInput');
+  if (inp) inp.value = '';
+  wdUpdateHighlight('');
+  if (wordDropGame.lives <= 0) wdGameOver('💀 생명 없음!');
+}
+
+function wdBreakWord(w) {
+  const stage = document.getElementById('wdStage');
+  if (!stage || !w.el) return;
+  const rect = w.el.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+  const cx = rect.left - stageRect.left + rect.width/2;
+  const cy = rect.top - stageRect.top + rect.height/2;
+  w.el.classList.add('wd-break');
+  // Shards
+  for (let i = 0; i < 10; i++) {
+    const s = document.createElement('div');
+    s.className = 'wd-shard';
+    s.style.left = (cx - 5) + 'px';
+    s.style.top = (cy - 5) + 'px';
+    const ang = (i / 10) * Math.PI * 2;
+    const dist = 50 + Math.random() * 50;
+    s.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
+    s.style.setProperty('--sy', Math.sin(ang) * dist + 'px');
+    s.style.setProperty('--sr', (Math.random() * 720 - 360) + 'deg');
+    stage.appendChild(s);
+    setTimeout(() => s.remove(), 650);
+  }
+  // White flash
+  const flash = document.createElement('div');
+  flash.className = 'wd-flash';
+  stage.appendChild(flash);
+  setTimeout(() => flash.remove(), 220);
+  try { wordBreakSound(); } catch(e) {}
+  setTimeout(() => { if (w.el) w.el.remove(); }, 460);
+  // Score
+  wordDropGame.combo++;
+  const base = 10 + w.text.length * 2;
+  const comboBonus = Math.floor(wordDropGame.combo / 3) * 5;
+  const pts = base + comboBonus;
+  wordDropGame.score += pts;
+  document.getElementById('wdScore').textContent = wordDropGame.score;
+  document.getElementById('wdCombo').textContent = wordDropGame.combo;
+  if (wordDropGame.combo >= 3) {
+    const p = document.createElement('div');
+    p.className = 'wd-combo-popup';
+    p.style.left = cx + 'px';
+    p.style.top = (cy - 20) + 'px';
+    p.textContent = `${wordDropGame.combo} COMBO!`;
+    stage.appendChild(p);
+    setTimeout(() => p.remove(), 920);
+    if (wordDropGame.combo % 5 === 0) {
+      try { comboSound(wordDropGame.combo); } catch(e) {}
+    }
+  }
+}
+
+function wdUpdateHighlight(typed) {
+  // Determine the active word: the lowest-on-screen word whose text starts with `typed`
+  // (case-sensitive — Korean is case-agnostic anyway). Empty input => no active word.
+  wordDropGame.words.forEach(w => { if (w.el) w.el.classList.remove('wd-active'); });
+  wordDropGame.activeWord = null;
+  if (!typed) {
+    // Render all words without typed prefix
+    wordDropGame.words.forEach(w => wdRenderWord(w, ''));
+    return;
+  }
+  // Find the candidate closest to the ground (largest y) that starts with typed
+  let best = null;
+  for (const w of wordDropGame.words) {
+    if (w.text.startsWith(typed) && (!best || w.y > best.y)) best = w;
+  }
+  wordDropGame.activeWord = best;
+  wordDropGame.words.forEach(w => {
+    wdRenderWord(w, (w === best) ? typed : '');
+    if (w === best && w.el) w.el.classList.add('wd-active');
+  });
+}
+
+function wdRenderWord(w, typedPrefix) {
+  if (!w.el) return;
+  const rest = w.text.slice(typedPrefix.length);
+  const typedSpan = w.el.querySelector('.wd-typed');
+  const restSpan = w.el.querySelector('.wd-rest');
+  if (typedSpan) typedSpan.textContent = typedPrefix;
+  if (restSpan) restSpan.textContent = rest;
+}
+
+function wdGameOver(msg) {
+  wordDropGame.running = false;
+  wordDropGame.ended = true;
+  if (wordDropGame.spawnId) clearTimeout(wordDropGame.spawnId);
+  if (wordDropGame.timerId) clearInterval(wordDropGame.timerId);
+  if (wordDropGame.tickId) cancelAnimationFrame(wordDropGame.tickId);
+  wordDropGame.spawnId = wordDropGame.timerId = wordDropGame.tickId = null;
+  // Remove remaining words after a short delay (so last frame renders)
+  wordDropGame.words.forEach(w => { if (w.el) w.el.remove(); });
+  wordDropGame.words = [];
+  wordDropGame.activeWord = null;
+  try { errorSound(); } catch(e) {}
+  // XP reward
+  const xpEarned = Math.floor(wordDropGame.score / 4);
+  if (xpEarned > 0 && typeof state !== 'undefined') {
+    try {
+      state.xp = (state.xp || 0) + xpEarned;
+      if (typeof save === 'function') save();
+      if (typeof renderStats === 'function') renderStats();
+    } catch(e) {}
+  }
+  try { if (typeof gameOverSound === 'function') gameOverSound(); } catch(e) {}
+  const stage = document.getElementById('wdStage');
+  if (stage) {
+    const over = document.createElement('div');
+    over.className = 'wd-gameover';
+    over.innerHTML = `
+      <div class="wd-gameover-big">${msg}</div>
+      <div class="wd-gameover-stats">
+        <div>점수<b>${wordDropGame.score}</b></div>
+        <div>최고 콤보<b>${wordDropGame.combo}</b></div>
+        <div>속도Lv<b>${wordDropGame.speedLvl}</b></div>
+        <div>+XP<b>${xpEarned}</b></div>
+      </div>
+    `;
+    stage.appendChild(over);
+  }
+  document.getElementById('wdRestartBtn').style.display = '';
+  const inp = document.getElementById('wdInput');
+  if (inp) { inp.value = ''; inp.disabled = true; }
+}
+
+function wdShowSpeedUp() {
+  const el = document.getElementById('wdSpeedUp');
+  if (!el) return;
+  el.classList.remove('show');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('show');
+}
+
+// Input handler: check full-word match on every change.
+// Korean IME-aware: ignores events during composition (partial jamo).
+// Plays the same mechanical-keyboard click sound as 손가락자리 연습 on each keystroke.
+(function bindWdInput() {
+  const inp = document.getElementById('wdInput');
+  if (!inp) return;
+  let composing = false;
+  inp.addEventListener('compositionstart', () => { composing = true; });
+  inp.addEventListener('compositionend', () => {
+    composing = false;
+    try { clickSound(); } catch(e) {}
+    handleInput();
+  });
+  function handleInput() {
+    if (!wordDropGame.running) return;
+    const typed = inp.value;
+    let matched = null;
+    for (const w of wordDropGame.words) {
+      if (w.text === typed && (!matched || w.y > matched.y)) matched = w;
+    }
+    if (matched) {
+      wordDropGame.words = wordDropGame.words.filter(x => x !== matched);
+      wdBreakWord(matched);
+      inp.value = '';
+      wdUpdateHighlight('');
+      return;
+    }
+    wdUpdateHighlight(typed);
+  }
+  inp.addEventListener('input', (e) => {
+    // Play keyboard sound on every keystroke (skip during IME composition — compositionend handles that)
+    if (!composing && !(e && e.isComposing)) {
+      try { clickSound(); } catch(err) {}
+    }
+    if (composing || (e && e.isComposing)) return;
+    handleInput();
+  });
+})();
 </script>
 </body>
 </html>

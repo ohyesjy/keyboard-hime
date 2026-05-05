@@ -1,9 +1,14 @@
-# 미디어 폴더는 git에 포함하지 않음 (용량 큼)
-장송의프리렌/
-사이키쿠스오/
-체인소맨/
-귀멸의칼날/
-도쿄리벤저스/
-기타/
-backups/
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editor temp
+*.swp
+*~
+
+# Project backups / experiments (not needed on GitHub Pages)
+backups/
+test3.mjs
+preview.html
+complete_preview.html
+핀터레스트 영상.png

@@ -1,0 +1,34 @@
+=============================================================
+ 키보드히메 - 사파리로 연습기록 이식 스크립트
+ 추출일: 2026-04-19
+=============================================================
+
+[사용 방법]
+
+1. 사파리 메뉴 > 설정 > 고급 에서
+   "메뉴 막대에서 개발자용 메뉴 보기"를 체크하세요.
+
+2. 사파리로 https://ohyesjy.github.io/keyboard-hime/ 에 접속.
+
+3. 상단 메뉴: 개발자용 > 웹 속성 보기 (또는 Option+Cmd+C)
+   → 상단 탭에서 "콘솔" 선택
+
+4. 아래 ===BEGIN=== 부터 ===END=== 사이의 코드를 전부 복사해서
+   콘솔에 붙여넣고 Enter.
+
+5. 페이지를 새로고침 (Cmd+R) 하면 연습기록이 그대로 뜹니다.
+
+
+===BEGIN===
+(()=>{const d={"khime_worlds":"{\"unlockedWorlds\":[\"frieren\",\"saiki\"],\"completedWorlds\":[],\"currentWorld\":\"frieren\"}","khime_v2":"{\"currentChar\":\"fern\",\"chars\":{\"fern\":{\"streak\":2,\"xp\":273,\"lastPlayed\":\"Sun Apr 19 2026\",\"badges\":[\"first\",\"wpm100\",\"wpm200\"],\"totalChars\":410,\"bestWpm\":300,\"missions\":[{\"id\":\"m1\",\"name\":\"🖐️ 기본자리 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_basic\"},{\"id\":\"m2\",\"name\":\"☝️ 윗줄 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_top\"},{\"id\":\"m3\",\"name\":\"👇 아랫줄 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_bottom\"},{\"id\":\"m4\",\"name\":\"🔀 한글낱자 섞기 5번\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_mix\"}],\"missionDate\":\"Sun Apr 19 2026\",\"fingerCompletes\":{\"basic\":5,\"top\":5,\"bottom\":0,\"mix\":0},\"practiceCompletes\":{\"word\":0,\"short\":0,\"long\":0},\"collectionSeen\":[\"serie\",\"heiter\",\"eisen\",\"sein\"],\"vaultOpened\":[\"sein\",\"serie\",\"heiter\",\"eisen\"],\"missionWorldId\":\"frieren\"},\"saiki\":{\"streak\":2,\"xp\":0,\"lastPlayed\":\"Sun Apr 19 2026\",\"badges\":[],\"totalChars\":0,\"bestWpm\":0,\"missions\":[{\"id\":\"m1\",\"name\":\"🖐️ 기본자리 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_basic\"},{\"id\":\"m2\",\"name\":\"☝️ 윗줄 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_top\"},{\"id\":\"m3\",\"name\":\"👇 아랫줄 5번 연습\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_bottom\"},{\"id\":\"m4\",\"name\":\"🔀 한글낱자 섞기 5번\",\"target\":5,\"progress\":0,\"reward\":30,\"type\":\"finger_mix\"}],\"missionDate\":\"Sun Apr 19 2026\",\"fingerCompletes\":{\"basic\":0,\"top\":0,\"bottom\":0,\"mix\":0},\"practiceCompletes\":{\"word\":0,\"short\":0,\"long\":0},\"collectionSeen\":[],\"vaultOpened\":[],\"missionWorldId\":\"frieren\"}}}","khime_reset_v2":"1"};Object.keys(d).forEach(k=>localStorage.setItem(k,d[k]));console.log("✅ 키보드히메 연습기록 복원 완료. 페이지를 새로고침하세요.");location.reload();})();
+===END===
+
+
+[추출된 기록 요약]
+- 프리렌 월드: 잠금 해제됨
+- 사이키쿠스오 월드: 잠금 해제됨 (비밀번호 통과)
+- fern 캐릭터: 연속 2일, XP 273, 뱃지 3개(first, wpm100, wpm200),
+  최고 WPM 300, 총 410자
+- 획득한 뱃지 컬렉션: serie, heiter, eisen, sein (4개)
+- 오늘의 미션 진행도도 그대로 유지됨
+
