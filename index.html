@@ -9098,13 +9098,20 @@ const wordGame = makeGame({
     if (count === 5) {
       setTimeout(() => pop('🎮 게임 가능! 낱말 게임이 열렸어요!'), 500);
     }
-    setTimeout(() => nextWord(), 800);
+    // 자동 진행 제거 — Enter로만 다음 낱말로
   }
 });
 document.getElementById('wordInput').addEventListener('input', e => wordGame.handle(e.target.value));
-// 포커스 시 자동으로 시작
+// Enter 키로 다음 낱말 (완료된 경우)
+document.getElementById('wordInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && wordGame.completed) {
+    e.preventDefault();
+    nextWord();
+  }
+});
+// 첫 포커스 시에만 startWord (이후에는 호출 안 함 — 큐 리셋 방지)
 document.getElementById('wordInput').addEventListener('focus', () => {
-  if (!wordAutoStarted || wordGame.completed) {
+  if (!wordAutoStarted) {
     wordAutoStarted = true;
     startWord();
   }
@@ -9156,12 +9163,20 @@ const shortGame = makeGame({
     }
     // 🎰 가챠 이벤트 단문 카운터
     try { onShortCompleteForEvent(); } catch(e) {}
-    setTimeout(() => nextShort(), 800);
+    // 자동 진행 제거 — Enter로만 다음 단문으로
   }
 });
 document.getElementById('shortInput').addEventListener('input', e => shortGame.handle(e.target.value));
+// Enter 키로 다음 단문 (완료된 경우)
+document.getElementById('shortInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && shortGame.completed) {
+    e.preventDefault();
+    nextShort();
+  }
+});
+// 첫 포커스 시에만 startShort
 document.getElementById('shortInput').addEventListener('focus', () => {
-  if (!shortAutoStarted || shortGame.completed) {
+  if (!shortAutoStarted) {
     shortAutoStarted = true;
     startShort();
   }
