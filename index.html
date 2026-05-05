@@ -9235,10 +9235,10 @@ document.getElementById('longInput').addEventListener('keydown', e => {
     e.preventDefault();
     if (longGame._lastResult) {
       const r = longGame._lastResult;
-      showResult(r.wpm, r.acc, r.xp, null);
+      showResult(r.wpm, r.acc, r.xp, null, 500);
       longGame._lastResult = null;
     }
-    setTimeout(() => nextLong(), 720);
+    setTimeout(() => nextLong(), 520);
   }
 });
 document.getElementById('longInput').addEventListener('focus', () => {
