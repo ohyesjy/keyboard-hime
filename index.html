@@ -3552,9 +3552,10 @@
   .cs-jump-pochita {
     position: absolute;
     bottom: 50px; left: 80px;
-    width: 60px; height: auto;
+    width: 100px; height: auto;
     z-index: 5;
     filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4));
+    transition: left 0.05s linear;
   }
   .cs-jump-pochita.run {
     animation: csPochitaBob 0.4s ease-in-out infinite alternate;
@@ -11318,7 +11319,7 @@ function wdShowSpeedUp() {
   var GRAVITY = 1400; // 픽셀/초^2
   var GROUND_Y = 50; // ground 높이
   var POCHITA_X = 80;
-  var POCHITA_W = 60;
+  var POCHITA_W = 100;
   var POCHITA_H = 60;
   var BLD_W = 78;
   var SPAWN_MIN = 1.6;
@@ -11339,7 +11340,7 @@ function wdShowSpeedUp() {
     currentEl = document.getElementById('csJumpCurrent');
     overlayEl = document.getElementById('csJumpOverlay');
     if (!stage || !inputEl) return;
-    pochita.src = encodeURI('체인소맨/pochita_trail.png') + '?v=' + Math.floor(Date.now()/300000);
+    pochita.src = encodeURI('체인소맨/pochita_run.png') + '?v=' + Math.floor(Date.now()/300000);
     inputEl.addEventListener('keydown', onKeyDown);
     inputEl.addEventListener('input', onInput);
     bestEl.textContent = parseInt(localStorage.getItem('csJumpBest') || '0', 10);
@@ -11434,6 +11435,12 @@ function wdShowSpeedUp() {
   function render() {
     // pochita
     pochita.style.bottom = (GROUND_Y + state.pochitaY) + 'px';
+    // 점프 중에는 앞으로 살짝 이동 (호 그리는 느낌)
+    var jumpProgress = state.pochitaY > 0 ? Math.min(1, state.pochitaY / 100) : 0;
+    pochita.style.left = (POCHITA_X + jumpProgress * 30) + 'px';
+    // 배경 파랄랙스 (느리게 좌측 이동)
+    state.bgOffset = (state.bgOffset || 0) - SPEED * 0.3 * (1/60);
+    stage.style.backgroundPositionX = state.bgOffset + 'px';
     // buildings
     var html = '';
     var activeIdx = -1;
