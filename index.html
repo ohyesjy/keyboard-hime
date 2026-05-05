@@ -3561,8 +3561,8 @@
     animation: csPochitaBob 0.4s ease-in-out infinite alternate;
   }
   @keyframes csPochitaBob {
-    from { transform: translateY(0) rotate(-2deg); }
-    to { transform: translateY(-4px) rotate(2deg); }
+    from { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)) brightness(1); }
+    to { filter: drop-shadow(2px 6px 4px rgba(0,0,0,0.5)) brightness(1.04); }
   }
   .cs-jump-buildings { position: absolute; inset: 0; pointer-events: none; }
   .cs-jump-bld {
@@ -11350,7 +11350,8 @@ function wdShowSpeedUp() {
     if (!stage) return;
     state = {
       score: 0, lives: 3,
-      pochitaY: 0, vy: 0, jumping: false,
+      pochitaX: POCHITA_X, pochitaY: 0,
+      vx: 0, vy: 0, jumping: false,
       buildings: [],
       spawnTimer: 0.5,
       gameOver: false,
@@ -11378,13 +11379,18 @@ function wdShowSpeedUp() {
     raf = requestAnimationFrame(loop);
   }
   function update(dt) {
-    // pochita physics
+    // pochita physics — 점프 시 앞으로 이동, 착지 후 base로 슬라이드 복귀
     if (state.jumping || state.pochitaY > 0) {
       state.vy -= GRAVITY * dt;
       state.pochitaY += state.vy * dt;
+      state.pochitaX += state.vx * dt;
       if (state.pochitaY <= 0) {
-        state.pochitaY = 0; state.vy = 0; state.jumping = false;
+        state.pochitaY = 0; state.vy = 0; state.vx = 0;
+        state.jumping = false;
       }
+    } else if (state.pochitaX > POCHITA_X) {
+      // 지상에서 base 위치로 천천히 슬라이드 복귀
+      state.pochitaX = Math.max(POCHITA_X, state.pochitaX - 220 * dt);
     }
     // building spawn
     state.spawnTimer -= dt;
@@ -11405,8 +11411,8 @@ function wdShowSpeedUp() {
       if (!b.cleared && !b.hit) {
         var bldLeft = b.x;
         var bldRight = b.x + BLD_W;
-        var pLeft = POCHITA_X;
-        var pRight = POCHITA_X + POCHITA_W;
+        var pLeft = state.pochitaX;
+        var pRight = state.pochitaX + POCHITA_W;
         var overlapping = bldRight > pLeft && bldLeft < pRight;
         if (overlapping) {
           // pochita 발 위치
@@ -11433,13 +11439,14 @@ function wdShowSpeedUp() {
     state.buildings = state.buildings.filter(function(b){ return b.x > -100; });
   }
   function render() {
-    // pochita
+    // pochita 위치
     pochita.style.bottom = (GROUND_Y + state.pochitaY) + 'px';
-    // 점프 중에는 앞으로 살짝 이동 (호 그리는 느낌)
-    var jumpProgress = state.pochitaY > 0 ? Math.min(1, state.pochitaY / 100) : 0;
-    pochita.style.left = (POCHITA_X + jumpProgress * 30) + 'px';
+    pochita.style.left = state.pochitaX + 'px';
+    // 점프 중 살짝 앞으로 기울이기 (활공 느낌)
+    var rot = state.jumping ? (state.vy > 0 ? -8 : 12) : 0;
+    pochita.style.transform = 'rotate(' + rot + 'deg)';
     // 배경 파랄랙스 (느리게 좌측 이동)
-    state.bgOffset = (state.bgOffset || 0) - SPEED * 0.3 * (1/60);
+    state.bgOffset = (state.bgOffset || 0) - SPEED * 0.4 * (1/60);
     stage.style.backgroundPositionX = state.bgOffset + 'px';
     // buildings
     var html = '';
@@ -11490,6 +11497,9 @@ function wdShowSpeedUp() {
         var jumpH = active.height + 50;
         // jumpH = (vy^2)/(2g)  →  vy = sqrt(2*g*h)
         state.vy = Math.sqrt(2 * GRAVITY * jumpH);
+        // 점프 시 앞으로도 이동 (빌딩을 호 그리며 넘기) — 체공 시간만큼 빌딩 너비+여유 거리 이동
+        var airTime = 2 * state.vy / GRAVITY;
+        state.vx = (BLD_W * 2.2) / airTime;
         state.jumping = true;
         active.cleared = true;
         state.score++;
