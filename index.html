@@ -1,6 +1,61 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+// ?reset=1 URL 파라미터가 있으면 모든 로컬 데이터 + 클라우드 초기화
+(function() {
+  var params = new URLSearchParams(location.search);
+  if (params.get('reset') === '1') {
+    try {
+      // 1. localStorage 모두 삭제 (닉만 보존)
+      var nick = localStorage.getItem('khime_nick');
+      localStorage.clear();
+      if (nick) localStorage.setItem('khime_nick', nick);
+      // 2. SW unregister
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) regs[i].unregister();
+        });
+      }
+      // 3. cache API 삭제
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          for (var i = 0; i < keys.length; i++) caches.delete(keys[i]);
+        });
+      }
+      // 4. firebase 데이터도 초기화 후 reload
+      setTimeout(function() {
+        try {
+          if (typeof firebase !== 'undefined' && firebase.database && nick) {
+            var db = firebase.database();
+            // firebase에 빈 객체 push
+            db.ref('users/' + nick).set({
+              v2: { currentChar: 'fern', chars: { fern: { badges: [], xp: 0, totalChars: 0, streak: 0, bestWpm: 0 } } },
+              updatedAt: Date.now(),
+              nick: nick
+            }).then(function() {
+              alert('✅ 모든 데이터 초기화 완료!\n\n새로고침합니다.');
+              location.replace(location.pathname);
+            }).catch(function(e) {
+              alert('Cloud 초기화 에러: ' + e.message + '\n로컬만 초기화됨. 새로고침합니다.');
+              location.replace(location.pathname);
+            });
+          } else {
+            alert('✅ 로컬 데이터 초기화 완료. 새로고침합니다.');
+            location.replace(location.pathname);
+          }
+        } catch(e) {
+          alert('초기화 중 에러: ' + e.message);
+          location.replace(location.pathname);
+        }
+      }, 600);
+    } catch(e) { alert('초기화 실패: ' + e.message); }
+    // reset=1 모드에선 다른 코드 실행 막기 위해 throw로 stop
+    throw new Error('Resetting data, page reloading');
+  }
+})();
+</script>
+
 <meta charset="UTF-8">
 <!-- 캐시 방지: 매번 최신 HTML 받아오게 (영석님이 매번 캐시 비우지 않게) -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
