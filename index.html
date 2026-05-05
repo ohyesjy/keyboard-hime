@@ -969,6 +969,46 @@
   .home-card.has-bg-img > *:not(.card-char-img) { position: relative; z-index: 3; }
   .home-card.has-bg-img .emoji { display: none; }
 
+  /* 체인소맨 낱말 진행상황 뱃지 (X/5) */
+  .home-card .cs-word-progress {
+    position: absolute; top: 8px; right: 8px;
+    display: flex; align-items: center; gap: 4px;
+    background: linear-gradient(135deg, #8b0000, #e94560);
+    color: #ffd400;
+    border: 2.5px solid #1a1a1a;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    z-index: 4;
+    box-shadow: 2px 2px 0 #1a1a1a, 0 0 12px rgba(233,69,96,0.6);
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .home-card .cs-word-progress.done {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #1a1a1a;
+    animation: csWordPulse 1.4s ease-in-out infinite;
+  }
+  .home-card .cs-word-progress .cs-chain {
+    display: inline-flex; gap: 2px;
+  }
+  .home-card .cs-word-progress .cs-chain-seg {
+    width: 7px; height: 7px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.4);
+  }
+  .home-card .cs-word-progress .cs-chain-seg.filled {
+    background: #ffd400;
+    box-shadow: 0 0 4px #ffd400;
+  }
+  @keyframes csWordPulse {
+    0%,100% { transform: scale(1); box-shadow: 2px 2px 0 #1a1a1a, 0 0 12px rgba(255,215,0,0.6); }
+    50% { transform: scale(1.06); box-shadow: 2px 2px 0 #1a1a1a, 0 0 22px rgba(255,215,0,0.9); }
+  }
+
   .level-pill { display: inline-block; background: rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 999px; font-size: 12px; margin-top: 8px; }
 
   /* Finger legend */
@@ -5634,6 +5674,7 @@ function addMission(type, amount=1) {
   save();
   renderMissions();
   renderStats(); // checkBadges() 포함 → 뱃지 획득 → 도감 해금
+  try { applyButtonImages(); } catch(e) {} // 체인소맨 낱말 진행상황 뱃지 갱신
   // 전체 미션 완료 시 특별 축하
   if (justCompleted && state.missions.every(m => m.progress >= m.target)) {
     setTimeout(() => {
@@ -6045,7 +6086,7 @@ const WORLD_BUTTON_IMAGES = {
   },
   chainsaw: {
     finger: '체인소맨/손가락자리.jpeg',
-    word:   '체인소맨/낱말버튼.jpeg',
+    word:   '체인소맨/word_btn_5.png',
     short:  '체인소맨/단문버튼.jpeg',
     long:   '체인소맨/장문버튼.jpeg',
     chat:   '체인소맨/채팅버튼.jpeg',
@@ -6118,6 +6159,22 @@ function applyButtonImages() {
       } else {
         card.classList.remove('has-bg-img');
         if (emojiDiv) emojiDiv.textContent = emojiDiv.dataset.fallback || '';
+      }
+      // 체인소맨 월드 + 낱말 카드: 진행상황 뱃지 추가
+      const oldProg = card.querySelector('.cs-word-progress');
+      if (oldProg) oldProg.remove();
+      if (currentWorldId === 'chainsaw' && section === 'word') {
+        const m = (state.missions || []).find(mm => mm.type === 'practice_word');
+        if (m) {
+          const prog = document.createElement('div');
+          prog.className = 'cs-word-progress' + (m.progress >= m.target ? ' done' : '');
+          let segs = '';
+          for (let i = 0; i < m.target; i++) {
+            segs += `<span class="cs-chain-seg${i < m.progress ? ' filled' : ''}"></span>`;
+          }
+          prog.innerHTML = `<span>${m.progress}/${m.target}</span><span class="cs-chain">${segs}</span>`;
+          card.appendChild(prog);
+        }
       }
     });
     // 월드 전용 단어/문장을 쓰는 월드에서는 낱말 탭 모드 선택 버튼 숨김
