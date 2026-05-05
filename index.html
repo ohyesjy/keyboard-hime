@@ -7638,6 +7638,8 @@ function animateHandPlacement() {
 function makeGame(opts) {
   return {
     text: '', pos: 0, errors: 0, startTime: null, completed: false, liveTimer: null,
+    _lastResult: null,
+    deferResult: !!opts.deferResult,
     targetEl: opts.targetEl, inputEl: opts.inputEl, progEl: opts.progEl,
     tab: opts.tab, onComplete: opts.onComplete, showKb: opts.showKb,
     wpmEl: document.getElementById(opts.tab + 'Wpm'),
@@ -7739,8 +7741,12 @@ function makeGame(opts) {
       // Clear input so lingering keystrokes don't carry over
       this.inputEl.blur();
       this.inputEl.value = '';
-      // Pass null → showResult picks a face matching the current character
-      showResult(wpm, acc, xp, null);
+      // 결과 저장 (Enter 시 표시용)
+      this._lastResult = { wpm: wpm, acc: acc, xp: xp };
+      if (!this.deferResult) {
+        // Pass null → showResult picks a face matching the current character
+        showResult(wpm, acc, xp, null);
+      }
       renderStats();
       if (this.onComplete) this.onComplete();
     }
@@ -9087,6 +9093,7 @@ const wordGame = makeGame({
   inputEl: document.getElementById('wordInput'),
   progEl: document.getElementById('wordProgress'),
   tab: 'word',
+  deferResult: true,
   onComplete() {
     addMission('words', 1);
     const count = trackPracticeComplete('word');
@@ -9101,7 +9108,12 @@ document.getElementById('wordInput').addEventListener('input', e => wordGame.han
 document.getElementById('wordInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && wordGame.completed) {
     e.preventDefault();
-    nextWord();
+    if (wordGame._lastResult) {
+      const r = wordGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null);
+      wordGame._lastResult = null;
+    }
+    setTimeout(() => nextWord(), 720);
   }
 });
 // 첫 포커스 시에만 startWord (이후에는 호출 안 함 — 큐 리셋 방지)
@@ -9150,6 +9162,7 @@ const shortGame = makeGame({
   inputEl: document.getElementById('shortInput'),
   progEl: document.getElementById('shortProgress'),
   tab: 'short',
+  deferResult: true,
   onComplete() {
     addMission('shortSent', 1);
     const count = trackPracticeComplete('short');
@@ -9166,7 +9179,12 @@ document.getElementById('shortInput').addEventListener('input', e => shortGame.h
 document.getElementById('shortInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && shortGame.completed) {
     e.preventDefault();
-    nextShort();
+    if (shortGame._lastResult) {
+      const r = shortGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null);
+      shortGame._lastResult = null;
+    }
+    setTimeout(() => nextShort(), 720);
   }
 });
 // 첫 포커스 시에만 startShort
@@ -9203,6 +9221,7 @@ const longGame = makeGame({
   inputEl: document.getElementById('longInput'),
   progEl: document.getElementById('longProgress'),
   tab: 'long',
+  deferResult: true,
   onComplete() {
     const count = trackPracticeComplete('long');
     if (count === 5) {
@@ -9211,8 +9230,19 @@ const longGame = makeGame({
   }
 });
 document.getElementById('longInput').addEventListener('input', e => longGame.handle(e.target.value));
+document.getElementById('longInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && longGame.completed) {
+    e.preventDefault();
+    if (longGame._lastResult) {
+      const r = longGame._lastResult;
+      showResult(r.wpm, r.acc, r.xp, null);
+      longGame._lastResult = null;
+    }
+    setTimeout(() => nextLong(), 720);
+  }
+});
 document.getElementById('longInput').addEventListener('focus', () => {
-  if (!longAutoStarted || longGame.completed) {
+  if (!longAutoStarted) {
     longAutoStarted = true;
     startLong();
   }
