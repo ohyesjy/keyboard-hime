@@ -11762,5 +11762,195 @@ function wdShowSpeedUp() {
 })();
 </script>
 
+
+<style id="csCompleteFlowStyles">
+.cs-complete-overlay {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(40,10,15,0.92), rgba(0,0,0,0.95));
+  z-index: 100000;
+  display: none;
+  align-items: center; justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.cs-complete-overlay.show { display: flex; }
+.cs-complete-box {
+  background: linear-gradient(135deg, #2a0a14, #1a0a14);
+  border: 4px solid #e94560;
+  border-radius: 24px;
+  padding: 32px 24px;
+  max-width: 480px;
+  width: 92%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(233,69,96,0.6), 0 0 80px rgba(255,140,0,0.3);
+  position: relative;
+}
+.cs-complete-title {
+  font-size: 24px; font-weight: 900;
+  color: #ffd400;
+  text-shadow: 0 0 12px #e94560, 0 0 24px #e94560;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  line-height: 1.3;
+}
+.cs-complete-msg {
+  color: #ffe5b8; font-size: 16px; line-height: 1.6; margin-bottom: 20px;
+  font-weight: 700;
+}
+.cs-complete-btn {
+  background: linear-gradient(135deg, #e94560, #ff8c00);
+  color: #fff; font-weight: 900; font-size: 17px;
+  border: 2.5px solid #ffd400;
+  border-radius: 14px;
+  padding: 13px 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(233,69,96,0.5), 3px 3px 0 #1a0a0a;
+  transition: transform 0.1s;
+  margin: 4px 6px;
+}
+.cs-complete-btn:hover { transform: translate(-1px,-1px); }
+.cs-complete-btn:active { transform: translate(1px,1px); }
+.cs-complete-btn.bonus {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #1a0a0a;
+}
+.cs-complete-card-img {
+  max-width: 100%; max-height: 60vh;
+  border: 4px solid #ffd400;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(255,212,0,0.5), 0 8px 30px rgba(0,0,0,0.5);
+  margin-bottom: 14px;
+  display: block; margin-left: auto; margin-right: auto;
+  animation: csCardReveal 0.7s ease-out;
+}
+@keyframes csCardReveal {
+  0% { transform: scale(0.3) rotate(-8deg); opacity: 0; }
+  60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+/* 체인소맨 참격 효과 */
+.cs-slash-fx {
+  position: fixed; inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  display: none;
+}
+.cs-slash-fx.play { display: block; }
+.cs-slash-fx::before, .cs-slash-fx::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(90deg, transparent, #ff1744, #ffd400, #ff1744, transparent);
+  height: 8px;
+  width: 200%;
+  top: 50%; left: -50%;
+  transform: translateY(-50%) rotate(20deg);
+  box-shadow: 0 0 30px #ff1744, 0 0 60px #ff8c00;
+  animation: csSlashFly 0.7s ease-out forwards;
+}
+.cs-slash-fx::after {
+  transform: translateY(-50%) rotate(-20deg);
+  animation-delay: 0.15s;
+}
+@keyframes csSlashFly {
+  0% { transform: translate(-100vw, -50%) rotate(20deg); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(100vw, -50%) rotate(20deg); opacity: 0; }
+}
+</style>
+<div class="cs-slash-fx" id="csSlashFx"></div>
+<div class="cs-complete-overlay" id="csCompleteOverlay">
+  <div class="cs-complete-box" id="csCompleteBox"></div>
+</div>
+<script>
+(function() {
+  function csNick() {
+    return (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '시윤';
+  }
+  function showCsStage1() {
+    var box = document.getElementById('csCompleteBox');
+    box.innerHTML =
+      '<div class="cs-complete-title">🎉 ' + csNick() + '짱 스고이장!!!!! 🎉</div>' +
+      '<div class="cs-complete-msg">오츠가레사마!<br>체인소맨 완전체사진을 겟또다제! 🍞🩸</div>' +
+      '<button class="cs-complete-btn" onclick="csCompleteStage2()">완전체카드 받기 🎁</button>';
+    document.getElementById('csCompleteOverlay').classList.add('show');
+  }
+  function showCsStage2() {
+    // 체인소 참격 효과
+    var fx = document.getElementById('csSlashFx');
+    fx.classList.add('play');
+    try { if (typeof comboSound === 'function') comboSound(15); } catch(_) {}
+    setTimeout(function(){ fx.classList.remove('play'); }, 800);
+
+    setTimeout(function() {
+      var box = document.getElementById('csCompleteBox');
+      box.innerHTML =
+        '<div class="cs-complete-title">✨ 완전체 달성! ✨</div>' +
+        '<img class="cs-complete-card-img" src="' + encodeURI('체인소맨/완전체카드.jpeg') + '" alt="완전체카드">' +
+        '<div class="cs-complete-msg" style="font-size:14px">7명의 캐릭터를 모두 모았어요!</div>' +
+        '<button class="cs-complete-btn bonus" onclick="csCompleteStage3()">🎁 보너스카드 받기</button>' +
+        '<button class="cs-complete-btn" onclick="csCompleteClose()" style="background:#444;border-color:#777">닫기</button>';
+    }, 350);
+  }
+  function showCsStage3() {
+    var fx = document.getElementById('csSlashFx');
+    fx.classList.add('play');
+    try { if (typeof comboSound === 'function') comboSound(20); } catch(_) {}
+    setTimeout(function(){ fx.classList.remove('play'); }, 800);
+    setTimeout(function() {
+      var box = document.getElementById('csCompleteBox');
+      box.innerHTML =
+        '<div class="cs-complete-title">💛 보너스카드 GET! 💛</div>' +
+        '<img class="cs-complete-card-img" src="' + encodeURI('체인소맨/완전체카드보너스.jpeg') + '" alt="보너스카드">' +
+        '<div class="cs-complete-msg" style="font-size:14px">아키 + 덴지 + 파워 보너스!</div>' +
+        '<button class="cs-complete-btn" onclick="csCompleteClose()">닫기</button>';
+    }, 350);
+  }
+  function csClose() {
+    document.getElementById('csCompleteOverlay').classList.remove('show');
+    var box = document.getElementById('csCompleteBox');
+    box.innerHTML = '';
+  }
+  // 트리거 — 조건 검사
+  function csCheckTrigger() {
+    try {
+      if (typeof currentWorldId === 'undefined' || currentWorldId !== 'chainsaw') return;
+      var totalBadges = (typeof BADGES !== 'undefined' && BADGES.length) ? BADGES.length : 9;
+      var earnedBadges = (state && state.badges) ? state.badges.length : 0;
+      if (earnedBadges < totalBadges) return;
+      if (state && state.chainsawSGiftShown) return;
+      state.chainsawSGiftShown = true;
+      try { save(); } catch(_) {}
+      setTimeout(showCsStage1, 1000);
+    } catch(e) { console.error('csCheckTrigger:', e); }
+  }
+  // 노출
+  window.csCompleteStage1 = showCsStage1;
+  window.csCompleteStage2 = showCsStage2;
+  window.csCompleteStage3 = showCsStage3;
+  window.csCompleteClose = csClose;
+  window.csCheckChainsawComplete = csCheckTrigger;
+
+  // 자동 트리거 — 뱃지 변화 감시
+  if (typeof window.checkBadges === 'function') {
+    var origCheck = window.checkBadges;
+    window.checkBadges = function() {
+      var r = origCheck.apply(this, arguments);
+      try { csCheckTrigger(); } catch(_) {}
+      return r;
+    };
+  }
+  // 월드 진입 시에도 체크
+  if (typeof window.switchWorld === 'function') {
+    var origSwitch = window.switchWorld;
+    window.switchWorld = function(id) {
+      var r = origSwitch.apply(this, arguments);
+      setTimeout(csCheckTrigger, 1500);
+      return r;
+    };
+  }
+  // 페이지 로드 후 1회 체크
+  setTimeout(csCheckTrigger, 3000);
+})();
+</script>
+
 </body>
 </html>
