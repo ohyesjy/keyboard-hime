@@ -9096,7 +9096,7 @@ const wordGame = makeGame({
     addMission('words', 1);
     const count = trackPracticeComplete('word');
     if (count === 5) {
-      setTimeout(() => pop('🎮 게임 가능! 낱말 게임이 열렸어요!'), 500);
+      if (currentWorldId !== 'chainsaw') setTimeout(() => pop('🎮 게임 가능! 낱말 게임이 열렸어요!'), 500);
     }
     // 자동 진행 제거 — Enter로만 다음 낱말로
   }
@@ -9159,7 +9159,7 @@ const shortGame = makeGame({
     addMission('shortSent', 1);
     const count = trackPracticeComplete('short');
     if (count === 5) {
-      setTimeout(() => pop('🎮 게임 가능! 단문 게임이 열렸어요!'), 500);
+      if (currentWorldId !== 'chainsaw') setTimeout(() => pop('🎮 게임 가능! 단문 게임이 열렸어요!'), 500);
     }
     // 🎰 가챠 이벤트 단문 카운터
     try { onShortCompleteForEvent(); } catch(e) {}
@@ -9211,7 +9211,7 @@ const longGame = makeGame({
   onComplete() {
     const count = trackPracticeComplete('long');
     if (count === 5) {
-      setTimeout(() => pop('🎮 게임 가능! 장문 게임이 열렸어요!'), 500);
+      if (currentWorldId !== 'chainsaw') setTimeout(() => pop('🎮 게임 가능! 장문 게임이 열렸어요!'), 500);
     }
   }
 });
