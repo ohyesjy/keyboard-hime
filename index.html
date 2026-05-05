@@ -11366,13 +11366,32 @@ function wdShowSpeedUp() {
     pochita.classList.add('run');
     updateUI();
     lastT = performance.now();
+    state.bgIndex = 0;
+    state.bgChangeAt = performance.now() + 60000; // 60초 후 다음 배경
+    setStageBg(0);
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(loop);
+  }
+  function setStageBg(idx) {
+    var bgs = ['체인소맨/jump_bg.jpg', '체인소맨/jump_bg2.jpg', '체인소맨/jump_bg3.jpg', '체인소맨/jump_bg4.jpg'];
+    var url = encodeURI(bgs[idx % bgs.length]);
+    stage.style.background =
+      'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 100%), ' +
+      'url("' + url + '") center bottom / cover no-repeat, ' +
+      'linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #f0e68c 100%)';
+    state.bgOffset = 0;
+    stage.style.backgroundPositionX = '0px';
   }
   function loop(t) {
     if (!state) return;
     var dt = Math.min(0.04, (t - lastT) / 1000);
     lastT = t;
+    // 배경 사이클 — 60초마다 다음 배경으로
+    if (t >= state.bgChangeAt) {
+      state.bgIndex = (state.bgIndex + 1) % 4;
+      setStageBg(state.bgIndex);
+      state.bgChangeAt = t + 60000;
+    }
     update(dt);
     render();
     if (state.gameOver) return;
