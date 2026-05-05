@@ -3584,7 +3584,8 @@
         </div>
       </div>
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
-        <span class="dash-game-fallback">🎮 게임</span>
+        <img id="dashGameShortcutImg" alt="게임" style="display:none">
+        <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
       </div>
     </div>
 
@@ -6239,6 +6240,22 @@ function applyButtonImages() {
         }
       }
     });
+    // 대시보드 게임 바로가기 슬롯 이미지: 체인소맨이면 game_btn.png, 아니면 fallback
+    try {
+      const slotImg = document.getElementById('dashGameShortcutImg');
+      const slotFallback = document.getElementById('dashGameFallback');
+      if (slotImg && slotFallback) {
+        if (currentWorldId === 'chainsaw') {
+          slotImg.src = encodeURI('체인소맨/game_btn.png') + '?v=' + Date.now();
+          slotImg.style.display = 'block';
+          slotFallback.style.display = 'none';
+        } else {
+          slotImg.removeAttribute('src');
+          slotImg.style.display = 'none';
+          slotFallback.style.display = '';
+        }
+      }
+    } catch(e) {}
     // 월드 전용 단어/문장을 쓰는 월드에서는 낱말 탭 모드 선택 버튼 숨김
     try {
       const useWorldContent = !!WORLD_WORDS[currentWorldId];
