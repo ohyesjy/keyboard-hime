@@ -3513,7 +3513,11 @@
 </style>
 <style id="csJumpStyles">
   /* ===== 체인소맨 점프 게임 ===== */
-  body.world-chainsaw #wdGameLegacy { display: none !important; }
+  body.world-chainsaw #tab-game > h2,
+  body.world-chainsaw #tab-game > p.hint,
+  body.world-chainsaw #wdSelect,
+  body.world-chainsaw #wdGame,
+  body.world-chainsaw #wdRestartBtn { display: none !important; }
   body:not(.world-chainsaw) #csJump { display: none !important; }
   body.world-chainsaw #csJump { display: block !important; }
   .cs-jump { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -4137,7 +4141,6 @@
       </div>
       <button class="btn ghost" id="csJumpRestart" onclick="csJumpStart()" style="margin-top:10px">🔁 다시 시작</button>
     </div>
-    <div id="wdGameLegacy">
     <h2>🎮 낱말 떨어뜨리기</h2>
     <p class="hint">낱말이 땅에 닿기 전에 타이핑해서 막아요! 15초마다 점점 빨라져요 🔥</p>
 
