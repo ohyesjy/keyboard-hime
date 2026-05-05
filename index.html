@@ -6635,10 +6635,22 @@ function renderCollection() {
   if (vault) {
     const opened = state.vaultOpened || [];
     const obtained = all.filter(m => opened.includes(m.id));
-    if (obtained.length === 0) {
+    // 체인소맨 월드 보너스 카드 (완전체 / 보너스)
+    const csSpecial = [];
+    if (currentWorldId === 'chainsaw') {
+      if (state.chainsawCompleteCardOwned) csSpecial.push({
+        id: 'cs_complete', name: '체인소맨 완전체', img: '체인소맨/완전체카드.jpeg', tier: 'SS'
+      });
+      if (state.chainsawBonusCardOwned) csSpecial.push({
+        id: 'cs_bonus', name: '체인소맨 보너스', img: '체인소맨/완전체카드보너스.jpeg', tier: 'SS'
+      });
+    }
+    if (obtained.length === 0 && csSpecial.length === 0) {
       vault.innerHTML = '<div class="vault-empty">🔒 아직 획득한 카드가 없어요.<br>도감에서 해금된 캐릭터를 눌러 카드를 열어보세요!</div>';
     } else {
-      vault.innerHTML = COLLECTION.map(t => {
+      let html = '';
+      // 일반 카드
+      html += COLLECTION.map(t => {
         return t.members.filter(m => opened.includes(m.id)).map(m => `
           <div class="vault-card" onclick="showPhotoCard('${m.id}','${t.tier}')">
             <span class="vault-tier vault-tier-${t.tier}">${t.tier}</span>
@@ -6647,6 +6659,15 @@ function renderCollection() {
           </div>
         `).join('');
       }).join('');
+      // 체인소맨 SS 보너스 카드
+      html += csSpecial.map(c => `
+        <div class="vault-card vault-card-ss" onclick="csShowVaultCard('${c.id}')" style="border:3px solid #ffd400;box-shadow:0 0 16px rgba(255,212,0,0.6)">
+          <span class="vault-tier vault-tier-S" style="background:linear-gradient(135deg,#ff1744,#ffd400);color:#000">SS</span>
+          <img src="${encodeURI(c.img)}" alt="${c.name}" onerror="this.style.display='none'">
+          <div class="vault-name">${c.name}</div>
+        </div>
+      `).join('');
+      vault.innerHTML = html;
     }
   }
 }
@@ -11643,44 +11664,38 @@ function wdShowSpeedUp() {
     }
   }
   function csCookieCrunchSound() {
+    // "바사삭" 사운드 — 빠르고 날카로운 고주파 크런치 5~7번
     try {
       var ctx = (window._csAudioCtx = window._csAudioCtx || new (window.AudioContext || window.webkitAudioContext)());
       var now = ctx.currentTime;
-      // 3~4번 연속 짧은 크런치 (쿠키 부서지는 느낌)
-      var crunches = 3 + Math.floor(Math.random() * 2);
+      var crunches = 5 + Math.floor(Math.random() * 3);
       for (var i = 0; i < crunches; i++) {
-        var t = now + i * (0.04 + Math.random() * 0.03);
-        var len = 0.025 + Math.random() * 0.02;
+        var t = now + i * (0.018 + Math.random() * 0.012);
+        var len = 0.008 + Math.random() * 0.012;
         var size = Math.floor(ctx.sampleRate * len);
         var buf = ctx.createBuffer(1, size, ctx.sampleRate);
         var data = buf.getChannelData(0);
-        for (var k = 0; k < size; k++) data[k] = (Math.random()*2-1) * Math.pow(1 - k/size, 0.6);
+        // 더 날카로운 노이즈 (고주파 강조)
+        for (var k = 0; k < size; k++) {
+          data[k] = (Math.random()*2-1) * Math.pow(1 - k/size, 0.4);
+        }
         var src = ctx.createBufferSource();
         src.buffer = buf;
-        var bp = ctx.createBiquadFilter();
-        bp.type = 'bandpass';
-        bp.frequency.value = 1500 + Math.random() * 1500;
-        bp.Q.value = 1.8;
+        // 고주파 강조 — 바삭함의 핵심
         var hp = ctx.createBiquadFilter();
         hp.type = 'highpass';
-        hp.frequency.value = 600;
+        hp.frequency.value = 2500 + Math.random() * 1000;
+        var bp = ctx.createBiquadFilter();
+        bp.type = 'peaking';
+        bp.frequency.value = 4500 + Math.random() * 2000;
+        bp.Q.value = 3;
+        bp.gain.value = 8;
         var g = ctx.createGain();
-        g.gain.setValueAtTime(0.18, t);
+        g.gain.setValueAtTime(0.22, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + len);
         src.connect(hp).connect(bp).connect(g).connect(ctx.destination);
         src.start(t); src.stop(t + len + 0.01);
       }
-      // 마지막에 부드러운 "냠" 사운드 (저음 살짝)
-      var endT = now + crunches * 0.05 + 0.04;
-      var osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(280, endT);
-      osc.frequency.exponentialRampToValueAtTime(160, endT + 0.15);
-      var og = ctx.createGain();
-      og.gain.setValueAtTime(0.08, endT);
-      og.gain.exponentialRampToValueAtTime(0.001, endT + 0.18);
-      osc.connect(og).connect(ctx.destination);
-      osc.start(endT); osc.stop(endT + 0.2);
     } catch(e) {}
   }
   function getActiveBuilding() {
@@ -11879,13 +11894,20 @@ function wdShowSpeedUp() {
     fx.classList.add('play');
     try { if (typeof comboSound === 'function') comboSound(15); } catch(_) {}
     setTimeout(function(){ fx.classList.remove('play'); }, 800);
-
+    // 카드 보관소에 저장
+    try {
+      if (typeof state !== 'undefined') {
+        state.chainsawCompleteCardOwned = true;
+        if (typeof save === 'function') save();
+        if (typeof renderCollection === 'function') renderCollection();
+      }
+    } catch(_) {}
     setTimeout(function() {
       var box = document.getElementById('csCompleteBox');
       box.innerHTML =
         '<div class="cs-complete-title">✨ 완전체 달성! ✨</div>' +
         '<img class="cs-complete-card-img" src="' + encodeURI('체인소맨/완전체카드.jpeg') + '" alt="완전체카드">' +
-        '<div class="cs-complete-msg" style="font-size:14px">7명의 캐릭터를 모두 모았어요!</div>' +
+        '<div class="cs-complete-msg" style="font-size:14px">7명의 캐릭터를 모두 모았어요!<br><b style="color:#ffd400">📚 카드 보관소에 저장됨</b></div>' +
         '<button class="cs-complete-btn bonus" onclick="csCompleteStage3()">🎁 보너스카드 받기</button>' +
         '<button class="cs-complete-btn" onclick="csCompleteClose()" style="background:#444;border-color:#777">닫기</button>';
     }, 350);
@@ -11895,12 +11917,20 @@ function wdShowSpeedUp() {
     fx.classList.add('play');
     try { if (typeof comboSound === 'function') comboSound(20); } catch(_) {}
     setTimeout(function(){ fx.classList.remove('play'); }, 800);
+    // 카드 보관소에 저장
+    try {
+      if (typeof state !== 'undefined') {
+        state.chainsawBonusCardOwned = true;
+        if (typeof save === 'function') save();
+        if (typeof renderCollection === 'function') renderCollection();
+      }
+    } catch(_) {}
     setTimeout(function() {
       var box = document.getElementById('csCompleteBox');
       box.innerHTML =
         '<div class="cs-complete-title">💛 보너스카드 GET! 💛</div>' +
         '<img class="cs-complete-card-img" src="' + encodeURI('체인소맨/완전체카드보너스.jpeg') + '" alt="보너스카드">' +
-        '<div class="cs-complete-msg" style="font-size:14px">아키 + 덴지 + 파워 보너스!</div>' +
+        '<div class="cs-complete-msg" style="font-size:14px">아키 + 덴지 + 파워 보너스!<br><b style="color:#ffd400">📚 카드 보관소에 저장됨</b></div>' +
         '<button class="cs-complete-btn" onclick="csCompleteClose()">닫기</button>';
     }, 350);
   }
@@ -11923,6 +11953,16 @@ function wdShowSpeedUp() {
     } catch(e) { console.error('csCheckTrigger:', e); }
   }
   // 노출
+  window.csShowVaultCard = function(id) {
+    var img = id === 'cs_complete' ? '체인소맨/완전체카드.jpeg' : '체인소맨/완전체카드보너스.jpeg';
+    var name = id === 'cs_complete' ? '체인소맨 완전체' : '체인소맨 보너스';
+    var box = document.getElementById('csCompleteBox');
+    if (!box) return;
+    box.innerHTML = '<div class="cs-complete-title">✨ ' + name + ' ✨</div>' +
+      '<img class="cs-complete-card-img" src="' + encodeURI(img) + '" alt="' + name + '">' +
+      '<button class="cs-complete-btn" onclick="csCompleteClose()">닫기</button>';
+    document.getElementById('csCompleteOverlay').classList.add('show');
+  };
   window.csCompleteStage1 = showCsStage1;
   window.csCompleteStage2 = showCsStage2;
   window.csCompleteStage3 = showCsStage3;
