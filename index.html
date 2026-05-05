@@ -715,7 +715,7 @@
   body.world-chainsaw {
     background:
       linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.15) 100%),
-      url("체인소맨/chainsaw_bg.jpg") center center / cover no-repeat fixed,
+      url("체인소맨/world_bg.jpg") center center / cover no-repeat fixed,
       #1a1a1a !important;
     background-attachment: fixed, fixed, fixed !important;
     color: #1a1a1a !important;
@@ -969,7 +969,8 @@
   .home-card.has-bg-img > *:not(.card-char-img) { position: relative; z-index: 3; }
   .home-card.has-bg-img .emoji { display: none; }
 
-  /* 체인소맨 낱말 진행상황 뱃지 (X/5) */
+  /* 체인소맨 낱말 진행상황 뱃지 (X/5) — 모든 연습 카드 호환 */
+  .home-card .cs-section-progress,
   .home-card .cs-word-progress {
     position: absolute; top: 8px; right: 8px;
     display: flex; align-items: center; gap: 4px;
@@ -986,20 +987,24 @@
     pointer-events: none;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   }
+  .home-card .cs-section-progress.done,
   .home-card .cs-word-progress.done {
     background: linear-gradient(135deg, #ffd700, #ff8c00);
     color: #1a1a1a;
     animation: csWordPulse 1.4s ease-in-out infinite;
   }
+  .home-card .cs-section-progress .cs-chain,
   .home-card .cs-word-progress .cs-chain {
     display: inline-flex; gap: 2px;
   }
+  .home-card .cs-section-progress .cs-chain-seg,
   .home-card .cs-word-progress .cs-chain-seg {
     width: 7px; height: 7px;
     background: rgba(255,255,255,0.25);
     border-radius: 2px;
     border: 1px solid rgba(0,0,0,0.4);
   }
+  .home-card .cs-section-progress .cs-chain-seg.filled,
   .home-card .cs-word-progress .cs-chain-seg.filled {
     background: #ffd400;
     box-shadow: 0 0 4px #ffd400;
@@ -6086,7 +6091,7 @@ const WORLD_BUTTON_IMAGES = {
   },
   chainsaw: {
     finger: '체인소맨/손가락자리.jpeg',
-    word:   '체인소맨/word_btn_5.png',
+    word:   '체인소맨/word_btn.jpg',
     short:  '체인소맨/단문버튼.jpeg',
     long:   '체인소맨/장문버튼.jpeg',
     chat:   '체인소맨/채팅버튼.jpeg',
@@ -6160,19 +6165,29 @@ function applyButtonImages() {
         card.classList.remove('has-bg-img');
         if (emojiDiv) emojiDiv.textContent = emojiDiv.dataset.fallback || '';
       }
-      // 체인소맨 월드 + 낱말 카드: 진행상황 뱃지 추가
-      const oldProg = card.querySelector('.cs-word-progress');
+      // 모든 월드 + 모든 연습 카드: 진행상황 뱃지 추가
+      const oldProg = card.querySelector('.cs-section-progress, .cs-word-progress');
       if (oldProg) oldProg.remove();
-      if (currentWorldId === 'chainsaw' && section === 'word') {
-        const m = (state.missions || []).find(mm => mm.type === 'practice_word');
+      const SECTION_TO_MISSION = {
+        word: 'practice_word', short: 'practice_short',
+        long: 'practice_long', chat: 'practice_chat',
+        finger: 'finger_basic'
+      };
+      const missionType = SECTION_TO_MISSION[section];
+      if (missionType) {
+        const m = (state.missions || []).find(mm => mm.type === missionType);
         if (m) {
           const prog = document.createElement('div');
-          prog.className = 'cs-word-progress' + (m.progress >= m.target ? ' done' : '');
+          prog.className = 'cs-section-progress' + (m.progress >= m.target ? ' done' : '');
+          // 칸 너무 많으면 시각화 생략, 숫자만
+          const showChain = m.target <= 5;
           let segs = '';
-          for (let i = 0; i < m.target; i++) {
-            segs += `<span class="cs-chain-seg${i < m.progress ? ' filled' : ''}"></span>`;
+          if (showChain) {
+            for (let i = 0; i < m.target; i++) {
+              segs += `<span class="cs-chain-seg${i < m.progress ? ' filled' : ''}"></span>`;
+            }
           }
-          prog.innerHTML = `<span>${m.progress}/${m.target}</span><span class="cs-chain">${segs}</span>`;
+          prog.innerHTML = `<span>${m.progress}/${m.target}</span>` + (showChain ? `<span class="cs-chain">${segs}</span>` : '');
           card.appendChild(prog);
         }
       }
