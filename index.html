@@ -11992,5 +11992,68 @@ function wdShowSpeedUp() {
 })();
 </script>
 
+
+<script>
+window.csSatisfyingSound = function() {
+  try {
+    var ctx = (window._csAudioCtx = window._csAudioCtx || new (window.AudioContext || window.webkitAudioContext)());
+    var now = ctx.currentTime;
+
+    // 1) 베이스 충격 — 묵직한 타격감 (60Hz → 30Hz, 80ms)
+    var bass = ctx.createOscillator();
+    bass.type = 'sine';
+    bass.frequency.setValueAtTime(80, now);
+    bass.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+    var bassG = ctx.createGain();
+    bassG.gain.setValueAtTime(0.45, now);
+    bassG.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    bass.connect(bassG).connect(ctx.destination);
+    bass.start(now); bass.stop(now + 0.2);
+
+    // 2) 체인소 회전음 — 짧은 sawtooth 200~600Hz 스윕 (50ms)
+    var saw = ctx.createOscillator();
+    saw.type = 'sawtooth';
+    saw.frequency.setValueAtTime(180, now + 0.02);
+    saw.frequency.exponentialRampToValueAtTime(540, now + 0.08);
+    var sawG = ctx.createGain();
+    sawG.gain.setValueAtTime(0, now + 0.02);
+    sawG.gain.linearRampToValueAtTime(0.18, now + 0.04);
+    sawG.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    var sawHp = ctx.createBiquadFilter();
+    sawHp.type = 'highpass';
+    sawHp.frequency.value = 150;
+    saw.connect(sawHp).connect(sawG).connect(ctx.destination);
+    saw.start(now + 0.02); saw.stop(now + 0.14);
+
+    // 3) 상승 스파클 — 1500 → 4500Hz (펜타토닉 풍, 차임)
+    var sparkleNotes = [1318, 1568, 1864, 2349, 2794, 3520];
+    sparkleNotes.forEach(function(f, i) {
+      var t = now + 0.05 + i * 0.045;
+      var osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = f;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.13, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.2);
+    });
+
+    // 4) 마무리 차임 — 고음 종 (5000Hz, 250ms 페이드)
+    var chime = ctx.createOscillator();
+    chime.type = 'sine';
+    chime.frequency.value = 5000;
+    var chimeG = ctx.createGain();
+    var ct = now + 0.32;
+    chimeG.gain.setValueAtTime(0, ct);
+    chimeG.gain.linearRampToValueAtTime(0.18, ct + 0.01);
+    chimeG.gain.exponentialRampToValueAtTime(0.001, ct + 0.35);
+    chime.connect(chimeG).connect(ctx.destination);
+    chime.start(ct); chime.stop(ct + 0.4);
+  } catch(e) {}
+};
+</script>
+
 </body>
 </html>
