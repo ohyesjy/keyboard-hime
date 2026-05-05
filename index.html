@@ -5799,6 +5799,22 @@ function checkSpecialEvent() {
   try {
     const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
     if (nick !== '시윤') return; // 시윤 전용
+
+    // 🌙 2026-05-05 밤 8시 이후 + 모든 뱃지 완료 트리거 (오늘 1회)
+    const now = new Date();
+    const isMay5 = now.getFullYear() === 2026 && now.getMonth() === 4 && now.getDate() === 5;
+    const isAfter8pm = now.getHours() >= 20;
+    const totalBadges = (typeof BADGES !== 'undefined' && BADGES.length) ? BADGES.length : 8;
+    const allBadgesDone = (state.badges || []).length >= totalBadges;
+    if (isMay5 && isAfter8pm && allBadgesDone && !state.may5NightFired) {
+      state.may5NightFired = true;
+      // 단문 3회 카운터 리셋해서 깜짝 이벤트 새로 진행되게
+      state.eventGacha = { announced: true, shortDone: 0, gachaDone: false };
+      save();
+      setTimeout(showEventGachaAnnounce, 1500);
+      return;
+    }
+
     state.eventGacha = state.eventGacha || { announced: false, shortDone: 0, gachaDone: false };
     if (state.eventGacha.gachaDone) return;
     if (state.eventGacha.announced) return;
