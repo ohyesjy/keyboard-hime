@@ -3618,15 +3618,19 @@
     z-index: 10;
     transform-origin: 50% 100%;
   }
-  /* 포치타 냠냠 */
-  @keyframes csPochitaChomp {
-    0%, 100% { transform: scaleY(1) scaleX(1); }
-    25%      { transform: scaleY(0.85) scaleX(1.15); }
-    50%      { transform: scaleY(1.05) scaleX(0.92); }
-    75%      { transform: scaleY(0.95) scaleX(1.05); }
+  /* 포치타 와그작 — 앞으로 돌진 + 입 벌리기 + 다시 복귀 */
+  @keyframes csPochitaChompLunge {
+    0%   { transform: translateX(0) translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
+    20%  { transform: translateX(20px) translateY(-6px) scaleY(0.85) scaleX(1.18) rotate(-4deg); }
+    40%  { transform: translateX(60px) translateY(-2px) scaleY(0.78) scaleX(1.25) rotate(-8deg); }
+    55%  { transform: translateX(85px) translateY(0) scaleY(1.1) scaleX(0.88) rotate(2deg); }
+    70%  { transform: translateX(70px) translateY(-4px) scaleY(0.95) scaleX(1.05) rotate(-2deg); }
+    85%  { transform: translateX(40px) translateY(-2px) scaleY(1.02) scaleX(0.98) rotate(1deg); }
+    100% { transform: translateX(0) translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
   }
   .cs-jump-pochita.chomp {
-    animation: csPochitaChomp 0.42s ease-in-out;
+    /* 와그작 동안에는 run 애니메이션 잠시 멈춤 */
+    animation: csPochitaChompLunge 0.6s cubic-bezier(0.5, 0, 0.3, 1) !important;
   }
   /* 먹기 효과 파티클 */
   .cs-eat-burst {
@@ -11563,7 +11567,7 @@ function wdShowSpeedUp() {
     updateUI();
     // 포치타 냠냠 애니메이션
     pochita.classList.add('chomp');
-    setTimeout(function(){ pochita.classList.remove('chomp'); }, 450);
+    setTimeout(function(){ pochita.classList.remove('chomp'); }, 600);
     // 별 파티클 효과
     var burst = document.createElement('div');
     burst.className = 'cs-eat-burst';
@@ -11745,9 +11749,14 @@ function wdShowSpeedUp() {
   document.addEventListener('keydown', function(e) {
     if (e.repeat) return;
     if (IGNORE_KEYS.has(e.key)) return;
-    // 입력창에 포커스가 있을 때만
     var t = document.activeElement;
-    if (!t || !t.classList || !t.classList.contains('input-area')) return;
+    if (!t) return;
+    // input-area, cs-jump-input, 또는 일반 text input/textarea
+    var isInput =
+      (t.classList && (t.classList.contains('input-area') || t.classList.contains('cs-jump-input')))
+      || (t.tagName === 'INPUT' && (t.type === 'text' || t.type === '' || t.type === 'search'))
+      || t.tagName === 'TEXTAREA';
+    if (!isInput) return;
     try { if (typeof clickSound === 'function') clickSound(); } catch(_) {}
   }, true);
 })();
