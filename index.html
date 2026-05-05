@@ -11557,9 +11557,7 @@ function wdShowSpeedUp() {
     pochita.style.bottom = GROUND_Y + 'px';
     pochita.style.left = state.pochitaX + 'px';
     pochita.style.transform = '';
-    // 배경 파랄랙스 (느리게 좌측 이동)
-    state.bgOffset = (state.bgOffset || 0) - SPEED * 0.4 * (1/60);
-    stage.style.backgroundPositionX = state.bgOffset + 'px';
+    // 파랄랙스 제거 — 배경이 흘러가서 빈 공간(하늘색) 노출되던 문제 해결
     // buildings
     var html = '';
     var activeIdx = -1;
