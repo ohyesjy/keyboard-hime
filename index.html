@@ -7860,14 +7860,9 @@ function updateFingerGameUi() {
   label.textContent = FINGER_MODE_NAMES[mode] || mode;
   cntEl.textContent = Math.min(count, 5);
   fill.style.width = Math.min(100, count / 5 * 100) + '%';
-  if (count >= 5) {
-    btn.disabled = false;
-    btn.querySelector('.btn-text').textContent = '🎮 게임 시작!';
-  } else {
-    btn.disabled = true;
-    btn.querySelector('.btn-text').textContent =
-      `${5-count}회 더 완료하면 게임 열림!`;
-  }
+  // 손가락자리 게임은 항시 활성화
+  btn.disabled = false;
+  btn.querySelector('.btn-text').textContent = '🎮 게임 시작!';
 }
 
 const fingerGame = makeGame({
@@ -7948,11 +7943,7 @@ const ROCK_DIFFICULTY = {
 function getRockDiff() { return ROCK_DIFFICULTY[rockGame.mode] || ROCK_DIFFICULTY.basic; }
 
 function openFingerGame() {
-  const count = state.fingerCompletes[currentFingerMode] || 0;
-  if (count < 5) {
-    pop('🔒 5회 학습을 완료해야 게임이 열려요!');
-    return;
-  }
+  // 손가락자리 게임은 항시 활성화
   document.getElementById('fingerGameModal').classList.add('show');
   // Show game selection screen instead of directly starting rock game
   showGameSelect();
