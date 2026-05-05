@@ -1357,7 +1357,8 @@
     overflow: visible;
     position: relative;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
     transition: transform 0.15s, filter 0.15s;
     min-height: 110px;
     padding: 0;
@@ -1371,6 +1372,44 @@
     max-height: 320px;
     object-fit: contain; display: block;
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35));
+  }
+  /* 네온 레드 'GAME START!' 레이블 */
+  .dash-row > .dash-game-shortcut .dash-game-neon {
+    font-family: -apple-system, "Helvetica Neue", "SF Pro Display", "Arial Black", sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: #ff0033;
+    text-transform: uppercase;
+    -webkit-text-stroke: 1px #ff0033;
+    text-shadow:
+      0 0 4px #ff0033,
+      0 0 10px #ff0033,
+      0 0 20px #ff003388,
+      0 0 40px #ff003355,
+      0 0 60px #e9456033;
+    animation: neonFlicker 2.5s ease-in-out infinite;
+    margin-top: -4px;
+    pointer-events: none;
+    user-select: none;
+  }
+  @keyframes neonFlicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+      text-shadow:
+        0 0 4px #ff0033,
+        0 0 10px #ff0033,
+        0 0 20px #ff003388,
+        0 0 40px #ff003355,
+        0 0 60px #e9456033;
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      text-shadow: none;
+      opacity: 0.85;
+    }
+  }
+  @media (max-width: 600px) {
+    .dash-row > .dash-game-shortcut .dash-game-neon { font-size: 22px; letter-spacing: 1px; }
   }
   .dash-row > .dash-game-shortcut .dash-game-fallback {
     font-size: 22px; font-weight: 900;
@@ -3576,6 +3615,7 @@
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
+        <span class="dash-game-neon" id="dashGameNeon">게임 START!</span>
       </div>
       <div class="dash-header">
         <div class="dash-portrait" id="dashPortrait">
