@@ -7782,17 +7782,11 @@ function showResult(wpm, acc, xp, img) {
   }
   const modal = document.getElementById('resultModal');
   modal.classList.add('show');
-  // Auto-dismiss countdown (2.5s). Count down in halves for smoother feel.
-  const AUTO_CLOSE_MS = 2500;
-  let remaining = 2.5;
-  document.getElementById('modalCountdown').textContent = remaining + '초';
+  // Auto-dismiss after 0.7s
+  const AUTO_CLOSE_MS = 700;
+  document.getElementById('modalCountdown').textContent = '';
   clearInterval(window._modalTimer);
   clearTimeout(window._modalTimeout);
-  window._modalTimer = setInterval(() => {
-    remaining = Math.max(0, remaining - 0.5);
-    if (remaining <= 0) { clearInterval(window._modalTimer); return; }
-    document.getElementById('modalCountdown').textContent = remaining + '초';
-  }, 500);
   window._modalTimeout = setTimeout(closeModal, AUTO_CLOSE_MS);
 }
 function closeModal() {
