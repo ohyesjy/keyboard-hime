@@ -753,6 +753,14 @@
     background: rgba(10,5,10,0.7) !important;
     border: 2px solid rgba(233,69,96,0.4);
   }
+  /* 체인소맨 월드: 홈/뱃지/채팅만 남기고 나머지 nav 버튼 숨김 */
+  body.world-chainsaw .nav button[data-tab="finger"],
+  body.world-chainsaw .nav button[data-tab="word"],
+  body.world-chainsaw .nav button[data-tab="short"],
+  body.world-chainsaw .nav button[data-tab="long"],
+  body.world-chainsaw .nav button[data-tab="game"] {
+    display: none !important;
+  }
   body.world-chainsaw .nav button {
     color: #f0c0c0 !important;
     border: 1px solid transparent;
