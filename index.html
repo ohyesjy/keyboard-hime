@@ -9260,12 +9260,8 @@ document.getElementById('wordInput').addEventListener('keydown', e => {
     if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
       window.csSatisfyingSound();
     }
-    if (wordGame._lastResult) {
-      const r = wordGame._lastResult;
-      showResult(r.wpm, r.acc, r.xp, null, 700);
-      wordGame._lastResult = null;
-    }
-    setTimeout(() => nextWord(), 720);
+    wordGame._lastResult = null;
+    nextWord();
   }
 });
 // 첫 포커스 시에만 startWord (이후에는 호출 안 함 — 큐 리셋 방지)
@@ -9334,12 +9330,8 @@ document.getElementById('shortInput').addEventListener('keydown', e => {
     if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
       window.csSatisfyingSound();
     }
-    if (shortGame._lastResult) {
-      const r = shortGame._lastResult;
-      showResult(r.wpm, r.acc, r.xp, null, 500);
-      shortGame._lastResult = null;
-    }
-    setTimeout(() => nextShort(), 520);
+    shortGame._lastResult = null;
+    nextShort();
   }
 });
 // 첫 포커스 시에만 startShort
@@ -9391,12 +9383,8 @@ document.getElementById('longInput').addEventListener('keydown', e => {
     if (currentWorldId === 'chainsaw' && typeof window.csSatisfyingSound === 'function') {
       window.csSatisfyingSound();
     }
-    if (longGame._lastResult) {
-      const r = longGame._lastResult;
-      showResult(r.wpm, r.acc, r.xp, null, 500);
-      longGame._lastResult = null;
-    }
-    setTimeout(() => nextLong(), 520);
+    longGame._lastResult = null;
+    nextLong();
   }
 });
 document.getElementById('longInput').addEventListener('focus', () => {
