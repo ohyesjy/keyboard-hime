@@ -1342,6 +1342,45 @@
   }
 
   /* Dashboard */
+  .dash-row {
+    display: flex; gap: 14px;
+    margin: 10px 0 22px 0;
+    align-items: stretch;
+  }
+  .dash-row > .dash-header { flex: 1 1 50%; margin: 0; min-width: 0; }
+  .dash-row > .dash-game-shortcut {
+    flex: 1 1 50%;
+    background: #fff;
+    border: 3px solid #111; border-radius: 20px;
+    box-shadow: 5px 5px 0 #111;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-height: 110px;
+  }
+  .dash-row > .dash-game-shortcut:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #111;
+  }
+  .dash-row > .dash-game-shortcut img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .dash-row > .dash-game-shortcut .dash-game-fallback {
+    font-size: 22px; font-weight: 900;
+    background: linear-gradient(135deg, #ffd43b, #fab005);
+    color: #111; padding: 14px 26px;
+    border-radius: 16px; border: 2.5px solid #111;
+    box-shadow: 3px 3px 0 #111;
+  }
+  /* 모바일: 세로 스택 */
+  @media (max-width: 600px) {
+    .dash-row { flex-direction: column; }
+    .dash-row > .dash-header,
+    .dash-row > .dash-game-shortcut { flex: 1 1 auto; }
+  }
   .dash-header {
     display: flex; align-items: center; gap: 20px;
     background: #fff;
@@ -3531,16 +3570,21 @@
     <div style="display:flex;gap:8px;margin-bottom:10px;">
       <button class="btn ghost" onclick="changeWorld()" style="font-size:12px;">🌍 월드 변경</button>
     </div>
-    <div class="dash-header">
-      <div class="dash-portrait" id="dashPortrait">
-        <img id="dashImg" src="" alt="">
-        <div class="dash-fallback">🎮</div>
+    <div class="dash-row">
+      <div class="dash-header">
+        <div class="dash-portrait" id="dashPortrait">
+          <img id="dashImg" src="" alt="">
+          <div class="dash-fallback">🎮</div>
+        </div>
+        <div class="dash-info">
+          <h2 id="dashName">이름</h2>
+          <div class="dash-level"><b>Lv.<span id="dashLevel">1</span></b></div>
+          <div class="xp-bar"><div class="xp-fill" id="dashXpFill"></div></div>
+          <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
+        </div>
       </div>
-      <div class="dash-info">
-        <h2 id="dashName">이름</h2>
-        <div class="dash-level"><b>Lv.<span id="dashLevel">1</span></b></div>
-        <div class="xp-bar"><div class="xp-fill" id="dashXpFill"></div></div>
-        <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
+      <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
+        <span class="dash-game-fallback">🎮 게임</span>
       </div>
     </div>
 
