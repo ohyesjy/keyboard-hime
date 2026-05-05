@@ -7744,14 +7744,15 @@ function makeGame(opts) {
       const xp = Math.round(this.text.length * (acc/100) * 0.5 + 10);
       state.xp += xp;
       save();
-      successSound();
-      emojiBurst();
       // Clear input so lingering keystrokes don't carry over
       this.inputEl.blur();
       this.inputEl.value = '';
       // 결과 저장 (Enter 시 표시용)
       this._lastResult = { wpm: wpm, acc: acc, xp: xp };
       if (!this.deferResult) {
+        // 손가락자리 연습 등 기존 게임은 효과음 + 팝업 유지
+        successSound();
+        emojiBurst();
         // Pass null → showResult picks a face matching the current character
         showResult(wpm, acc, xp, null);
       }
