@@ -7715,7 +7715,7 @@ function makeGame(opts) {
       }
       if (last === expected && allMatch) {
         this.pos = val.length;
-        clickSound();
+        // clickSound는 글로벌 keydown 리스너에서 처리 (모든 키 누름마다 1회)
         state.totalChars++;
         addMission('chars', 1);
         this.updateLive();
@@ -11715,6 +11715,23 @@ function wdShowSpeedUp() {
   // 초기화 시도
   if (document.readyState !== 'loading') setTimeout(function(){ init(); }, 100);
   else document.addEventListener('DOMContentLoaded', function(){ setTimeout(init, 100); });
+})();
+</script>
+
+
+<script>
+/* 모든 타이핑 input에서 키 누름마다 clickSound 호출 — Enter 포함 */
+(function() {
+  // 키 반복(KeyboardEvent.repeat) 무시, modifier 단독 키 무시
+  var IGNORE_KEYS = new Set(['Shift','Control','Alt','Meta','CapsLock','NumLock','ScrollLock','Tab','Escape','Dead']);
+  document.addEventListener('keydown', function(e) {
+    if (e.repeat) return;
+    if (IGNORE_KEYS.has(e.key)) return;
+    // 입력창에 포커스가 있을 때만
+    var t = document.activeElement;
+    if (!t || !t.classList || !t.classList.contains('input-area')) return;
+    try { if (typeof clickSound === 'function') clickSound(); } catch(_) {}
+  }, true);
 })();
 </script>
 
