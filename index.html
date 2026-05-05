@@ -9068,10 +9068,15 @@ function updatePracticeGameUI(type) {
   const infoEl = document.getElementById(type + 'GameInfo');
   if (countEl) countEl.textContent = count;
   if (btnEl) {
-    btnEl.disabled = count < 5;
+    // 체인소맨 월드는 항시 활성화
+    if (currentWorldId === 'chainsaw') {
+      btnEl.disabled = false;
+    } else {
+      btnEl.disabled = count < 5;
+    }
     if (count >= 5) btnEl.style.animation = 'newGet 0.8s ease-out';
   }
-  if (infoEl && count >= 5) {
+  if (infoEl && (count >= 5 || currentWorldId === 'chainsaw')) {
     infoEl.innerHTML = '🎮 <b style="color:#2f9e44">게임 해금!</b>';
   }
 }
@@ -9137,7 +9142,7 @@ function nextWord() {
 function skipWord() { nextWord(); }
 function openWordGame() {
   const count = state.practiceCompletes?.word || 0;
-  if (count < 5) { pop('🔒 낱말 연습 5회를 완료해야 게임이 열려요!'); return; }
+  if (count < 5 && currentWorldId !== 'chainsaw') { pop('🔒 낱말 연습 5회를 완료해야 게임이 열려요!'); return; }
   // 기존 fingerGame 모달 활용 또는 별도 게임
   document.getElementById('fingerGameModal').classList.add('show');
   showGameSelect();
@@ -9191,7 +9196,7 @@ function nextShort() {
 function skipShort() { nextShort(); }
 function openShortGame() {
   const count = state.practiceCompletes?.short || 0;
-  if (count < 5) { pop('🔒 단문 연습 5회를 완료해야 게임이 열려요!'); return; }
+  if (count < 5 && currentWorldId !== 'chainsaw') { pop('🔒 단문 연습 5회를 완료해야 게임이 열려요!'); return; }
   document.getElementById('fingerGameModal').classList.add('show');
   showGameSelect();
 }
@@ -9227,7 +9232,7 @@ function startLong() {
 }
 function openLongGame() {
   const count = state.practiceCompletes?.long || 0;
-  if (count < 5) { pop('🔒 장문 연습 5회를 완료해야 게임이 열려요!'); return; }
+  if (count < 5 && currentWorldId !== 'chainsaw') { pop('🔒 장문 연습 5회를 완료해야 게임이 열려요!'); return; }
   document.getElementById('fingerGameModal').classList.add('show');
   showGameSelect();
 }
