@@ -4417,7 +4417,7 @@
       <div><strong id="rXp">+0</strong><span>XP</span></div>
     </div>
     <p id="modalMsg" style="margin-bottom:6px;color:#666;"></p>
-    <button id="modalGameUnlock" type="button" onclick="openGameFromUnlock()" style="display:none;background:linear-gradient(135deg,#ffd43b,#fab005);color:#111;font-weight:900;font-size:16px;padding:10px 20px;border-radius:12px;margin:8px 0;border:2.5px solid #111;animation:newGet 0.8s ease-out;cursor:pointer;box-shadow:3px 3px 0 #111;">🎮 게임 시작하기!</button>
+    <button id="modalGameUnlock" hidden type="button" onclick="openGameFromUnlock()" style="display:none;background:linear-gradient(135deg,#ffd43b,#fab005);color:#111;font-weight:900;font-size:16px;padding:10px 20px;border-radius:12px;margin:8px 0;border:2.5px solid #111;animation:newGet 0.8s ease-out;cursor:pointer;box-shadow:3px 3px 0 #111;">🎮 게임 시작하기!</button>
     <button class="btn" onclick="closeModal()">좋아요! (Space)</button>
   </div>
 </div>
@@ -7914,6 +7914,10 @@ function pickPopupFace(acc) {
 let _showGameUnlockInModal = false;
 
 function showResult(wpm, acc, xp, img, durationMs) {
+  // 낱말/단문/장문 연습 탭에선 결과 팝업 띄우지 않음
+  if (typeof currentTab !== 'undefined' && (currentTab === 'word' || currentTab === 'short' || currentTab === 'long')) {
+    return;
+  }
   document.getElementById('rWpm').textContent = wpm;
   document.getElementById('rAcc').textContent = acc + '%';
   document.getElementById('rXp').textContent = '+' + xp;
@@ -9198,10 +9202,7 @@ function trackPracticeComplete(type) {
   try { addMission('practice_' + type, 1); } catch(e) {}
   updatePracticeGameUI(type);
   // 5회 이상이면 현재 표시 중인 결과 모달에 게임해금 배너 즉시 표시
-  if (state.practiceCompletes[type] >= 5) {
-    const unlockBanner = document.getElementById('modalGameUnlock');
-    if (unlockBanner) unlockBanner.style.display = '';
-  }
+  // 5회 완료 시 게임 시작하기 버튼 표시 제거 (사용자 요청)
   // 최초 5회 달성 시(정확히 5) 한 번만 큰 해금 팝업 띄움
   if (state.practiceCompletes[type] === 5) {
     setTimeout(() => { try { showGameUnlockPopup(); } catch(e) {} }, 600);
