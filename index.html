@@ -3586,6 +3586,44 @@
     from { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)) brightness(1); }
     to { filter: drop-shadow(2px 6px 4px rgba(0,0,0,0.5)) brightness(1.04); }
   }
+  /* 식빵 먹기 애니메이션 */
+  @keyframes csBreadEat {
+    0%   { transform: scale(1) translateX(0) rotate(0deg); opacity: 1; }
+    40%  { transform: scale(0.7) translateX(-50px) rotate(-15deg); opacity: 0.95; }
+    75%  { transform: scale(0.3) translateX(-110px) translateY(8px) rotate(-30deg); opacity: 0.7; }
+    100% { transform: scale(0) translateX(-140px) translateY(20px) rotate(-45deg); opacity: 0; }
+  }
+  .cs-jump-bld.eating {
+    animation: csBreadEat 0.6s cubic-bezier(0.4, 0.1, 0.5, 1) forwards;
+    pointer-events: none;
+    z-index: 10;
+    transform-origin: 50% 100%;
+  }
+  /* 포치타 냠냠 */
+  @keyframes csPochitaChomp {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    25%      { transform: scaleY(0.85) scaleX(1.15); }
+    50%      { transform: scaleY(1.05) scaleX(0.92); }
+    75%      { transform: scaleY(0.95) scaleX(1.05); }
+  }
+  .cs-jump-pochita.chomp {
+    animation: csPochitaChomp 0.42s ease-in-out;
+  }
+  /* 먹기 효과 파티클 */
+  .cs-eat-burst {
+    position: absolute;
+    font-size: 22px;
+    pointer-events: none;
+    animation: csEatBurst 0.8s ease-out forwards;
+    z-index: 11;
+    transform-origin: 50% 50%;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  @keyframes csEatBurst {
+    0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+    25%  { transform: translateY(-15px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-50px) scale(1); opacity: 0; }
+  }
   .cs-jump-buildings { position: absolute; inset: 0; pointer-events: none; }
   /* 토스트 식빵 장애물 */
   .cs-jump-bld {
@@ -4152,7 +4190,7 @@
     <div id="csJump" class="cs-jump" style="display:none">
       <div class="cs-jump-header">
         <h2>🏃 포치타 빌딩 점프!</h2>
-        <p class="hint">빌딩에 적힌 낱말을 타이핑하고 <b>엔터</b>를 누르면 포치타가 점프해요. 빌딩이 높을수록 긴 낱말이에요!</p>
+        <p class="hint">식빵에 적힌 낱말을 타이핑하고 <b>엔터</b>를 누르면 포치타가 냠냠 먹어요! 못 먹으면 부딪혀요 🍞</p>
       </div>
       <div class="cs-jump-stats">
         <div class="cs-jump-stat">⭐ <b id="csJumpScore">0</b></div>
@@ -11385,19 +11423,12 @@ function wdShowSpeedUp() {
     raf = requestAnimationFrame(loop);
   }
   function update(dt) {
-    // pochita physics — 점프 시 앞으로 이동, 착지 후 base로 슬라이드 복귀
-    if (state.jumping || state.pochitaY > 0) {
-      state.vy -= GRAVITY * dt;
-      state.pochitaY += state.vy * dt;
-      state.pochitaX += state.vx * dt;
-      if (state.pochitaY <= 0) {
-        state.pochitaY = 0; state.vy = 0; state.vx = 0;
-        state.jumping = false;
-      }
-    } else if (state.pochitaX > POCHITA_X) {
-      // 지상에서 base 위치로 천천히 슬라이드 복귀
-      state.pochitaX = Math.max(POCHITA_X, state.pochitaX - 220 * dt);
-    }
+    // pochita 물리 제거됨 — 항상 지면 / 항상 base 위치
+    state.pochitaY = 0;
+    state.vy = 0;
+    state.vx = 0;
+    state.pochitaX = POCHITA_X;
+    state.jumping = false;
     // building spawn
     state.spawnTimer -= dt;
     if (state.spawnTimer <= 0) {
@@ -11421,17 +11452,14 @@ function wdShowSpeedUp() {
         var pRight = state.pochitaX + POCHITA_W;
         var overlapping = bldRight > pLeft && bldLeft < pRight;
         if (overlapping) {
-          // pochita 발 위치
-          var pochitaBottom = state.pochitaY;
-          if (pochitaBottom < b.height) {
-            // 충돌!
-            b.hit = true;
-            state.lives--;
-            // shake effect
-            stage.style.animation = 'csShake 0.3s';
-            setTimeout(function(){ if (stage) stage.style.animation = ''; }, 320);
-            if (state.lives <= 0) gameOver();
-          }
+          // 안 먹은 식빵이 닿으면 무조건 충돌 (점프 없음)
+          b.hit = true;
+          state.lives--;
+          updateUI();
+          // 흔들림 효과
+          stage.style.animation = 'csShake 0.3s';
+          setTimeout(function(){ if (stage) stage.style.animation = ''; }, 320);
+          if (state.lives <= 0) gameOver();
         }
         // passed without hit
         if (!b.hit && bldRight < pLeft) {
@@ -11444,13 +11472,48 @@ function wdShowSpeedUp() {
     // remove off-screen
     state.buildings = state.buildings.filter(function(b){ return b.x > -100; });
   }
+  function eatActiveBread(bread) {
+    // DOM에서 해당 식빵 찾아서 떼어내고 먹기 애니메이션
+    var domEls = buildingsEl.querySelectorAll('.cs-jump-bld');
+    var visIdx = 0;
+    for (var k = 0; k < state.buildings.length; k++) {
+      if (state.buildings[k] === bread) break;
+      if (!state.buildings[k].cleared && !state.buildings[k].hit) visIdx++;
+    }
+    var el = domEls[visIdx];
+    if (el) {
+      var rect = el.getBoundingClientRect();
+      var stageRect = stage.getBoundingClientRect();
+      var clone = el.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.left = (rect.left - stageRect.left) + 'px';
+      clone.style.bottom = (stageRect.bottom - rect.bottom) + 'px';
+      clone.style.height = el.offsetHeight + 'px';
+      clone.style.width = el.offsetWidth + 'px';
+      clone.classList.add('eating');
+      stage.appendChild(clone);
+      setTimeout(function(){ if (clone.parentNode) clone.parentNode.removeChild(clone); }, 700);
+    }
+    bread.cleared = true;
+    state.score++;
+    updateUI();
+    // 포치타 냠냠 애니메이션
+    pochita.classList.add('chomp');
+    setTimeout(function(){ pochita.classList.remove('chomp'); }, 450);
+    // 별 파티클 효과
+    var burst = document.createElement('div');
+    burst.className = 'cs-eat-burst';
+    burst.textContent = '✨🍞✨';
+    burst.style.left = (state.pochitaX + 50) + 'px';
+    burst.style.bottom = (GROUND_Y + 60) + 'px';
+    stage.appendChild(burst);
+    setTimeout(function(){ if (burst.parentNode) burst.parentNode.removeChild(burst); }, 800);
+  }
   function render() {
-    // pochita 위치
-    pochita.style.bottom = (GROUND_Y + state.pochitaY) + 'px';
+    // pochita 위치 — 점프 제거됨, 항상 지면에
+    pochita.style.bottom = GROUND_Y + 'px';
     pochita.style.left = state.pochitaX + 'px';
-    // 점프 중 살짝 앞으로 기울이기 (활공 느낌)
-    var rot = state.jumping ? (state.vy > 0 ? -8 : 12) : 0;
-    pochita.style.transform = 'rotate(' + rot + 'deg)';
+    pochita.style.transform = '';
     // 배경 파랄랙스 (느리게 좌측 이동)
     state.bgOffset = (state.bgOffset || 0) - SPEED * 0.4 * (1/60);
     stage.style.backgroundPositionX = state.bgOffset + 'px';
@@ -11499,19 +11562,9 @@ function wdShowSpeedUp() {
     if (e.key === 'Enter') {
       var active = getActiveBuilding();
       if (active && inputEl.value === active.word) {
-        // jump! 점프 높이를 빌딩 높이보다 살짝 더
-        var jumpH = active.height + 50;
-        // jumpH = (vy^2)/(2g)  →  vy = sqrt(2*g*h)
-        state.vy = Math.sqrt(2 * GRAVITY * jumpH);
-        // 점프 시 앞으로도 이동 (빌딩을 호 그리며 넘기) — 체공 시간만큼 빌딩 너비+여유 거리 이동
-        var airTime = 2 * state.vy / GRAVITY;
-        state.vx = (BLD_W * 2.2) / airTime;
-        state.jumping = true;
-        active.cleared = true;
-        state.score++;
-        updateUI();
+        // 식빵 먹기 효과 — 점프 대신
+        eatActiveBread(active);
         inputEl.value = '';
-        // 점프 사운드
         try { if (typeof successSound === 'function') successSound(); } catch(_) {}
       } else {
         // 미완료 시 입력 클리어 (잘못된 단어 방지)
