@@ -5223,6 +5223,19 @@ if (!allState) {
   localStorage.setItem('khime_v2', JSON.stringify(allState));
 }
 
+// ★ 체인소맨 월드 1회성 리셋 — 도감을 "하루 1개" 룰로 새로 시작
+//   denji_play 캐릭터의 진행상태(badges/totalChars/xp/missions/도감기록 등)만 초기화
+//   다른 월드(프리렌, 사이키 등) 캐릭터 상태는 건드리지 않음
+//   이전 자동 지급 시스템에서 받은 mission_clear 등 뱃지 잔재 제거가 목적
+if (!localStorage.getItem('khime_reset_chainsaw_v1')) {
+  if (allState.chars && allState.chars.denji_play) {
+    delete allState.chars.denji_play;
+    localStorage.setItem('khime_v2', JSON.stringify(allState));
+    localStorage.setItem('khime_updated_at', String(Date.now()));
+  }
+  localStorage.setItem('khime_reset_chainsaw_v1', '1');
+}
+
 // `state` is the ACTIVE character's bucket, aliased so existing code works.
 // `state.currentChar` is synthesized from allState.currentChar.
 let state;
