@@ -12121,47 +12121,47 @@ function wdShowSpeedUp() {
 
 <script>
 window.csSatisfyingSound = function() {
-  // 🥔 포테토칩 씹는 소리 — 짧고 거친 노이즈 버스트 6~9번을 빠르게 연속 재생
-  //   대역폭 1500~3500Hz 중심으로 바삭함 강조, 약한 저역 임팩트로 "씹는" 느낌
+  // 🩷 귀여운 "뽕! 삥♪" — 부드러운 2음 상승 + 살짝 반짝
+  //   사인+트라이앵글 위주, 부드러운 어택, 따뜻한 톤
   try {
     var ctx = (window._csAudioCtx = window._csAudioCtx || new (window.AudioContext || window.webkitAudioContext)());
     var now = ctx.currentTime;
 
-    var crunches = 6 + Math.floor(Math.random() * 4); // 6~9개
-    var t = now;
-    for (var i = 0; i < crunches; i++) {
-      // 각 버스트 사이 12~28ms 랜덤 간격 → 자연스럽게 끊김
-      t += 0.012 + Math.random() * 0.016;
-      var len = 0.014 + Math.random() * 0.018; // 14~32ms
-      var size = Math.max(1, Math.floor(ctx.sampleRate * len));
-      var buf = ctx.createBuffer(1, size, ctx.sampleRate);
-      var data = buf.getChannelData(0);
-      // 거친 노이즈 + 빠른 감쇠 (씹을 때의 부서짐)
-      for (var k = 0; k < size; k++) {
-        data[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / size, 0.5);
-      }
-      var src = ctx.createBufferSource();
-      src.buffer = buf;
-      // 1차: 저역 컷 (저역 보일라 잘림 방지 X — 살짝 남김)
-      var hp = ctx.createBiquadFilter();
-      hp.type = 'highpass';
-      hp.frequency.value = 800 + Math.random() * 400;
-      // 2차: 1500~3500Hz 대역 강조 (감자칩 바삭한 톤)
-      var bp = ctx.createBiquadFilter();
-      bp.type = 'peaking';
-      bp.frequency.value = 1800 + Math.random() * 1500;
-      bp.Q.value = 2.5;
-      bp.gain.value = 6;
-      // 3차: 6kHz 위 살짝 컷 — 너무 쇳소리 안 나게
-      var lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 6500;
-      var g = ctx.createGain();
-      g.gain.setValueAtTime(0.18 + Math.random() * 0.08, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + len);
-      src.connect(hp).connect(bp).connect(lp).connect(g).connect(ctx.destination);
-      src.start(t); src.stop(t + len + 0.01);
-    }
+    // 1) 첫 음 "뽕" — 사인 파, 600Hz → 880Hz 살짝 상승 (90ms)
+    var o1 = ctx.createOscillator();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(600, now);
+    o1.frequency.exponentialRampToValueAtTime(880, now + 0.09);
+    var g1 = ctx.createGain();
+    g1.gain.setValueAtTime(0, now);
+    g1.gain.linearRampToValueAtTime(0.22, now + 0.012); // 부드러운 어택
+    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+    o1.connect(g1).connect(ctx.destination);
+    o1.start(now); o1.stop(now + 0.15);
+
+    // 2) 둘째 음 "삥" — 트라이앵글, 1320Hz (한 음 위, E6) (110ms)
+    var t2 = now + 0.08;
+    var o2 = ctx.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.value = 1320;
+    var g2 = ctx.createGain();
+    g2.gain.setValueAtTime(0, t2);
+    g2.gain.linearRampToValueAtTime(0.18, t2 + 0.012);
+    g2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.16);
+    o2.connect(g2).connect(ctx.destination);
+    o2.start(t2); o2.stop(t2 + 0.18);
+
+    // 3) 마무리 반짝 — 사인 2200Hz, 짧게 (귀엽게 살짝만)
+    var t3 = now + 0.16;
+    var o3 = ctx.createOscillator();
+    o3.type = 'sine';
+    o3.frequency.value = 2200;
+    var g3 = ctx.createGain();
+    g3.gain.setValueAtTime(0, t3);
+    g3.gain.linearRampToValueAtTime(0.08, t3 + 0.008);
+    g3.gain.exponentialRampToValueAtTime(0.001, t3 + 0.12);
+    o3.connect(g3).connect(ctx.destination);
+    o3.start(t3); o3.stop(t3 + 0.14);
   } catch(e) {}
 };
 </script>
