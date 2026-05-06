@@ -3589,145 +3589,6 @@
   body.world-chainsaw #wdRestartBtn { display: none !important; }
   body:not(.world-chainsaw) #csJump { display: none !important; }
   body.world-chainsaw #csJump { display: block !important; }
-  /* ========= 사이키 월드 전용: 쿠스오 낱말 떨어뜨리기 게임 ========= */
-  body.world-saiki #tab-game > h2,
-  body.world-saiki #tab-game > p.hint,
-  body.world-saiki #wdSelect,
-  body.world-saiki #wdGame,
-  body.world-saiki #wdRestartBtn { display: none !important; }
-  body:not(.world-saiki) #saikiDrop { display: none !important; }
-  body.world-saiki #saikiDrop { display: block !important; }
-
-  .saiki-drop { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-  .saiki-drop-header h2 { color: #f76707; margin: 0 0 4px; font-size: 22px; }
-  .saiki-drop-header .hint { color: #555; font-size: 13px; margin: 0 0 12px; }
-  .sd-stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-  .sd-stage-card {
-    background: linear-gradient(135deg, #fff4e0, #ffe0b3);
-    border: 3px solid #f76707;
-    border-radius: 16px;
-    padding: 16px 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 3px 3px 0 #d9480f;
-  }
-  .sd-stage-card:hover { transform: translateY(-3px); box-shadow: 4px 6px 0 #d9480f; }
-  .sd-stage-card:active { transform: translateY(0); box-shadow: 2px 2px 0 #d9480f; }
-  .sd-stage-ico { font-size: 32px; margin-bottom: 6px; }
-  .sd-stage-name { font-weight: 900; color: #d9480f; font-size: 15px; margin-bottom: 4px; }
-  .sd-stage-desc { color: #855; font-size: 11px; line-height: 1.35; }
-
-  .sd-hud { display: flex; gap: 8px; margin: 8px 0; }
-  .sd-hud-box {
-    flex: 1; text-align: center;
-    background: linear-gradient(135deg, #fff4e0, #ffe0b3);
-    border: 2px solid #f76707; border-radius: 10px;
-    padding: 6px 4px; font-weight: 800;
-  }
-  .sd-hud-box span { display: block; font-size: 10px; color: #855; font-weight: 600; }
-  .sd-hud-box b { font-size: 16px; color: #d9480f; }
-
-  .sd-stage {
-    position: relative;
-    width: 100%; height: 380px;
-    border: 3px solid #f76707; border-radius: 14px;
-    overflow: hidden;
-    background-size: cover; background-position: center;
-    box-shadow: inset 0 0 24px rgba(0,0,0,0.15);
-  }
-  .sd-stage.bg-cat    { background-image: url('사이키쿠스오/saiki_game_bg_cat.jpeg'); }
-  .sd-stage.bg-st1    { background-image: url('사이키쿠스오/saiki_game_bg_street1.jpeg'); }
-  .sd-stage.bg-st2    { background-image: url('사이키쿠스오/saiki_game_bg_street2.jpeg'); }
-  .sd-stage.bg-st3    { background-image: url('사이키쿠스오/saiki_game_bg_street3.jpeg'); }
-
-  .sd-player {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 110px; height: auto; pointer-events: none;
-    transition: left 0.18s cubic-bezier(.2,1.4,.4,1), transform 0.18s;
-    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35));
-    z-index: 5;
-  }
-  .sd-player.dodge-l { transform: translateX(-50%) translateX(-60px) rotate(-8deg); }
-  .sd-player.dodge-r { transform: translateX(-50%) translateX(60px) rotate(8deg); }
-  .sd-player.hit { animation: sdPlayerHit 0.45s ease; }
-  @keyframes sdPlayerHit {
-    0%,100% { filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35)); }
-    20%,60% { filter: drop-shadow(0 0 8px #ff5252) brightness(1.4); transform: translateX(-50%) rotate(-6deg); }
-    40%,80% { transform: translateX(-50%) rotate(6deg); }
-  }
-
-  .sd-randou {
-    position: absolute;
-    width: 90px; height: auto;
-    top: -100px;
-    pointer-events: none;
-    filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.35));
-    z-index: 4;
-    transition: opacity 0.2s;
-  }
-  .sd-randou.poof { animation: sdPoof 0.45s ease forwards; }
-  @keyframes sdPoof {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; }
-    100% { transform: scale(0.3) rotate(45deg); opacity: 0; }
-  }
-
-  .sd-bubble {
-    position: absolute;
-    background: #fff;
-    border: 3px solid #d9480f;
-    border-radius: 16px;
-    padding: 4px 10px;
-    font-weight: 900;
-    color: #d9480f;
-    font-size: 16px;
-    white-space: nowrap;
-    box-shadow: 2px 3px 0 #d9480f;
-    transform: translateX(-50%);
-    z-index: 4;
-    pointer-events: none;
-  }
-  .sd-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -10px; left: 50%; transform: translateX(-50%);
-    border: 7px solid transparent;
-    border-top-color: #d9480f;
-  }
-  .sd-bubble.matched {
-    background: #d9f7be; border-color: #2b8a3e; color: #2b8a3e;
-    box-shadow: 2px 3px 0 #2b8a3e;
-  }
-  .sd-bubble.matched::after { border-top-color: #2b8a3e; }
-
-  .sd-input-row { margin-top: 10px; display: flex; gap: 8px; }
-  .sd-input {
-    flex: 1; padding: 10px 14px; border-radius: 12px;
-    border: 3px solid #f76707; font-size: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #fff8ef;
-  }
-  .sd-input:focus { outline: none; border-color: #d9480f; box-shadow: 0 0 0 3px rgba(247,103,7,0.25); }
-
-  .sd-ready {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(255,244,224,0.92);
-    z-index: 10;
-  }
-  .sd-ready-big { font-size: 36px; font-weight: 900; color: #d9480f; margin-bottom: 6px; }
-  .sd-ready-sub { font-size: 14px; color: #855; text-align: center; margin-bottom: 14px; line-height: 1.5; }
-
-  .sd-over {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(255,244,224,0.95);
-    z-index: 11;
-  }
-  .sd-over-big { font-size: 32px; font-weight: 900; color: #d9480f; margin-bottom: 8px; }
-  .sd-over-score { font-size: 16px; color: #555; margin-bottom: 14px; }
-
   .cs-jump { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
   .cs-jump-header h2 { color: #e94560 !important; margin-bottom: 4px; }
   .cs-jump-header .hint { color: #555 !important; font-size: 13px; margin-bottom: 12px; }
@@ -4432,65 +4293,6 @@
       </div>
       <button class="btn ghost" id="csJumpRestart" onclick="csJumpStart()" style="margin-top:10px">🔁 다시 시작</button>
     </div>
-
-    <!-- ===== 사이키 월드 전용: 쿠스오 낱말 떨어뜨리기 게임 ===== -->
-    <div id="saikiDrop" class="saiki-drop" style="display:none">
-      <div class="saiki-drop-header">
-        <h2>🍪 쿠스오 vs 떨어지는 랜도!</h2>
-        <p class="hint">낱말이 적힌 랜도가 위에서 떨어져요. 정확히 타이핑하고 <b>엔터</b>를 누르면 쿠스오가 텔레파시로 피해요! ✨</p>
-      </div>
-
-      <!-- 단계 선택 -->
-      <div id="sdSelect">
-        <div class="sd-stages">
-          <div class="sd-stage-card" onclick="sdSelectStage('home')">
-            <div class="sd-stage-ico">🏠</div>
-            <div class="sd-stage-name">기본자리</div>
-            <div class="sd-stage-desc">ㅁㄴㅇㄹㅎ + ㅏㅓㅗㅣ</div>
-          </div>
-          <div class="sd-stage-card" onclick="sdSelectStage('top')">
-            <div class="sd-stage-ico">⬆️</div>
-            <div class="sd-stage-name">윗자리</div>
-            <div class="sd-stage-desc">ㅂㅈㄷㄱㅅ 포함</div>
-          </div>
-          <div class="sd-stage-card" onclick="sdSelectStage('bottom')">
-            <div class="sd-stage-ico">⬇️</div>
-            <div class="sd-stage-name">아래자리</div>
-            <div class="sd-stage-desc">ㅋㅌㅊㅍ 포함</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 게임 화면 -->
-      <div id="sdGame" style="display:none">
-        <div class="sd-hud">
-          <div class="sd-hud-box"><span>단계</span><b id="sdStageLbl">기본자리</b></div>
-          <div class="sd-hud-box"><span>점수</span><b id="sdScore">0</b></div>
-          <div class="sd-hud-box"><span>콤보</span><b id="sdCombo">0</b></div>
-          <div class="sd-hud-box"><span>생명</span><b id="sdLives">3</b></div>
-          <div class="sd-hud-box"><span>최고</span><b id="sdBest">0</b></div>
-        </div>
-        <div class="sd-stage" id="sdStage">
-          <img class="sd-player" id="sdPlayer" src="사이키쿠스오/saiki_game_player.png" alt="플레이어">
-          <div class="sd-ready" id="sdReady">
-            <div class="sd-ready-big">READY?</div>
-            <div class="sd-ready-sub"><b id="sdReadyStage">기본자리</b><br>낱말이 적힌 랜도가 떨어져요. 정답+엔터로 피하세요! 💢</div>
-            <button class="btn" onclick="sdBegin()">▶ 시작!</button>
-          </div>
-          <div class="sd-over" id="sdOver" style="display:none">
-            <div class="sd-over-big">💔 게임 끝!</div>
-            <div class="sd-over-score">점수 <b id="sdOverScore">0</b> · 최고 <b id="sdOverBest">0</b></div>
-            <button class="btn" onclick="sdRestart()">🔁 다시 시작</button>
-            <button class="btn ghost" onclick="sdBackToSelect()" style="margin-top:6px">↩ 단계 선택</button>
-          </div>
-        </div>
-        <div class="sd-input-row">
-          <input type="text" id="sdInput" class="sd-input" placeholder="낱말 입력 후 Enter" autocomplete="off" autocapitalize="off">
-        </div>
-        <button class="btn ghost" onclick="sdBackToSelect()" style="margin-top:8px">↩ 단계 선택으로</button>
-      </div>
-    </div>
-
     <h2>🎮 낱말 떨어뜨리기</h2>
     <p class="hint">낱말이 땅에 닿기 전에 타이핑해서 막아요! 15초마다 점점 빨라져요 🔥</p>
 
@@ -6500,7 +6302,6 @@ function pickStreak7Reward(worldId) {
 /* ========= 🎰 시윤 깜짝 이벤트 (시윤 입장 시 1회 발동)
    단문 3회 연습 → 축하 + 덴지(체인소맨) 월드 비번 직접 공개 (선택 단계 없음) */
 function checkSpecialEvent() {
-  return; // 깜짝선물 이벤트 비활성화 (사용자 요청 2026-05-06)
   try {
     const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
     if (nick !== '시윤') return; // 시윤 전용
@@ -6556,7 +6357,6 @@ function showEventGachaAnnounce() {
 
 // 단문 완료 시 호출 (이벤트 카운터)
 function onShortCompleteForEvent() {
-  return; // 깜짝선물 이벤트 비활성화 (사용자 요청 2026-05-06)
   if (!state.eventGacha || !state.eventGacha.announced || state.eventGacha.gachaDone) return;
   state.eventGacha.shortDone = (state.eventGacha.shortDone || 0) + 1;
   save();
@@ -12318,301 +12118,63 @@ function wdShowSpeedUp() {
 
 
 <script>
-/* ===================== 사이키 월드 전용: 쿠스오 낱말 떨어뜨리기 게임 ===================== */
-const SD_BG_LIST = ['bg-cat', 'bg-st1', 'bg-st2', 'bg-st3'];
-const sdGame = {
-  running: false,
-  ended: false,
-  stage: 'home',
-  score: 0,
-  combo: 0,
-  lives: 3,
-  best: 0,
-  randous: [],
-  fallSpeed: 38,    // px/s
-  spawnInterval: 2200, // ms
-  spawnTimerId: null,
-  fallTimerId: null,
-  lastTick: 0,
-  startedAt: 0,
-};
-
-const SD_STAGE_LABELS = { home: '기본자리', top: '윗자리', bottom: '아래자리' };
-
-function sdGetWordPool() {
-  if (sdGame.stage === 'top') return WORDS_TOP;
-  if (sdGame.stage === 'bottom') return WORDS_BOTTOM;
-  return WORDS_HOME;
-}
-
-function sdSelectStage(stage) {
-  sdGame.stage = stage;
-  document.getElementById('sdSelect').style.display = 'none';
-  document.getElementById('sdGame').style.display = 'block';
-  document.getElementById('sdStageLbl').textContent = SD_STAGE_LABELS[stage] || '기본자리';
-  document.getElementById('sdReadyStage').textContent = SD_STAGE_LABELS[stage] || '기본자리';
-  // 배경 무작위로 1개
-  const stageEl = document.getElementById('sdStage');
-  SD_BG_LIST.forEach(c => stageEl.classList.remove(c));
-  stageEl.classList.add(SD_BG_LIST[Math.floor(Math.random() * SD_BG_LIST.length)]);
-  // 베스트 점수 로드
-  const bestKey = 'sd_best_' + stage;
-  sdGame.best = parseInt(localStorage.getItem(bestKey) || '0', 10);
-  document.getElementById('sdBest').textContent = sdGame.best;
-  // 초기 ready 화면
-  document.getElementById('sdReady').style.display = 'flex';
-  document.getElementById('sdOver').style.display = 'none';
-  // 점수/생명 초기화
-  sdGame.score = 0; sdGame.combo = 0; sdGame.lives = 3;
-  document.getElementById('sdScore').textContent = 0;
-  document.getElementById('sdCombo').textContent = 0;
-  document.getElementById('sdLives').textContent = 3;
-  // 기존 랜도 제거
-  sdClearRandous();
-}
-
-function sdBackToSelect() {
-  sdStop();
-  document.getElementById('sdSelect').style.display = 'block';
-  document.getElementById('sdGame').style.display = 'none';
-}
-
-function sdBegin() {
-  document.getElementById('sdReady').style.display = 'none';
-  document.getElementById('sdOver').style.display = 'none';
-  sdGame.running = true;
-  sdGame.ended = false;
-  sdGame.score = 0; sdGame.combo = 0; sdGame.lives = 3;
-  sdGame.fallSpeed = 38;
-  sdGame.spawnInterval = 2200;
-  sdGame.startedAt = performance.now();
-  sdGame.lastTick = performance.now();
-  document.getElementById('sdScore').textContent = 0;
-  document.getElementById('sdCombo').textContent = 0;
-  document.getElementById('sdLives').textContent = 3;
-  sdClearRandous();
-  // 첫 스폰 즉시
-  sdSpawnRandou();
-  // 스폰 타이머 — 시간 경과로 빨라지게 setTimeout 재귀
-  function sdSpawnLoop() {
-    if (!sdGame.running) return;
-    sdSpawnRandou();
-    const elapsed = (performance.now() - sdGame.startedAt) / 1000;
-    sdGame.fallSpeed = Math.min(110, 38 + elapsed * 1.6);
-    sdGame.spawnInterval = Math.max(900, 2200 - elapsed * 35);
-    sdGame.spawnTimerId = setTimeout(sdSpawnLoop, sdGame.spawnInterval);
-  }
-  sdGame.spawnTimerId = setTimeout(sdSpawnLoop, sdGame.spawnInterval);
-  // 낙하 애니메이션 루프
-  sdGame.fallTimerId = requestAnimationFrame(sdTick);
-  // 입력 포커스
-  setTimeout(() => { try { document.getElementById('sdInput').focus(); } catch(e) {} }, 100);
-}
-
-function sdSpawnRandou() {
-  const pool = sdGetWordPool();
-  if (!pool || !pool.length) return;
-  const word = pool[Math.floor(Math.random() * pool.length)];
-  const stageEl = document.getElementById('sdStage');
-  const stageW = stageEl.clientWidth || 360;
-  // 좌우 가장자리 30px 패딩
-  const x = 30 + Math.random() * Math.max(60, stageW - 120);
-  const img = document.createElement('img');
-  img.className = 'sd-randou';
-  img.src = '사이키쿠스오/saiki_game_randou.png';
-  img.alt = '랜도';
-  img.style.left = x + 'px';
-  img.style.top = '-100px';
-  const bubble = document.createElement('div');
-  bubble.className = 'sd-bubble';
-  bubble.textContent = word;
-  bubble.style.left = (x + 45) + 'px';   // 랜도 가운데 정렬 (랜도 width 90의 절반)
-  bubble.style.top = '-130px';
-  stageEl.appendChild(img);
-  stageEl.appendChild(bubble);
-  sdGame.randous.push({ img, bubble, word, y: -100, x });
-}
-
-function sdTick(now) {
-  if (!sdGame.running) return;
-  const dt = Math.min(50, now - sdGame.lastTick) / 1000;
-  sdGame.lastTick = now;
-  const stageEl = document.getElementById('sdStage');
-  const stageH = stageEl.clientHeight || 380;
-  // 모든 랜도 낙하
-  for (let i = sdGame.randous.length - 1; i >= 0; i--) {
-    const r = sdGame.randous[i];
-    r.y += sdGame.fallSpeed * dt;
-    r.img.style.top = r.y + 'px';
-    r.bubble.style.top = (r.y - 28) + 'px';
-    // 바닥 도달
-    if (r.y > stageH - 60) {
-      sdHitPlayer(i);
-    }
-  }
-  if (sdGame.running) sdGame.fallTimerId = requestAnimationFrame(sdTick);
-}
-
-function sdHitPlayer(idx) {
-  const r = sdGame.randous[idx];
-  if (!r) return;
-  // 시각 효과
-  try { r.img.remove(); r.bubble.remove(); } catch(e) {}
-  sdGame.randous.splice(idx, 1);
-  sdGame.lives--;
-  sdGame.combo = 0;
-  document.getElementById('sdLives').textContent = sdGame.lives;
-  document.getElementById('sdCombo').textContent = 0;
-  const player = document.getElementById('sdPlayer');
-  player.classList.remove('hit');
-  void player.offsetWidth; // restart anim
-  player.classList.add('hit');
-  setTimeout(() => player.classList.remove('hit'), 480);
-  try { if (typeof errorSound === 'function') errorSound(); } catch(e) {}
-  if (sdGame.lives <= 0) sdGameOver();
-}
-
-function sdHandleEnter() {
-  const inputEl = document.getElementById('sdInput');
-  const val = (inputEl.value || '').trim();
-  inputEl.value = '';
-  if (!val || !sdGame.running) return;
-  // 입력과 일치하는 가장 아래쪽(가장 위험한) 랜도 찾기
-  let bestIdx = -1, bestY = -Infinity;
-  for (let i = 0; i < sdGame.randous.length; i++) {
-    if (sdGame.randous[i].word === val && sdGame.randous[i].y > bestY) {
-      bestY = sdGame.randous[i].y;
-      bestIdx = i;
-    }
-  }
-  if (bestIdx === -1) {
-    // 빗맞춤 — 콤보 끊김
-    sdGame.combo = 0;
-    document.getElementById('sdCombo').textContent = 0;
-    try { if (typeof wrongSound === 'function') wrongSound(); } catch(e) {}
-    return;
-  }
-  sdDodgeAndPoof(bestIdx);
-}
-
-function sdDodgeAndPoof(idx) {
-  const r = sdGame.randous[idx];
-  if (!r) return;
-  // 랜도 펑 — 사라지는 애니메이션
-  r.bubble.classList.add('matched');
-  r.img.classList.add('poof');
-  setTimeout(() => { try { r.img.remove(); r.bubble.remove(); } catch(e) {} }, 460);
-  sdGame.randous.splice(idx, 1);
-  // 플레이어 옆으로 살짝 피하기 (랜덤 좌/우)
-  const player = document.getElementById('sdPlayer');
-  player.classList.remove('dodge-l', 'dodge-r');
-  void player.offsetWidth;
-  const dir = Math.random() < 0.5 ? 'dodge-l' : 'dodge-r';
-  player.classList.add(dir);
-  setTimeout(() => player.classList.remove(dir), 220);
-  // 점수 + 콤보
-  sdGame.combo++;
-  const gain = 10 + Math.min(50, sdGame.combo * 2);
-  sdGame.score += gain;
-  document.getElementById('sdScore').textContent = sdGame.score;
-  document.getElementById('sdCombo').textContent = sdGame.combo;
-  // 효과음 — 귀여운 뽕삥
-  try { if (typeof window.csSatisfyingSound === 'function') window.csSatisfyingSound(); } catch(e) {}
-  // 콤보 5단위 — 보너스
-  if (sdGame.combo > 0 && sdGame.combo % 5 === 0) {
-    try { if (typeof comboSound === 'function') comboSound(sdGame.combo); } catch(e) {}
-  }
-}
-
-function sdClearRandous() {
-  sdGame.randous.forEach(r => {
-    try { r.img.remove(); r.bubble.remove(); } catch(e) {}
-  });
-  sdGame.randous = [];
-}
-
-function sdStop() {
-  sdGame.running = false;
-  if (sdGame.spawnTimerId) { clearTimeout(sdGame.spawnTimerId); sdGame.spawnTimerId = null; }
-  if (sdGame.fallTimerId) { cancelAnimationFrame(sdGame.fallTimerId); sdGame.fallTimerId = null; }
-  sdClearRandous();
-}
-
-function sdGameOver() {
-  sdStop();
-  sdGame.ended = true;
-  // 최고 점수 갱신
-  const bestKey = 'sd_best_' + sdGame.stage;
-  if (sdGame.score > sdGame.best) {
-    sdGame.best = sdGame.score;
-    localStorage.setItem(bestKey, String(sdGame.best));
-  }
-  document.getElementById('sdBest').textContent = sdGame.best;
-  document.getElementById('sdOverScore').textContent = sdGame.score;
-  document.getElementById('sdOverBest').textContent = sdGame.best;
-  document.getElementById('sdOver').style.display = 'flex';
-  try { if (typeof gameOverSound === 'function') gameOverSound(); } catch(e) {}
-}
-
-function sdRestart() {
-  document.getElementById('sdOver').style.display = 'none';
-  sdBegin();
-}
-
-// 입력 엔터 키 바인딩 (DOMContentLoaded 후 1회)
-document.addEventListener('DOMContentLoaded', function() {
-  const inputEl = document.getElementById('sdInput');
-  if (!inputEl) return;
-  inputEl.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sdHandleEnter();
-    }
-  });
-});
-
 window.csSatisfyingSound = function() {
-  // 🩷 귀여운 "뽕! 삥♪" — 부드러운 2음 상승 + 살짝 반짝
-  //   사인+트라이앵글 위주, 부드러운 어택, 따뜻한 톤
   try {
     var ctx = (window._csAudioCtx = window._csAudioCtx || new (window.AudioContext || window.webkitAudioContext)());
     var now = ctx.currentTime;
 
-    // 1) 첫 음 "뽕" — 사인 파, 600Hz → 880Hz 살짝 상승 (90ms)
-    var o1 = ctx.createOscillator();
-    o1.type = 'sine';
-    o1.frequency.setValueAtTime(600, now);
-    o1.frequency.exponentialRampToValueAtTime(880, now + 0.09);
-    var g1 = ctx.createGain();
-    g1.gain.setValueAtTime(0, now);
-    g1.gain.linearRampToValueAtTime(0.22, now + 0.012); // 부드러운 어택
-    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
-    o1.connect(g1).connect(ctx.destination);
-    o1.start(now); o1.stop(now + 0.15);
+    // 1) 베이스 충격 — 묵직한 타격감 (60Hz → 30Hz, 80ms)
+    var bass = ctx.createOscillator();
+    bass.type = 'sine';
+    bass.frequency.setValueAtTime(80, now);
+    bass.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+    var bassG = ctx.createGain();
+    bassG.gain.setValueAtTime(0.45, now);
+    bassG.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    bass.connect(bassG).connect(ctx.destination);
+    bass.start(now); bass.stop(now + 0.2);
 
-    // 2) 둘째 음 "삥" — 트라이앵글, 1320Hz (한 음 위, E6) (110ms)
-    var t2 = now + 0.08;
-    var o2 = ctx.createOscillator();
-    o2.type = 'triangle';
-    o2.frequency.value = 1320;
-    var g2 = ctx.createGain();
-    g2.gain.setValueAtTime(0, t2);
-    g2.gain.linearRampToValueAtTime(0.18, t2 + 0.012);
-    g2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.16);
-    o2.connect(g2).connect(ctx.destination);
-    o2.start(t2); o2.stop(t2 + 0.18);
+    // 2) 체인소 회전음 — 짧은 sawtooth 200~600Hz 스윕 (50ms)
+    var saw = ctx.createOscillator();
+    saw.type = 'sawtooth';
+    saw.frequency.setValueAtTime(180, now + 0.02);
+    saw.frequency.exponentialRampToValueAtTime(540, now + 0.08);
+    var sawG = ctx.createGain();
+    sawG.gain.setValueAtTime(0, now + 0.02);
+    sawG.gain.linearRampToValueAtTime(0.18, now + 0.04);
+    sawG.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    var sawHp = ctx.createBiquadFilter();
+    sawHp.type = 'highpass';
+    sawHp.frequency.value = 150;
+    saw.connect(sawHp).connect(sawG).connect(ctx.destination);
+    saw.start(now + 0.02); saw.stop(now + 0.14);
 
-    // 3) 마무리 반짝 — 사인 2200Hz, 짧게 (귀엽게 살짝만)
-    var t3 = now + 0.16;
-    var o3 = ctx.createOscillator();
-    o3.type = 'sine';
-    o3.frequency.value = 2200;
-    var g3 = ctx.createGain();
-    g3.gain.setValueAtTime(0, t3);
-    g3.gain.linearRampToValueAtTime(0.08, t3 + 0.008);
-    g3.gain.exponentialRampToValueAtTime(0.001, t3 + 0.12);
-    o3.connect(g3).connect(ctx.destination);
-    o3.start(t3); o3.stop(t3 + 0.14);
+    // 3) 상승 스파클 — 1500 → 4500Hz (펜타토닉 풍, 차임)
+    var sparkleNotes = [1318, 1568, 1864, 2349, 2794, 3520];
+    sparkleNotes.forEach(function(f, i) {
+      var t = now + 0.05 + i * 0.045;
+      var osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = f;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.13, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.2);
+    });
+
+    // 4) 마무리 차임 — 고음 종 (5000Hz, 250ms 페이드)
+    var chime = ctx.createOscillator();
+    chime.type = 'sine';
+    chime.frequency.value = 5000;
+    var chimeG = ctx.createGain();
+    var ct = now + 0.32;
+    chimeG.gain.setValueAtTime(0, ct);
+    chimeG.gain.linearRampToValueAtTime(0.18, ct + 0.01);
+    chimeG.gain.exponentialRampToValueAtTime(0.001, ct + 0.35);
+    chime.connect(chimeG).connect(ctx.destination);
+    chime.start(ct); chime.stop(ct + 0.4);
   } catch(e) {}
 };
 </script>
