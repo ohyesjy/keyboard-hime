@@ -1419,7 +1419,7 @@
     overflow: visible;
     position: relative;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
     transition: transform 0.15s, filter 0.15s;
     margin-left: auto;
   }
@@ -3463,6 +3463,70 @@
     100% { transform: translateY(40px) scale(0.3); opacity: 0; }
   }
 
+  /* ===== 쿠소게임 비주얼 추가 ===== */
+  .wd-stage-img {
+    display: block;
+    width: 88px; height: 88px;
+    object-fit: contain;
+    margin: 0 auto 6px;
+  }
+  .wd-word .wd-rendo {
+    width: 26px; height: 26px;
+    object-fit: contain;
+    margin-right: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .wd-stage.wd-bg-home,
+  .wd-stage.wd-bg-top,
+  .wd-stage.wd-bg-bottom,
+  .wd-stage.wd-bg-mix {
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+  }
+  .wd-stage.wd-bg-home   { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리.jpg'); }
+  .wd-stage.wd-bg-top    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리1.jpg'); }
+  .wd-stage.wd-bg-bottom { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리3.jpg'); }
+  .wd-stage.wd-bg-mix    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임 고양이.jpg'); }
+  .wd-girl {
+    position: absolute;
+    bottom: 22px; left: 50%;
+    width: 78px; height: 100px;
+    transform: translateX(-50%);
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
+    filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.35));
+  }
+  .wd-girl.shake { animation: wdGirlShake 0.4s ease-in-out; }
+  @keyframes wdGirlShake {
+    0%,100% { transform: translateX(-50%) rotate(0); }
+    20% { transform: translateX(-58%) rotate(-8deg); }
+    40% { transform: translateX(-42%) rotate(8deg); }
+    60% { transform: translateX(-56%) rotate(-5deg); }
+    80% { transform: translateX(-44%) rotate(5deg); }
+  }
+  .wd-word.wd-flyup {
+    animation: wdFlyUp 0.75s cubic-bezier(.4,0,.6,1) forwards;
+    pointer-events: none;
+  }
+  @keyframes wdFlyUp {
+    0%   { transform: scale(1) rotate(0); opacity: 1; }
+    20%  { transform: translateY(-30px) scale(1.08) rotate(-4deg); opacity: 1; }
+    100% { transform: translateY(-560px) scale(0.55) rotate(18deg); opacity: 0; }
+  }
+  .dash-game-caption {
+    display: none;
+    font-size: 11px; font-weight: 900;
+    color: #111;
+    text-align: center;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+  }
+  body.world-saiki .dash-game-caption { display: block; }
+
   .wd-shard {
     position: absolute;
     width: 10px; height: 10px;
@@ -3904,6 +3968,7 @@
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
+        <span class="dash-game-caption" id="dashGameCaption">ゲームしなさいよ。</span>
       </div>
     </div>
 
@@ -4301,17 +4366,17 @@
       <div class="wd-title">단계를 선택하세요</div>
       <div class="wd-stages">
         <div class="wd-stage-card" onclick="wdStart('home')">
-          <div class="wd-stage-ico">🏠</div>
+          <img class="wd-stage-img" src="사이키쿠스오/게임테루하시.jpg" alt="" onerror="wdImgFallback(this)">
           <div class="wd-stage-name">1단계 · 기본자리</div>
           <div class="wd-stage-desc">ㅁㄴㅇㄹㅎ·ㅏㅓㅗㅣ로 만든 쉬운 낱말</div>
         </div>
         <div class="wd-stage-card" onclick="wdStart('top')">
-          <div class="wd-stage-ico">⬆️</div>
+          <img class="wd-stage-img" src="사이키쿠스오/게임 윗자리.jpg" alt="" onerror="wdImgFallback(this)">
           <div class="wd-stage-name">2단계 · 윗줄</div>
           <div class="wd-stage-desc">ㅂㅈㄷㄱㅅ이 섞인 낱말</div>
         </div>
         <div class="wd-stage-card" onclick="wdStart('bottom')">
-          <div class="wd-stage-ico">⬇️</div>
+          <img class="wd-stage-img" src="사이키쿠스오/게임아랫자리.jpg" alt="" onerror="wdImgFallback(this)">
           <div class="wd-stage-name">3단계 · 아랫줄</div>
           <div class="wd-stage-desc">ㅋㅌㅊㅍ이 섞인 낱말</div>
         </div>
@@ -4340,6 +4405,7 @@
           <button class="btn" onclick="wdBegin()">▶ 시작!</button>
         </div>
         <div class="wd-speedup" id="wdSpeedUp">SPEED UP!</div>
+        <img class="wd-girl" id="wdGirl" src="사이키쿠스오/쿠스오게임 움직일캐릭터.jpg" alt="" onerror="wdImgFallback(this)">
         <div class="wd-ground"></div>
       </div>
       <input type="text" class="input-area wd-input" id="wdInput" placeholder="여기에 낱말을 입력!" autocomplete="off" style="display:none">
@@ -6547,7 +6613,7 @@ const WORLD_BUTTON_IMAGES = {
     short:  '사이키쿠스오/단문연습.jpeg',
     long:   '사이키쿠스오/장문연습.jpeg',
     chat:   '사이키쿠스오/채팅연습.jpeg',
-    game:   '사이키쿠스오/쿠스오 돌깨기게임버튼이미지.jpeg',
+    game:   '사이키쿠스오/쿠스오엄마.jpg',
   },
   chainsaw: {
     finger: '체인소맨/손가락자리.jpeg',
@@ -11181,6 +11247,13 @@ function parentResetConfirm() {
    - 생명 3개, 땅에 닿으면 -1
    ================================================================ */
 const WD_STAGE_LABELS = { home: '기본자리', top: '윗줄', bottom: '아랫줄', mix: '복합' };
+function wdImgFallback(img) {
+  var step = parseInt(img.dataset.fbStep || '0');
+  var exts = ['.jpeg', '.png', '.JPG', '.JPEG', '.PNG'];
+  if (step >= exts.length) { img.style.display = 'none'; return; }
+  img.dataset.fbStep = step + 1;
+  img.src = img.src.replace(/\.[^.\/]+$/, exts[step]);
+}
 const wordDropGame = {
   running: false, ended: false,
   stage: 'home',
@@ -11217,6 +11290,8 @@ function wdStart(stage) {
   // Clear stage
   const st = document.getElementById('wdStage');
   st.querySelectorAll('.wd-word, .wd-shard, .wd-combo-popup, .wd-flash, .wd-gameover').forEach(n => n.remove());
+  st.classList.remove('wd-bg-home', 'wd-bg-top', 'wd-bg-bottom', 'wd-bg-mix');
+  st.classList.add('wd-bg-' + stage);
 }
 
 function wdBegin() {
@@ -11298,19 +11373,36 @@ function wdSpawnWord() {
   }
   const el = document.createElement('div');
   el.className = 'wd-word';
-  el.innerHTML = `<span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
+  el.innerHTML = `<img class="wd-rendo" src="사이키쿠스오/쿠스오게임랜도.jpg" alt="" onerror="wdImgFallback(this)"><span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
   stage.appendChild(el);
   // Position: random x within stage, accounting for word width
   const stageW = stage.clientWidth;
   const wordW = el.offsetWidth || 90;
   const maxX = Math.max(10, stageW - wordW - 10);
-  const x = 10 + Math.random() * maxX;
+  const minGap = Math.max(8, Math.round(stageW * 0.04));
+  const N_TRIES = 10;
+  let x = 10 + Math.random() * maxX;
+  let bestX = x, bestOverlap = Infinity;
+  for (let i = 0; i < N_TRIES; i++) {
+    const cand = 10 + Math.random() * maxX;
+    let maxOverlap = 0;
+    for (const other of wordDropGame.words) {
+      if (other.x == null || other.width == null) continue;
+      const left  = Math.max(cand - minGap, other.x);
+      const right = Math.min(cand + wordW + minGap, other.x + other.width);
+      const overlap = right - left;
+      if (overlap > maxOverlap) maxOverlap = overlap;
+    }
+    if (maxOverlap <= 0) { bestX = cand; bestOverlap = 0; break; }
+    if (maxOverlap < bestOverlap) { bestOverlap = maxOverlap; bestX = cand; }
+  }
+  x = bestX;
   el.style.left = x + 'px';
   el.style.top = '-60px';
-  // Falling speed: scales with speedLvl. Level 1 ≈ 42 px/s, +18 per level, +small jitter.
+  // 쿠스오게임 — 전체 낙하 속도 20% 감속
   const baseSpeed = 42 + (wordDropGame.speedLvl - 1) * 18;
-  const speed = baseSpeed + Math.random() * 14;
-  wordDropGame.words.push({ el, text: word, y: -60, speed, id: Math.random().toString(36).slice(2) });
+  const speed = (baseSpeed + Math.random() * 14) * 0.8;
+  wordDropGame.words.push({ el, text: word, y: -60, speed, x, width: wordW, id: Math.random().toString(36).slice(2) });
 }
 
 function wdTick() {
@@ -11346,6 +11438,12 @@ function wdMissWord(w) {
   wordDropGame.lives--;
   document.getElementById('wdCombo').textContent = '0';
   document.getElementById('wdLives').textContent = wordDropGame.lives;
+  const girl = document.getElementById('wdGirl');
+  if (girl) {
+    girl.classList.remove('shake');
+    void girl.offsetWidth;
+    girl.classList.add('shake');
+  }
   if (stage) {
     const flash = document.createElement('div');
     flash.className = 'wd-flash red';
@@ -11367,28 +11465,13 @@ function wdBreakWord(w) {
   const stageRect = stage.getBoundingClientRect();
   const cx = rect.left - stageRect.left + rect.width/2;
   const cy = rect.top - stageRect.top + rect.height/2;
-  w.el.classList.add('wd-break');
-  // Shards
-  for (let i = 0; i < 10; i++) {
-    const s = document.createElement('div');
-    s.className = 'wd-shard';
-    s.style.left = (cx - 5) + 'px';
-    s.style.top = (cy - 5) + 'px';
-    const ang = (i / 10) * Math.PI * 2;
-    const dist = 50 + Math.random() * 50;
-    s.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
-    s.style.setProperty('--sy', Math.sin(ang) * dist + 'px');
-    s.style.setProperty('--sr', (Math.random() * 720 - 360) + 'deg');
-    stage.appendChild(s);
-    setTimeout(() => s.remove(), 650);
-  }
-  // White flash
+  w.el.classList.add('wd-flyup');
   const flash = document.createElement('div');
   flash.className = 'wd-flash';
   stage.appendChild(flash);
   setTimeout(() => flash.remove(), 220);
   try { wordBreakSound(); } catch(e) {}
-  setTimeout(() => { if (w.el) w.el.remove(); }, 460);
+  setTimeout(() => { if (w.el) w.el.remove(); }, 780);
   // Score
   wordDropGame.combo++;
   const base = 10 + w.text.length * 2;
