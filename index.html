@@ -3526,6 +3526,15 @@
     text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
   }
   body.world-saiki .dash-game-caption { display: block; }
+  .dash-mom-extra {
+    display: none;
+    width: 64px; height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2.5px solid #111;
+    box-shadow: 2px 2px 0 #111;
+  }
+  body.world-saiki .dash-mom-extra { display: block; }
 
   .wd-shard {
     position: absolute;
@@ -3966,6 +3975,7 @@
         <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
       </div>
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
+        <img class="dash-mom-extra" src="사이키쿠스오/쿠스오엄마.jpg" alt="엄마" onerror="wdImgFallback(this)">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
         <span class="dash-game-caption" id="dashGameCaption">ゲームしなさいよ。</span>
