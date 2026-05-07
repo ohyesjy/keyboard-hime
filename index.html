@@ -3423,27 +3423,45 @@
   .wd-ready-sub { color: #fff; font-weight: 700; font-size: 15px; line-height: 1.7; }
   .wd-ready-sub b { color: #ffd43b; }
 
-  /* Falling word block */
+  /* Falling word block — 랜도가 말풍선 들고 떨어지는 형태 */
   .wd-word {
     position: absolute;
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 10px 18px;
-    background: linear-gradient(135deg,#fff,#ffe8a1);
-    border: 3px solid #111;
-    border-radius: 14px;
-    font-size: 22px; font-weight: 900; color: #111;
-    box-shadow: 3px 3px 0 #111, inset 0 -3px 0 rgba(0,0,0,0.1);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
     white-space: nowrap;
     user-select: none;
     z-index: 2;
-    transition: box-shadow 0.1s;
+    background: transparent;
+    border: none;
+    padding: 0;
+    transition: transform 0.1s;
+  }
+  .wd-bubble {
+    background: linear-gradient(135deg,#fff,#ffe8a1);
+    border: 3px solid #111;
+    border-radius: 14px;
+    padding: 8px 16px;
+    font-size: 20px; font-weight: 900; color: #111;
+    box-shadow: 3px 3px 0 #111, inset 0 -3px 0 rgba(0,0,0,0.1);
+    margin-bottom: 0;
+    position: relative;
+  }
+  .wd-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border: 7px solid transparent;
+    border-top-color: #111;
   }
   .wd-word .wd-typed { color: #2b8a3e; }
   .wd-word .wd-rest { color: #111; }
-  .wd-word.wd-active {
+  .wd-word.wd-active { transform: scale(1.08); }
+  .wd-word.wd-active .wd-bubble {
     background: linear-gradient(135deg,#fff,#b2f2bb);
     box-shadow: 4px 4px 0 #2b8a3e, 0 0 16px rgba(64,192,87,0.7);
-    transform: scale(1.08);
   }
   .wd-word.wd-break {
     animation: wdBreakAnim 0.45s forwards;
@@ -3457,9 +3475,13 @@
   .wd-word.wd-miss {
     animation: wdMissAnim 0.4s forwards;
   }
+  .wd-word.wd-miss .wd-bubble {
+    background: #ff6b6b;
+    transition: background 0.15s;
+  }
   @keyframes wdMissAnim {
     0% { transform: scale(1); filter: brightness(1); }
-    40% { transform: scale(1.1); filter: brightness(0.5) hue-rotate(320deg); background: #ff6b6b; }
+    40% { transform: scale(1.1); filter: brightness(0.5) hue-rotate(320deg); }
     100% { transform: translateY(40px) scale(0.3); opacity: 0; }
   }
 
@@ -3471,10 +3493,9 @@
     margin: 0 auto 6px;
   }
   .wd-word .wd-rendo {
-    width: 26px; height: 26px;
+    width: 80px; height: 100px;
     object-fit: contain;
-    margin-right: 6px;
-    vertical-align: middle;
+    margin-top: 4px;
     flex-shrink: 0;
   }
   .wd-stage.wd-bg-home,
@@ -3528,13 +3549,21 @@
   body.world-saiki .dash-game-caption { display: block; }
   .dash-mom-extra {
     display: none;
-    width: 64px; height: 64px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2.5px solid #111;
-    box-shadow: 2px 2px 0 #111;
+    width: 130px; height: auto;
+    max-height: 160px;
+    object-fit: contain;
+    cursor: pointer;
+    margin-left: auto;
+    transition: transform 0.15s, filter 0.15s;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35));
+    mix-blend-mode: darken;
+  }
+  .dash-mom-extra:hover {
+    transform: translateY(-2px) scale(1.04);
+    filter: drop-shadow(0 0 14px rgba(233,69,96,0.55));
   }
   body.world-saiki .dash-mom-extra { display: block; }
+  body.world-saiki #dashGameShortcut { display: none !important; }
 
   .wd-shard {
     position: absolute;
@@ -3975,11 +4004,11 @@
         <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
       </div>
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
-        <img class="dash-mom-extra" src="사이키쿠스오/사이키쿠스오엄마도감.jpg" alt="엄마" onerror="wdImgFallback(this)">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
         <span class="dash-game-caption" id="dashGameCaption">ゲームしなさいよ。</span>
       </div>
+      <img class="dash-mom-extra" src="사이키쿠스오/사이키쿠스오엄마도감.jpg" alt="엄마" onclick="showTab('game')" onerror="wdImgFallback(this)">
     </div>
 
     <h3 class="comic-h3">📌 오늘의 미션</h3>
@@ -11384,7 +11413,7 @@ function wdSpawnWord() {
   }
   const el = document.createElement('div');
   el.className = 'wd-word';
-  el.innerHTML = `<img class="wd-rendo" src="사이키쿠스오/saiki_game_randou.png" alt="" onerror="wdImgFallback(this)"><span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
+  el.innerHTML = `<div class="wd-bubble"><span class="wd-typed"></span><span class="wd-rest">${word}</span></div><img class="wd-rendo" src="사이키쿠스오/saiki_game_randou.png" alt="" onerror="wdImgFallback(this)">`;
   stage.appendChild(el);
   // Position: random x within stage, accounting for word width
   const stageW = stage.clientWidth;
