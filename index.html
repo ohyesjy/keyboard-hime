@@ -3485,10 +3485,10 @@
     background-position: center bottom;
     background-repeat: no-repeat;
   }
-  .wd-stage.wd-bg-home   { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리.jpg'); }
-  .wd-stage.wd-bg-top    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리1.jpg'); }
-  .wd-stage.wd-bg-bottom { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임거리3.jpg'); }
-  .wd-stage.wd-bg-mix    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/쿠스오게임 고양이.jpg'); }
+  .wd-stage.wd-bg-home   { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/saiki_game_bg_street1.jpeg'); }
+  .wd-stage.wd-bg-top    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/saiki_game_bg_street2.jpeg'); }
+  .wd-stage.wd-bg-bottom { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/saiki_game_bg_street3.jpeg'); }
+  .wd-stage.wd-bg-mix    { background-image: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%), url('사이키쿠스오/saiki_game_bg_cat.jpeg'); }
   .wd-girl {
     position: absolute;
     bottom: 22px; left: 50%;
@@ -3975,7 +3975,7 @@
         <div class="xp-text"><span id="dashXp">0</span> / <span id="dashXpNext">100</span> XP</div>
       </div>
       <div class="dash-game-shortcut" id="dashGameShortcut" onclick="showTab('game')" role="button" tabindex="0" aria-label="게임 바로가기">
-        <img class="dash-mom-extra" src="사이키쿠스오/쿠스오엄마.jpg" alt="엄마" onerror="wdImgFallback(this)">
+        <img class="dash-mom-extra" src="사이키쿠스오/사이키쿠스오엄마도감.jpg" alt="엄마" onerror="wdImgFallback(this)">
         <img id="dashGameShortcutImg" alt="게임" style="display:none">
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
         <span class="dash-game-caption" id="dashGameCaption">ゲームしなさいよ。</span>
@@ -4376,7 +4376,7 @@
       <div class="wd-title">단계를 선택하세요</div>
       <div class="wd-stages">
         <div class="wd-stage-card" onclick="wdStart('home')">
-          <img class="wd-stage-img" src="사이키쿠스오/게임테루하시.jpg" alt="" onerror="wdImgFallback(this)">
+          <img class="wd-stage-img" src="사이키쿠스오/테루하시도감.jpg" alt="" onerror="wdImgFallback(this)">
           <div class="wd-stage-name">1단계 · 기본자리</div>
           <div class="wd-stage-desc">ㅁㄴㅇㄹㅎ·ㅏㅓㅗㅣ로 만든 쉬운 낱말</div>
         </div>
@@ -4415,7 +4415,7 @@
           <button class="btn" onclick="wdBegin()">▶ 시작!</button>
         </div>
         <div class="wd-speedup" id="wdSpeedUp">SPEED UP!</div>
-        <img class="wd-girl" id="wdGirl" src="사이키쿠스오/쿠스오게임 움직일캐릭터.jpg" alt="" onerror="wdImgFallback(this)">
+        <img class="wd-girl" id="wdGirl" src="사이키쿠스오/saiki_game_player.png" alt="" onerror="wdImgFallback(this)">
         <div class="wd-ground"></div>
       </div>
       <input type="text" class="input-area wd-input" id="wdInput" placeholder="여기에 낱말을 입력!" autocomplete="off" style="display:none">
@@ -6624,7 +6624,7 @@ const WORLD_BUTTON_IMAGES = {
     short:  '사이키쿠스오/단문연습.jpeg',
     long:   '사이키쿠스오/장문연습.jpeg',
     chat:   '사이키쿠스오/채팅연습.jpeg',
-    game:   '사이키쿠스오/쿠스오엄마.jpg',
+    game:   '사이키쿠스오/사이키쿠스오엄마도감.jpg',
   },
   chainsaw: {
     finger: '체인소맨/손가락자리.jpeg',
@@ -11384,7 +11384,7 @@ function wdSpawnWord() {
   }
   const el = document.createElement('div');
   el.className = 'wd-word';
-  el.innerHTML = `<img class="wd-rendo" src="사이키쿠스오/쿠스오게임랜도.jpg" alt="" onerror="wdImgFallback(this)"><span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
+  el.innerHTML = `<img class="wd-rendo" src="사이키쿠스오/saiki_game_randou.png" alt="" onerror="wdImgFallback(this)"><span class="wd-typed"></span><span class="wd-rest">${word}</span>`;
   stage.appendChild(el);
   // Position: random x within stage, accounting for word width
   const stageW = stage.clientWidth;
