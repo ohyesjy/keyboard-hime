@@ -6368,6 +6368,7 @@ function pickStreak7Reward(worldId) {
 /* ========= 🎰 시윤 깜짝 이벤트 (시윤 입장 시 1회 발동)
    단문 3회 연습 → 축하 + 덴지(체인소맨) 월드 비번 직접 공개 (선택 단계 없음) */
 function checkSpecialEvent() {
+  return; // 깜짝 선물 팝업 비활성화 (사용자 요청)
   try {
     const nick = (typeof cloudSync !== 'undefined' && cloudSync.nickname) ? cloudSync.nickname : '';
     if (nick !== '시윤') return; // 시윤 전용
