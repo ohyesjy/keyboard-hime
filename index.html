@@ -3486,12 +3486,38 @@
   }
 
   /* ===== 쿠소게임 비주얼 추가 ===== */
-  .wd-stage-img {
-    display: block;
-    width: 88px; height: 88px;
-    object-fit: contain;
-    margin: 0 auto 6px;
+  .wd-stage-img { display: none; }
+  .wd-stage-card {
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    min-height: 200px;
   }
+  .wd-stage-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.65) 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .wd-stage-card > * { position: relative; z-index: 1; }
+  .wd-stage-card .wd-stage-name {
+    color: #fff;
+    text-shadow:
+      2px 2px 0 #111, -2px -2px 0 #111, 2px -2px 0 #111, -2px 2px 0 #111,
+      0 2px 0 #111, 2px 0 0 #111, -2px 0 0 #111, 0 -2px 0 #111,
+      4px 4px 0 rgba(0,0,0,0.5);
+  }
+  .wd-stage-card .wd-stage-desc {
+    color: #fff;
+    text-shadow: 1px 1px 0 #111, -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111;
+  }
+  .wd-card-home   { background-image: url('사이키쿠스오/쿠스오병맛포즈.jpg'); }
+  .wd-card-top    { background-image: url('사이키쿠스오/게임테루하시.jpg'); }
+  .wd-card-bottom { background-image: url('사이키쿠스오/사이키쿠스오미니.jpg'); }
+  .wd-card-mix    { background-image: url('사이키쿠스오/섞인낱말버튼.jpg'); }
   .wd-word .wd-rendo {
     width: 80px; height: 100px;
     object-fit: contain;
@@ -3556,7 +3582,6 @@
     margin-left: auto;
     transition: transform 0.15s, filter 0.15s;
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35));
-    mix-blend-mode: darken;
   }
   .dash-mom-extra:hover {
     transform: translateY(-2px) scale(1.04);
@@ -4008,7 +4033,7 @@
         <span class="dash-game-fallback" id="dashGameFallback">🎮 게임</span>
         <span class="dash-game-caption" id="dashGameCaption">ゲームしなさいよ。</span>
       </div>
-      <img class="dash-mom-extra" src="사이키쿠스오/사이키쿠스오엄마도감.jpg" alt="엄마" onclick="showTab('game')" onerror="wdImgFallback(this)">
+      <img class="dash-mom-extra" src="사이키쿠스오/saiki_mom_cutout.png" alt="엄마" onclick="showTab('game')" onerror="wdImgFallback(this)">
     </div>
 
     <h3 class="comic-h3">📌 오늘의 미션</h3>
@@ -4404,23 +4429,19 @@
     <div id="wdSelect" class="wd-select">
       <div class="wd-title">단계를 선택하세요</div>
       <div class="wd-stages">
-        <div class="wd-stage-card" onclick="wdStart('home')">
-          <img class="wd-stage-img" src="사이키쿠스오/테루하시도감.jpg" alt="" onerror="wdImgFallback(this)">
+        <div class="wd-stage-card wd-card-home" onclick="wdStart('home')">
           <div class="wd-stage-name">1단계 · 기본자리</div>
           <div class="wd-stage-desc">ㅁㄴㅇㄹㅎ·ㅏㅓㅗㅣ로 만든 쉬운 낱말</div>
         </div>
-        <div class="wd-stage-card" onclick="wdStart('top')">
-          <img class="wd-stage-img" src="사이키쿠스오/게임 윗자리.jpg" alt="" onerror="wdImgFallback(this)">
+        <div class="wd-stage-card wd-card-top" onclick="wdStart('top')">
           <div class="wd-stage-name">2단계 · 윗줄</div>
           <div class="wd-stage-desc">ㅂㅈㄷㄱㅅ이 섞인 낱말</div>
         </div>
-        <div class="wd-stage-card" onclick="wdStart('bottom')">
-          <img class="wd-stage-img" src="사이키쿠스오/게임아랫자리.jpg" alt="" onerror="wdImgFallback(this)">
+        <div class="wd-stage-card wd-card-bottom" onclick="wdStart('bottom')">
           <div class="wd-stage-name">3단계 · 아랫줄</div>
           <div class="wd-stage-desc">ㅋㅌㅊㅍ이 섞인 낱말</div>
         </div>
-        <div class="wd-stage-card" onclick="wdStart('mix')">
-          <div class="wd-stage-ico">🌈</div>
+        <div class="wd-stage-card wd-card-mix" onclick="wdStart('mix')">
           <div class="wd-stage-name">4단계 · 섞인 낱말</div>
           <div class="wd-stage-desc">모든 글자가 섞여서 떨어져요!</div>
         </div>
@@ -6653,7 +6674,7 @@ const WORLD_BUTTON_IMAGES = {
     short:  '사이키쿠스오/단문연습.jpeg',
     long:   '사이키쿠스오/장문연습.jpeg',
     chat:   '사이키쿠스오/채팅연습.jpeg',
-    game:   '사이키쿠스오/사이키쿠스오엄마도감.jpg',
+    game:   '사이키쿠스오/saiki_mom_cutout.png',
   },
   chainsaw: {
     finger: '체인소맨/손가락자리.jpeg',
